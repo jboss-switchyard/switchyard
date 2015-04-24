@@ -20,8 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.enterprise.context.spi.CreationalContext;
-import javax.xml.namespace.QName;
-
 import org.jboss.logging.Logger;
 import org.switchyard.Exchange;
 import org.switchyard.ExchangePattern;
@@ -75,8 +73,8 @@ public class ServiceProxyHandler extends BaseServiceHandler implements ServiceHa
      */
     private CreationalContext<?> _beanCreationalContext;
     
-    private Map<String, ServiceReference> _references = 
-            new HashMap<String, ServiceReference>();
+    private Map<String, Map<String,ServiceReference>> _references = 
+            new HashMap<String, Map<String,ServiceReference>>();
 
     /**
      * Public constructor.
@@ -122,8 +120,13 @@ public class ServiceProxyHandler extends BaseServiceHandler implements ServiceHa
      * @param reference service reference
      */
     public void addReference(ServiceReference reference) {
-        QName refName = ComponentNames.unqualify(reference);
-        _references.put(refName.getLocalPart(), reference);
+        String unqualifiedName = ComponentNames.unqualify(reference).getLocalPart();
+        Map<String, ServiceReference> refs = _references.get(unqualifiedName);
+        if (refs == null) {
+            refs = new HashMap<String,ServiceReference>();
+            _references.put(unqualifiedName, refs);
+        }
+        refs.put(reference.getName().getLocalPart(), reference);
     }
 
     /**
@@ -224,15 +227,43 @@ public class ServiceProxyHandler extends BaseServiceHandler implements ServiceHa
     protected void doStart() {
         // Initialise any client proxies to the started service...
         for (ClientProxyBean proxyBean : _beanDeploymentMetaData.getClientProxies()) {
-            if (_references.containsKey(proxyBean.getServiceName())) {
-                proxyBean.setService(_references.get(proxyBean.getServiceName()));
+            if (proxyBean.getServiceName().contains("/")) {
+                String qualifiedName = proxyBean.getServiceName();
+                String unqualifiedName = proxyBean.getServiceName().split("/")[1];
+                if (_references.containsKey(unqualifiedName)) {
+                    Map<String,ServiceReference> refs = _references.get(unqualifiedName);
+                    if (refs.containsKey(qualifiedName)) {
+                        proxyBean.setService(refs.get(qualifiedName));
+                    }
+                }
+            } else if (_references.containsKey(proxyBean.getServiceName())) {
+                Map<String,ServiceReference> refs = _references.get(proxyBean.getServiceName());
+                ServiceReference target = refs.values().iterator().next();
+                proxyBean.setService(target);
+                if (refs.size() > 1) {
+                    BeanLogger.ROOT_LOGGER.ambiguousReferenceInjection(proxyBean.getServiceName(), target.getName().getLocalPart());
+                }
             }
         }
         
         // Initialise ReferenceInvokers
         for (ReferenceInvokerBean invokerBean : _beanDeploymentMetaData.getReferenceInvokers()) {
-            if (_references.containsKey(invokerBean.getServiceName())) {
-                invokerBean.setReference(_references.get(invokerBean.getServiceName()));
+            if (invokerBean.getServiceName().contains("/")) {
+                String qualifiedName = invokerBean.getServiceName();
+                String unqualifiedName = invokerBean.getServiceName().split("/")[1];
+                if (_references.containsKey(unqualifiedName)) {
+                    Map<String,ServiceReference> refs = _references.get(unqualifiedName);
+                    if (refs.containsKey(qualifiedName)) {
+                        invokerBean.setReference(refs.get(qualifiedName));
+                    }
+                }
+            } else if (_references.containsKey(invokerBean.getServiceName())) {
+                Map<String,ServiceReference> refs = _references.get(invokerBean.getServiceName());
+                ServiceReference target = refs.values().iterator().next();
+                invokerBean.setReference(target);
+                if (refs.size() > 1) {
+                    BeanLogger.ROOT_LOGGER.ambiguousReferenceInjection(invokerBean.getServiceName(), target.getName().getLocalPart());
+                }
             }
         }
     }

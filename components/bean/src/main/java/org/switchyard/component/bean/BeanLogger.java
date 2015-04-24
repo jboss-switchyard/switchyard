@@ -29,5 +29,14 @@ public interface BeanLogger {
     @Message(id = 30000, value = "Property '%s' has incompatible type: Bean '%s' is expecting '%s', but was '%s'. ignoring...")
     void propertyHasIncompatibleTypeBean(String propAnnoName, String serviceMetadataClassName, String fieldTypeName, String propertyClassName);
 
+    /**
+     * ambiguousReferenceInjection method definition.
+     * @param refName refName
+     * @param usedRefName usedRefName
+     */
+    @LogMessage(level = Level.WARN)
+    @Message(id = 30001, value = "Ambiguous bean service reference - reference name '%s' is not unique. Using '%s' anyway. Add @Reference(\"componentName/referenceName\") instead if multiple bean services have a reference to the same service.")
+    void ambiguousReferenceInjection(String refName, String usedRefName);
+
 }
 

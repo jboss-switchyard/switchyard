@@ -123,13 +123,16 @@ public class MessageProxy implements Message {
     /**
      * Sets the {@link Message} for the current thread.
      * @param message the message
+     * @return the message previously associated with current thread
      */
-    public static void setMessage(Message message) {
+    public static Message setMessage(Message message) {
+        Message orig = MESSAGE.get();
         if (message != null) {
             MESSAGE.set(message);
         } else {
             MESSAGE.remove();
         }
+        return orig;
     }
 
 }

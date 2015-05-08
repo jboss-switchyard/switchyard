@@ -29,6 +29,7 @@ import org.switchyard.ServiceDomain;
 import org.switchyard.common.type.Classes;
 import org.switchyard.common.util.ProviderRegistry;
 import org.switchyard.component.common.composer.MessageComposer;
+import org.switchyard.component.resteasy.RestEasyLogger;
 import org.switchyard.component.resteasy.composer.RESTEasyComposition;
 import org.switchyard.component.resteasy.composer.RESTEasyBindingData;
 import org.switchyard.component.resteasy.config.model.RESTEasyBindingModel;
@@ -95,11 +96,18 @@ public class OutboundHandler extends BaseServiceHandler {
             while (st.hasMoreTokens()) {
                 String className = st.nextToken().trim();
                 Class<?> clazz = Classes.forName(className);
+                Boolean multiParams = false;
                 for (Method method : clazz.getMethods()) {
                     // ignore the as method to allow declaration in client interfaces
                     if (!("as".equals(method.getName()) && Arrays.equals(method.getParameterTypes(), CLASS_ARG_ARRAY))) {
                         _methodMap.put(method.getName(), invokerFactory.createInvoker(path, clazz, method, _config));
                     }
+                    if (!multiParams && (method.getParameterTypes().length > 1)) {
+                        multiParams = true;
+                    }
+                }
+                if (multiParams) {
+                    RestEasyLogger.ROOT_LOGGER.defaultRESTEasyMessageComposerDoesnTHandleMultipleInputParameters(clazz.getName());
                 }
             }
             // Create and configure the RESTEasy message composer

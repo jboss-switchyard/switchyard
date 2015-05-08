@@ -23,9 +23,9 @@ public interface RestEasyLogger {
     /**
      * defaultRESTEasyMessageComposerDoesnTHandleMultipleInputParameters method definition.
      */
-    @LogMessage(level = Level.WARN)
-    @Message(id = 37600, value = "Default RESTEasy Message Composer doesn't handle multiple input parameters.")
-    void defaultRESTEasyMessageComposerDoesnTHandleMultipleInputParameters();
+    @LogMessage(level = Level.INFO)
+    @Message(id = 37600, value = "Default RESTEasy Message Composer doesn't handle multiple input parameters. Please ensure it is handled in a custom composer. Class \"%s\"")
+    void defaultRESTEasyMessageComposerDoesnTHandleMultipleInputParameters(String className);
 
     /**
      * unexpectedExceptionComposingInboundMessage method definition.

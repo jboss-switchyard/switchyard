@@ -14,12 +14,14 @@
  
 package org.switchyard.component.resteasy.util;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.jboss.logging.Logger;
 import org.switchyard.common.type.Classes;
 import org.switchyard.component.resteasy.InboundHandler;
+import org.switchyard.component.resteasy.RestEasyLogger;
 
 /**
  * Utility class that generates RESTEasy singleton instances.
@@ -48,6 +50,16 @@ public final class ClassUtil {
                 LOGGER.trace("Generating instance for " + resourceIntf);
             }
             Class<?> clazz = Classes.forName(resourceIntf);
+            Boolean multiParams = false;
+            for (Method method : clazz.getMethods()) {
+                if (method.getParameterTypes().length > 1) {
+                    multiParams = true;
+                    break;
+                }
+            }
+            if (multiParams) {
+                RestEasyLogger.ROOT_LOGGER.defaultRESTEasyMessageComposerDoesnTHandleMultipleInputParameters(clazz.getName());
+            }
             Object instance = RESTEasyProxy.newInstance(handler, clazz);
             instances.add(instance);
         }

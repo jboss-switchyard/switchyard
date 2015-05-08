@@ -43,9 +43,6 @@ public class RESTEasyMessageComposer extends BaseMessageComposer<RESTEasyBinding
         }
         message.setContent(content);
 
-        if (source.getParameters().length > 1) {
-            RestEasyLogger.ROOT_LOGGER.defaultRESTEasyMessageComposerDoesnTHandleMultipleInputParameters();
-        }
         return message;
     }
 

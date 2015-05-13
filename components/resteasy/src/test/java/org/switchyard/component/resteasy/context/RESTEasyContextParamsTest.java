@@ -139,7 +139,8 @@ public class RESTEasyContextParamsTest {
         } catch (InvocationFaultException e) {
             expectedException = ((HandlerException) e.getFaultMessage().getContent()).getCause().getCause().getMessage();
         }
-        Assert.assertEquals("could not find writer for content-type text/plain type: java.lang.String", expectedException);
+        String expected = "could not find writer for content-type text/plain type: java.lang.String";
+        Assert.assertTrue("expected=[" + expected + "], but was=[" + expectedException + "]", expectedException.contains(expected));
     }
 
     @Test

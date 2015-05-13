@@ -93,7 +93,6 @@ public class CamelMQTTBindingTest {
         }
     }
 
-    @Ignore("Disable for now due to https://issues.jboss.org/browse/SWITCHYARD-2221")
     @Test
     public void testReferenceBinding() throws Exception {
         MQTT mqtt = new MQTT();

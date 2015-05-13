@@ -72,14 +72,11 @@ public class CamelMQTTBindingQuickstartTest {
             publishConnection.connect();
             publishConnection.publish(TOPIC_INPUT, MESSAGE_INPUT.getBytes(), QoS.AT_LEAST_ONCE, false);
 
-            /* Disable for now due to https://issues.jboss.org/browse/SWITCHYARD-2221
-             * 
             Message message = subscribeConnection.receive(1000, TimeUnit.MILLISECONDS);
             Assert.assertNotNull("No output message from " + TOPIC_OUTPUT, message);
             Assert.assertEquals(MESSAGE_OUTPUT, new String(message.getPayload()));
             Assert.assertNull("More than one message received from " + TOPIC_OUTPUT,
                     subscribeConnection.receive(1000, TimeUnit.MILLISECONDS));
-             */
         } finally {
             if (publishConnection != null && publishConnection.isConnected()) {
                 publishConnection.disconnect();

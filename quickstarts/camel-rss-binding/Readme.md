@@ -74,7 +74,7 @@ karaf@root> features:uninstall switchyard-quickstart-camel-rss-binding
 
 Expected Results
 ================
-The titles and artists of the iTunes singles top 10 should print out to the console.   There will
+The titles and artists of the iTunes singles top 10 should print out to the server log. There will
 be a delay between the printing of each entry.
 
 

@@ -74,7 +74,7 @@ karaf@root> features:uninstall switchyard-quickstart-camel-atom-binding
 
 Expected Output
 ===============
-The title and artist of the iTunes top 10 singles should print to the console.    There will be a delay between each entry that prints to the console.
+The title and artist of the iTunes top 10 singles should print to the server log. There will be a delay between each entry that prints to the console.
 
 
 ## Further Reading

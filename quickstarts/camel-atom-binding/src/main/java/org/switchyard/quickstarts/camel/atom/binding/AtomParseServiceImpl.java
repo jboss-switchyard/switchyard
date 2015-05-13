@@ -17,7 +17,7 @@
 package org.switchyard.quickstarts.camel.atom.binding;
 
 import org.apache.abdera.parser.stax.FOMEntry;
-
+import org.apache.log4j.Logger;
 import org.switchyard.component.bean.Service;
 
 /**
@@ -26,9 +26,11 @@ import org.switchyard.component.bean.Service;
 @Service(AtomParseService.class)
 public class AtomParseServiceImpl implements AtomParseService {
 
+    private static final Logger LOGGER = Logger.getLogger(AtomParseServiceImpl.class);
+
     @Override
     public void parse(FOMEntry entry) throws Exception {
-        System.out.println(entry.getTitle());
+        LOGGER.info("Title: " + entry.getTitle());
     }
 
 }

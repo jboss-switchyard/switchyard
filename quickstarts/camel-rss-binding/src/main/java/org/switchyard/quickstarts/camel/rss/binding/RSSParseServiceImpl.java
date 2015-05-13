@@ -16,19 +16,22 @@
  */
 package org.switchyard.quickstarts.camel.rss.binding;
 
-import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.feed.synd.SyndFeed;
-
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.switchyard.component.bean.Service;
+
+import com.sun.syndication.feed.synd.SyndEntry;
+import com.sun.syndication.feed.synd.SyndFeed;
 
 /**
  * Simple service which parses RSS and prints it.
  */
 @Service(RSSParseService.class)
 public class RSSParseServiceImpl implements RSSParseService {
+
+    private static final Logger LOGGER = Logger.getLogger(RSSParseServiceImpl.class);
 
     @Override
     public void parse(SyndFeed feed) throws Exception {
@@ -38,7 +41,7 @@ public class RSSParseServiceImpl implements RSSParseService {
 
         while (itEntries.hasNext()) {
             SyndEntry entry = (SyndEntry) itEntries.next();
-            System.out.println("Title :  " + entry.getTitle());
+            LOGGER.info("Title: " + entry.getTitle());
         }
     }
 

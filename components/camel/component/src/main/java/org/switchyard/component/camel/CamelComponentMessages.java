@@ -128,5 +128,12 @@ public interface CamelComponentMessages {
      */
     @Message(id = 33016, value = "The endpoint '%s' could not be resolved")
     NullPointerException couldNotResolveToEndpointUri(String to);
-        
+
+    /**
+     * invalidJavaDSLClassSpecified
+     * @param className class name
+     * @return Exception
+     */
+    @Message(id = 33017, value = "Could not load a Java DSL class '%s'")
+    SwitchYardException invalidJavaDSLClassSpecified(String className);        
 }

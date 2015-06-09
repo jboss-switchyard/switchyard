@@ -151,7 +151,11 @@ public final class RouteFactory {
      * @return the route definition
      */
     public static List<RouteDefinition> createRoute(String className, SwitchYardCamelContext camelContext, String namespace) {
-        return createRoute(Classes.forName(className), camelContext, namespace);
+        Class<?> clazz = Classes.forName(className);
+        if (clazz == null) {
+            throw CamelComponentMessages.MESSAGES.invalidJavaDSLClassSpecified(className);
+        }
+        return createRoute(clazz, camelContext, namespace);
     }
 
     /**

@@ -43,6 +43,10 @@
   <message name="helloWS">
     <part name="parameters" element="tns:helloWS"/>
   </message>
+  <message name="unusedMultiPartMessage">
+    <part name="one" type="xsd:string"/>
+    <part name="two" type="xsd:string"/>
+  </message>
   <portType name="HelloWebService">
     <operation name="sayHello">
       <input message="tns:sayHello"/>

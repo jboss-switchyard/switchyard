@@ -43,6 +43,11 @@
     <part name="parameters" element="tns:sayHelloResponse"/>
   </message>
 
+  <message name="multiPartMessage">
+    <part name="one" type="xsd:string"/>
+    <part name="two" type="xsd:string"/>
+  </message>
+
   <portType name="HelloWebService">
     <operation name="sayHello">
       <input message="tns:sayHello"/>

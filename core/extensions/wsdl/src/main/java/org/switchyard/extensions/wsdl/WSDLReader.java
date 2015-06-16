@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
@@ -37,6 +38,7 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -351,11 +353,36 @@ outer:  while (tempEl != null) {
      * @throws WSDLReaderException if the wsdl operation is improper
      */
     private Map<QName, QName> getParts(final Element defEl, final Element portType, Map<String, String> namespaces) throws WSDLReaderException {
+        Set<QName> messagesInUse = new HashSet<QName>();
+        NodeList inputs = portType.getElementsByTagNameNS(INPUT.getNamespaceURI(), INPUT.getLocalPart());
+        for (int i = 0; i < inputs.getLength(); i++) {
+            NamedNodeMap attrs = inputs.item(i).getAttributes();
+            Node message = attrs.getNamedItem(ATTR_MESSAGE);
+            messagesInUse.add(getQName(message.getNodeValue(), namespaces));
+        }
+        NodeList outputs = portType.getElementsByTagNameNS(OUTPUT.getNamespaceURI(), OUTPUT.getLocalPart());
+        for (int i = 0; i < outputs.getLength(); i++) {
+            NamedNodeMap attrs = outputs.item(i).getAttributes();
+            Node message = attrs.getNamedItem(ATTR_MESSAGE);
+            messagesInUse.add(getQName(message.getNodeValue(), namespaces));
+        }
+        NodeList faults = portType.getElementsByTagNameNS(FAULT.getNamespaceURI(), FAULT.getLocalPart());
+        for (int i = 0; i < faults.getLength(); i++) {
+            NamedNodeMap attrs = faults.item(i).getAttributes();
+            Node message = attrs.getNamedItem(ATTR_MESSAGE);
+            messagesInUse.add(getQName(message.getNodeValue(), namespaces));
+        }
+
         NodeList messages = defEl.getElementsByTagNameNS(MESSAGE.getNamespaceURI(), MESSAGE.getLocalPart());
         int msgSize = messages.getLength();
         Map<QName, QName> parts = new HashMap<QName, QName>();
         for (int i = 0; i < msgSize; i++) {
             Element msgEl = (Element) messages.item(i);
+            QName name = getQName(msgEl.getAttribute(ATTR_NAME), namespaces);
+            if (!messagesInUse.contains(name)) {
+                continue;
+            }
+
             NodeList partEls = msgEl.getElementsByTagNameNS(PART.getNamespaceURI(), PART.getLocalPart());
             if (_documentStyle && (partEls.getLength() != 1)) {
                 throw WSDLExtensionsMessages.MESSAGES.wsdlInterfaceNeedsOneParameter();

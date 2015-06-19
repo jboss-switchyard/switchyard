@@ -61,5 +61,12 @@ public interface HttpLogger {
     @Message(id = 36004, value = "Unexpected Exception invoking SwitchYard service")
     void unexpectedExceptionInvokingSwitchyardServcie(@Cause Exception e);
 
+    /**
+     * removingProhibitedRequestHeader
+     * @param header header
+     */
+    @LogMessage(level = Level.WARN)
+    @Message(id = 36005, value = "Header '%s' is not allowed to be set manually. Ignoring...")
+    void removingProhibitedRequestHeader(String header);
 }
 

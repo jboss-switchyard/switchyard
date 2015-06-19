@@ -17,9 +17,12 @@ package org.switchyard.component.http;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.jboss.logging.Logger;
 import org.apache.http.Header;
@@ -45,6 +48,7 @@ import org.apache.http.client.params.AuthPolicy;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.conn.params.ConnRoutePNames;
+import org.apache.http.entity.BufferedHttpEntity;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
@@ -52,6 +56,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.HTTP;
 import org.switchyard.Exchange;
 import org.switchyard.HandlerException;
 import org.switchyard.Message;
@@ -82,6 +87,8 @@ public class OutboundHandler extends BaseServiceHandler {
     private static final String HTTP_HEAD = "HEAD";
     private static final String HTTP_PUT = "PUT";
     private static final String HTTP_OPTIONS = "OPTIONS";
+    private static final Set<String> REQUEST_HEADER_BLACKLIST
+        = new HashSet<String>(Arrays.asList(HTTP.CONTENT_LEN, HTTP.TRANSFER_ENCODING));
 
     private final HttpBindingModel _config;
     private final String _bindingName;
@@ -222,14 +229,14 @@ public class OutboundHandler extends BaseServiceHandler {
                 request = new HttpGet(_baseAddress);
             } else if (_httpMethod.equals(HTTP_POST)) {
                 request = new HttpPost(_baseAddress);
-                ((HttpPost) request).setEntity(new InputStreamEntity(httpRequest.getBodyBytes(), httpRequest.getBodyBytes().available()));
+                ((HttpPost) request).setEntity(new BufferedHttpEntity(new InputStreamEntity(httpRequest.getBodyBytes(), httpRequest.getBodyBytes().available())));
             } else if (_httpMethod.equals(HTTP_DELETE)) {
                 request = new HttpDelete(_baseAddress);
             } else if (_httpMethod.equals(HTTP_HEAD)) {
                 request = new HttpHead(_baseAddress);
             } else if (_httpMethod.equals(HTTP_PUT)) {
                 request = new HttpPut(_baseAddress);
-                ((HttpPut) request).setEntity(new InputStreamEntity(httpRequest.getBodyBytes(), httpRequest.getBodyBytes().available()));
+                ((HttpPut) request).setEntity(new BufferedHttpEntity(new InputStreamEntity(httpRequest.getBodyBytes(), httpRequest.getBodyBytes().available())));
             } else if (_httpMethod.equals(HTTP_OPTIONS)) {
                 request = new HttpOptions(_baseAddress);
             }
@@ -237,6 +244,10 @@ public class OutboundHandler extends BaseServiceHandler {
             while (entries.hasNext()) {
                 Map.Entry<String, List<String>> entry = entries.next();
                 String name = entry.getKey();
+                if (REQUEST_HEADER_BLACKLIST.contains(name)) {
+                    HttpLogger.ROOT_LOGGER.removingProhibitedRequestHeader(name);
+                    continue;
+                }
                 List<String> values = entry.getValue();
                 for (String value : values) {
                     request.addHeader(name, value);

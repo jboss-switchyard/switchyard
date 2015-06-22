@@ -67,6 +67,12 @@ public class JMSEndpoint extends AbstractInflowEndpoint implements MessageListen
     public static final String KEY_USERNAME = "userName";
     /** key for password. */
     public static final String KEY_PASSWORD = "password";
+    /** key for Delivery Mode. */
+    public static final String KEY_DELIVERY_MODE = "deliveryMode";
+    /** key for priority. */
+    public static final String KEY_PRIORITY = "priority";
+    /** key for Time-to-Live. */
+    public static final String KEY_TIME_TO_LIVE = "timeToLive";
 
     private Logger _logger = Logger.getLogger(JMSEndpoint.class);
     private MessageComposer<JMSBindingData> _composer;
@@ -209,6 +215,7 @@ public class JMSEndpoint extends AbstractInflowEndpoint implements MessageListen
     protected void sendJMSMessage(Session session, Destination destination, Exchange exchange, MessageType type) {
         try {
             MessageProducer producer = session.createProducer(destination);
+            Context context = exchange.getContext();
 
             Message msg;
             switch (type) {
@@ -230,7 +237,10 @@ public class JMSEndpoint extends AbstractInflowEndpoint implements MessageListen
             default:
                 msg = session.createObjectMessage();
             }
-            producer.send(_composer.decompose(exchange, new JMSBindingData(msg)).getMessage());
+            producer.send(_composer.decompose(exchange, new JMSBindingData(msg)).getMessage(),
+                    getDeliveryModeFromContext(context, producer),
+                    getPriorityFromContext(context, producer),
+                    getTimeToLiveFromContext(context, producer));
         } catch (Exception e) {
             JCALogger.ROOT_LOGGER.failedToSendMessage(destination.toString(), e.getMessage());
             if (_logger.isDebugEnabled()) {
@@ -412,6 +422,42 @@ public class JMSEndpoint extends AbstractInflowEndpoint implements MessageListen
             return type;
         }
         return _defaultOutMessageType;
+    }
+
+    protected int getDeliveryModeFromContext(Context ctx, MessageProducer producer) throws Exception {
+        String key = CONTEXT_PROPERTY_PREFIX + KEY_DELIVERY_MODE;
+        if (ctx.getProperty(key) != null) {
+            int deliveryMode = Integer.parseInt(ctx.getPropertyValue(key).toString());
+            if (_logger.isDebugEnabled()) {
+                _logger.debug("Delivery Mode is set to '" + deliveryMode + "'");
+            }
+            return deliveryMode;
+        }
+        return producer.getDeliveryMode();
+    }
+
+    protected int getPriorityFromContext(Context ctx, MessageProducer producer) throws Exception {
+        String key = CONTEXT_PROPERTY_PREFIX + KEY_PRIORITY;
+        if (ctx.getProperty(key) != null) {
+            int priority = Integer.parseInt(ctx.getPropertyValue(key).toString());
+            if (_logger.isDebugEnabled()) {
+                _logger.debug("Priority is set to '" + priority + "'");
+            }
+            return priority;
+        }
+        return producer.getPriority();
+    }
+
+    protected long getTimeToLiveFromContext(Context ctx, MessageProducer producer) throws Exception {
+        String key = CONTEXT_PROPERTY_PREFIX + KEY_TIME_TO_LIVE;
+        if (ctx.getProperty(key) != null) {
+            long ttl = Long.parseLong(ctx.getPropertyValue(key).toString());
+            if (_logger.isDebugEnabled()) {
+                _logger.debug("Time to Live is set to '" + ttl + "'");
+            }
+            return ttl;
+        }
+        return producer.getTimeToLive();
     }
 
     /**

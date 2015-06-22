@@ -58,6 +58,12 @@ public class JMSProcessor extends AbstractOutboundProcessor {
     public static final String KEY_DESTINATION = "destination";
     /** key for message type property. */
     public static final String KEY_MESSAGE_TYPE  = "messageType";
+    /** key for Delivery Mode property. */
+    public static final String KEY_DELIVERY_MODE = "deliveryMode";
+    /** key for priority property. */
+    public static final String KEY_PRIORITY = "priority";
+    /** key for Time-to-Live property. */
+    public static final String KEY_TIME_TO_LIVE = "timeToLive";
     /** key for JNDI properties file to look up the JMS destination. */
     public static final String KEY_DESTINATION_JNDI_PROPERTIES_FILE = "destinationJndiPropertiesFileName";
 
@@ -196,7 +202,10 @@ public class JMSProcessor extends AbstractOutboundProcessor {
                     msg = session.createObjectMessage();
             }
             
-            producer.send(_composer.decompose(exchange, new JMSBindingData(msg)).getMessage());
+            producer.send(_composer.decompose(exchange, new JMSBindingData(msg)).getMessage(),
+                    getDeliveryModeFromContext(context, producer),
+                    getPriorityFromContext(context, producer),
+                    getTimeToLiveFromContext(context, producer));
             
             if (session.getTransacted()) {
                 try {
@@ -360,6 +369,42 @@ public class JMSProcessor extends AbstractOutboundProcessor {
             return msgType;
         }
         return _defaultOutMessageType;
+    }
+
+    protected int getDeliveryModeFromContext(Context ctx, MessageProducer producer) throws JMSException {
+        String key = CONTEXT_PROPERTY_PREFIX + KEY_DELIVERY_MODE;
+        if (ctx.getProperty(key) != null) {
+            int deliveryMode = Integer.parseInt(ctx.getPropertyValue(key).toString());
+            if (_logger.isDebugEnabled()) {
+                _logger.debug("Delivery Mode is set to '" + deliveryMode + "'");
+            }
+            return deliveryMode;
+        }
+        return producer.getDeliveryMode();
+    }
+
+    protected int getPriorityFromContext(Context ctx, MessageProducer producer) throws JMSException {
+        String key = CONTEXT_PROPERTY_PREFIX + KEY_PRIORITY;
+        if (ctx.getProperty(key) != null) {
+            int priority = Integer.parseInt(ctx.getPropertyValue(key).toString());
+            if (_logger.isDebugEnabled()) {
+                _logger.debug("Priority is set to '" + priority + "'");
+            }
+            return priority;
+        }
+        return producer.getPriority();
+    }
+
+    protected long getTimeToLiveFromContext(Context ctx, MessageProducer producer) throws JMSException {
+        String key = CONTEXT_PROPERTY_PREFIX + KEY_TIME_TO_LIVE;
+        if (ctx.getProperty(key) != null) {
+            long ttl = Long.parseLong(ctx.getPropertyValue(key).toString());
+            if (_logger.isDebugEnabled()) {
+                _logger.debug("Time to Live is set to '" + ttl + "'");
+            }
+            return ttl;
+        }
+        return producer.getTimeToLive();
     }
 
     /**

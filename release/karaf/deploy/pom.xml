@@ -36,9 +36,7 @@
         <switchyard.osgi.import>
             org.switchyard.admin.*;${switchyard.osgi.import.switchyard.version},
             !org.osgi.service;org.switchyard.admin.*;${switchyard.osgi.import.switchyard.version},
-            org.switchyard.component.soap.*;${switchyard.osgi.import.switchyard.version};resolution:="optional",
             org.switchyard.component.*;${switchyard.osgi.import.switchyard.version};resolution:="optional",
-            org.apache.cxf.*;resolution:="optional",
             org.switchyard.*;${switchyard.osgi.import.switchyard.version},
             *
         </switchyard.osgi.import>
@@ -99,16 +97,6 @@
             <groupId>org.switchyard.components</groupId>
             <artifactId>switchyard-component-common</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.switchyard.components</groupId>
-            <artifactId>switchyard-component-soap</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.cxf</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
         <!-- external dependencies -->
         <dependency>
             <groupId>org.jboss.spec.javax.servlet</groupId>
@@ -122,22 +110,6 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-core-osgi</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-bindings-soap</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-frontend-jaxws</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-ws-addr</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.karaf.features</groupId>

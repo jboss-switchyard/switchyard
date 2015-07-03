@@ -308,6 +308,7 @@
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.saaj-impl/${version.org.apache.servicemix.bundles.saaj-impl}</bundle>
         <bundle>mvn:org.switchyard.components/switchyard-component-common/${project.version}</bundle>
         <bundle>mvn:org.switchyard.components/switchyard-component-soap/${project.version}</bundle>
+        <bundle>mvn:org.switchyard.karaf/switchyard-karaf-plugin-soap/${project.version}</bundle>
     </feature>
 
     <feature name="switchyard-sap" version="${project.version}" resolver="(obr)">

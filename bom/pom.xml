@@ -34,6 +34,7 @@
         <version.org.kie>6.2.0.CR3</version.org.kie>
         <version.org.drools>6.2.0.CR3</version.org.drools>
         <version.org.jbpm>6.2.0.CR3</version.org.jbpm>
+        <version.org.jboss.as>7.5.0.Final-redhat-21</version.org.jboss.as>
     </properties>
     <dependencyManagement>
         <dependencies>

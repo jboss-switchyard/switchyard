@@ -15,6 +15,8 @@ package org.switchyard.component.resteasy.config.model.v2;
 
 import org.switchyard.component.resteasy.config.model.ContextParamsModel;
 import org.switchyard.component.resteasy.config.model.RESTEasyBindingModel;
+import org.switchyard.component.resteasy.config.model.RESTEasyNameValueModel.RESTEasyName;
+import org.switchyard.component.resteasy.config.model.SSLContextModel;
 import org.switchyard.component.resteasy.config.model.v1.V1RESTEasyBindingModel;
 import org.switchyard.config.Configuration;
 import org.switchyard.config.model.Descriptor;
@@ -25,6 +27,7 @@ import org.switchyard.config.model.Descriptor;
 public class V2RESTEasyBindingModel extends V1RESTEasyBindingModel {
 
     private ContextParamsModel _contextParamsConfig;
+    private SSLContextModel _sslContext;
 
     /**
      * Constructor.
@@ -57,6 +60,14 @@ public class V2RESTEasyBindingModel extends V1RESTEasyBindingModel {
         setChildModel(contextParamsConfig);
         _contextParamsConfig = contextParamsConfig;
         return this;
+    }
+
+    @Override
+    public SSLContextModel getSSLContextConfig() {
+        if (_sslContext == null) {
+            _sslContext = (SSLContextModel)getFirstChildModel(RESTEasyName.ssl.name());
+        }
+        return _sslContext;
     }
 
 }

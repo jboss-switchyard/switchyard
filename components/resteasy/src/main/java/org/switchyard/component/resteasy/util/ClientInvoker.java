@@ -14,11 +14,15 @@
 
 package org.switchyard.component.resteasy.util;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.KeyStore;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +51,11 @@ import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
+import org.apache.http.conn.ssl.BrowserCompatHostnameVerifier;
 import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.conn.ssl.StrictHostnameVerifier;
+import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -84,6 +92,7 @@ import org.switchyard.component.resteasy.RestEasyMessages;
 import org.switchyard.component.resteasy.composer.RESTEasyBindingData;
 import org.switchyard.component.resteasy.config.model.ProxyModel;
 import org.switchyard.component.resteasy.config.model.RESTEasyBindingModel;
+import org.switchyard.component.resteasy.config.model.SSLContextModel;
 
 /**
  * Client Invoker for RESTEasy gateway. Code lifted from RESTEasy.
@@ -97,6 +106,9 @@ public class ClientInvoker extends ClientInterceptorRepositoryImpl implements Me
 
     private static final String AS7_URIBUILDER = "org.jboss.resteasy.specimpl.UriBuilderImpl";
     private static final String WFLY_URIBUILDER = "org.jboss.resteasy.specimpl.ResteasyUriBuilder";
+    private static final String ANY = "ANY";
+    private static final String BROWSER = "BROWSER";
+    private static final String STRICT = "STRICT";
     private static Class<?> URIBUILDER_CLASS = null;
 
     private String _subResourcePath;
@@ -157,7 +169,9 @@ public class ClientInvoker extends ClientInterceptorRepositoryImpl implements Me
     public ClientInvoker(String basePath, Class<?> resourceClass, Method method, RESTEasyBindingModel model) {
         Set<String> httpMethods = IsHttpMethod.getHttpMethods(method);
         _baseUri = createUri(basePath);
-        if ((httpMethods == null || httpMethods.size() == 0) && method.isAnnotationPresent(Path.class) && method.getReturnType().isInterface()) {
+        if ((httpMethods == null || httpMethods.size() == 0)
+            && method.isAnnotationPresent(Path.class)
+            && method.getReturnType().isInterface()) {
             _subResourcePath = createSubResourcePath(basePath, method);
         } else if (httpMethods == null || httpMethods.size() != 1) {
             throw RestEasyMessages.MESSAGES.youMustUseAtLeastOneButNoMoreThanOneHttpMethodAnnotationOn(method.toString());
@@ -225,7 +239,11 @@ public class ClientInvoker extends ClientInterceptorRepositoryImpl implements Me
             if (port == -1) {
                 port = 443;
             }
-            schemeRegistry.register(new Scheme(_baseUri.getScheme(), port, SSLSocketFactory.getSocketFactory()));
+            SSLSocketFactory sslFactory = getSSLSocketFactory(model.getSSLContextConfig());
+            if (sslFactory == null) {
+                sslFactory = SSLSocketFactory.getSocketFactory();
+            }
+            schemeRegistry.register(new Scheme(_baseUri.getScheme(), port, sslFactory));
         } else {
             if (port == -1) {
                 port = 80;
@@ -299,6 +317,66 @@ public class ClientInvoker extends ClientInterceptorRepositoryImpl implements Me
      */
     public ResteasyProviderFactory getResteasyProviderFactory() {
         return _providerFactory;
+    }
+
+    private SSLSocketFactory getSSLSocketFactory(SSLContextModel sslContextConfig) {
+        SSLSocketFactory sslFactory = null;
+        if (sslContextConfig != null) {
+            X509HostnameVerifier verifier = null;
+            if (sslContextConfig.getVerifier() != null) {
+                if (sslContextConfig.getVerifier().equals(ANY)) {
+                    verifier = new AllowAllHostnameVerifier();
+                } else if (sslContextConfig.getVerifier().equals(BROWSER)) {
+                    verifier = new BrowserCompatHostnameVerifier();
+                } else if (sslContextConfig.getVerifier().equals(STRICT)) {
+                    verifier = new StrictHostnameVerifier();
+                }
+            }
+            KeyStore truststore = null;
+            KeyStore keystore = null;
+            if (sslContextConfig.getTruststore() != null) {
+                FileInputStream instream = null;
+                try {
+                    truststore  = KeyStore.getInstance(KeyStore.getDefaultType());
+                    instream = new FileInputStream(new File(sslContextConfig.getTruststore()));
+                    truststore.load(instream, sslContextConfig.getTruststorePass().toCharArray());
+                } catch (Exception e) {
+                    throw RestEasyMessages.MESSAGES.unexpectedExceptionLoadingTruststore(e);
+                } finally {
+                    if (instream != null) {
+                        try {
+                            instream.close();
+                        } catch (IOException ioe) {
+                            throw RestEasyMessages.MESSAGES.unexpectedExceptionClosingTruststore(ioe);
+                        }
+                    }
+                }
+            }
+            if (sslContextConfig.getKeystore() != null) {
+                FileInputStream instream = null;
+                try {
+                    keystore  = KeyStore.getInstance(KeyStore.getDefaultType());
+                    instream = new FileInputStream(new File(sslContextConfig.getKeystore()));
+                    keystore.load(instream, sslContextConfig.getKeystorePass().toCharArray());
+                } catch (Exception e) {
+                    throw RestEasyMessages.MESSAGES.unexpectedExceptionLoadingKeystore(e);
+                } finally {
+                    if (instream != null) {
+                        try {
+                            instream.close();
+                        } catch (IOException ioe) {
+                            throw RestEasyMessages.MESSAGES.unexpectedExceptionClosingKeystore(ioe);
+                        }
+                    }
+                }
+            }
+            try {
+                sslFactory = new SSLSocketFactory(SSLSocketFactory.TLS, keystore, sslContextConfig.getKeystorePass(), truststore, null, verifier);
+            } catch (Exception e) {
+                 throw new RuntimeException(e);
+            }
+        }
+        return sslFactory;
     }
 
     private AuthScope createAuthScope(String host, String portStr, String realm) throws RuntimeException {

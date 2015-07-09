@@ -22,6 +22,7 @@ public interface RestEasyLogger {
 
     /**
      * defaultRESTEasyMessageComposerDoesnTHandleMultipleInputParameters method definition.
+     * @param className the className
      */
     @LogMessage(level = Level.INFO)
     @Message(id = 37600, value = "Default RESTEasy Message Composer doesn't handle multiple input parameters. Please ensure it is handled in a custom composer. Class \"%s\"")

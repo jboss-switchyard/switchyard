@@ -79,5 +79,37 @@ public interface RestEasyMessages {
      */
     @Message(id = 38019, value = "Unexpected exception composing inbound REST response")
     String unexpectedExceptionComposingRESTResponse();
+
+    /**
+     * unexpectedExceptionLoadingTruststore method definition.
+     * @param e the e
+     * @return  HandlerException
+     */
+    @Message(id = 38020, value = "Unexpected exception loading truststore")
+    RuntimeException unexpectedExceptionLoadingTruststore(@Cause Exception e);
+
+    /**
+     * unexpectedExceptionClosingTruststore method definition.
+     * @param e the e
+     * @return  HandlerException
+     */
+    @Message(id = 38021, value = "Unexpected exception closing truststore")
+    RuntimeException unexpectedExceptionClosingTruststore(@Cause Exception e);
+
+    /**
+     * unexpectedExceptionLoadingKeystore method definition.
+     * @param e the e
+     * @return  HandlerException
+     */
+    @Message(id = 38022, value = "Unexpected exception loading keystore")
+    RuntimeException unexpectedExceptionLoadingKeystore(@Cause Exception e);
+
+    /**
+     * unexpectedExceptionClosingKeystore method definition.
+     * @param e the e
+     * @return  HandlerException
+     */
+    @Message(id = 38023, value = "Unexpected exception closing keystore")
+    RuntimeException unexpectedExceptionClosingKeystore(@Cause Exception e);
 }
 

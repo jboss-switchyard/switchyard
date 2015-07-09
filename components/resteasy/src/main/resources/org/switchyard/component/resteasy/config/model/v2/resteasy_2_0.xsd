@@ -68,6 +68,11 @@
                                     <documentation>Http proxy settings.</documentation>
                                 </annotation>
                             </element>
+                            <element name="ssl" type="rest:SSLContextType" minOccurs="0" maxOccurs="1">
+                                <annotation>
+                                    <documentation>Http SSL Context settings.</documentation>
+                                </annotation>
+                            </element>
                         </sequence>
                     </choice>
                     <element name="contextParams" type="rest:ContextParamsType" minOccurs="0" maxOccurs="1"/>
@@ -144,6 +149,39 @@
                     <element name="password" type="string" minOccurs="0" maxOccurs="1">
                         <annotation>
                             <documentation>Proxy password.</documentation>
+                        </annotation>
+                    </element>
+                </sequence>
+            </extension>
+        </complexContent>
+    </complexType>
+    <complexType name="SSLContextType">
+        <complexContent>
+            <extension base="sca:CommonExtensionBase">
+                <sequence>
+                    <element name="verifier" type="string" minOccurs="0" maxOccurs="1">
+                        <annotation>
+                            <documentation>SSL hostname verifier.</documentation>
+                        </annotation>
+                    </element>
+                    <element name="keystore" type="string" minOccurs="0" maxOccurs="1">
+                        <annotation>
+                            <documentation>SSL keystore store.</documentation>
+                        </annotation>
+                    </element>
+                    <element name="keystorePass" type="string" minOccurs="0" maxOccurs="1">
+                        <annotation>
+                            <documentation>SSL keystore password.</documentation>
+                        </annotation>
+                    </element>
+                    <element name="truststore" type="string" minOccurs="0" maxOccurs="1">
+                        <annotation>
+                            <documentation>SSL truststore store.</documentation>
+                        </annotation>
+                    </element>
+                    <element name="truststorePass" type="string" minOccurs="0" maxOccurs="1">
+                        <annotation>
+                            <documentation>SSL truststore password.</documentation>
                         </annotation>
                     </element>
                 </sequence>

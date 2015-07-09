@@ -33,6 +33,7 @@ public class RESTEasyConfigModelTest {
     private static final String REST_BINDING_AUTH = "rest-binding-auth.xml";
     private static final String REST_BINDING_PROXY = "rest-binding-proxy.xml";
     private static final String REST_BINDING_CONTEXT_PARAMS = "rest-binding-context-params.xml";
+    private static final String REST_BINDING_SSL_CONTEXT = "rest-binding-ssl-context.xml";
 
     @Test
     public void testReadConfigBinding() throws Exception {
@@ -89,5 +90,20 @@ public class RESTEasyConfigModelTest {
 
         Assert.assertEquals("resteasy.use.builtin.providers", contextParams.get(1).getName());
         Assert.assertEquals("true", contextParams.get(1).getValue());
+    }
+
+    @Test
+    public void testReadReferenceWithSSLContext() throws Exception {
+        ModelPuller<RESTEasyBindingModel> puller = new ModelPuller<RESTEasyBindingModel>();
+        RESTEasyBindingModel model = puller.pull(REST_BINDING_SSL_CONTEXT, getClass());
+        Assert.assertTrue(model.isModelValid());
+
+        SSLContextModel sslContextConfig = model.getSSLContextConfig();
+        Assert.assertNotNull(sslContextConfig);
+        Assert.assertEquals("ANY", sslContextConfig.getVerifier());
+        Assert.assertEquals("https.jks", sslContextConfig.getKeystore());
+        Assert.assertEquals("changeit", sslContextConfig.getKeystorePass());
+        Assert.assertEquals("client.jks", sslContextConfig.getTruststore());
+        Assert.assertEquals("changeit", sslContextConfig.getTruststorePass());
     }
 }

@@ -23,6 +23,7 @@ import org.switchyard.component.resteasy.config.model.ProxyModel;
 import org.switchyard.component.resteasy.config.model.RESTEasyBindingModel;
 import org.switchyard.component.resteasy.config.model.RESTEasyNameValueModel;
 import org.switchyard.component.resteasy.config.model.RESTEasyNameValueModel.RESTEasyName;
+import org.switchyard.component.resteasy.config.model.SSLContextModel;
 import org.switchyard.config.Configuration;
 import org.switchyard.config.Configurations;
 import org.switchyard.config.model.Descriptor;
@@ -260,6 +261,14 @@ public class V1RESTEasyBindingModel extends V1BindingModel implements RESTEasyBi
         setChildModel(proxyConfig);
         _proxyConfig = proxyConfig;
         return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public SSLContextModel getSSLContextConfig() {
+        return null;
     }
 
     /**

@@ -20,7 +20,6 @@ import org.switchyard.ExchangeState;
 import org.switchyard.HandlerException;
 import org.switchyard.Message;
 import org.switchyard.component.common.composer.BaseMessageComposer;
-import org.switchyard.component.resteasy.RestEasyLogger;
 
 /**
  * Composes/decomposes RESTEasy messages.

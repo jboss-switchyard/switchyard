@@ -15,6 +15,7 @@ package org.switchyard.component.resteasy.config.model.v2;
 
 import org.switchyard.component.resteasy.config.model.ContextParamModel;
 import org.switchyard.component.resteasy.config.model.ContextParamsModel;
+import org.switchyard.component.resteasy.config.model.RESTEasyNameValueModel.RESTEasyName;
 import org.switchyard.component.resteasy.config.model.v1.V1RESTEasyMarshaller;
 import org.switchyard.config.Configuration;
 import org.switchyard.config.model.Descriptor;
@@ -51,6 +52,8 @@ public class V2RESTEasyMarshaller extends V1RESTEasyMarshaller {
             return new V2ContextParamsModel(config, desc);
         } else if (name.equals(ContextParamModel.CONTEXT_PARAM)) {
             return new V2ContextParamModel(config, desc);
+        } else if (name.equals(RESTEasyName.ssl.name())) {
+            return new V2SSLContextModel(config, getDescriptor());
         }
         return super.read(config);
     }

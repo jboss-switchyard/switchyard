@@ -1,0 +1,12 @@
+<rest:binding.rest xmlns:rest="urn:switchyard-component-resteasy:config:2.0">
+    <rest:interfaces>org.switchyard.quickstarts.rest.binding.OrderResource,org.switchyard.quickstarts.rest.binding.TestResource</rest:interfaces>
+    <rest:address>https://localhost:8443/</rest:address>
+    <rest:timeout>5000</rest:timeout>
+    <rest:ssl>
+      <rest:verifier>ANY</rest:verifier>
+      <rest:keystore>https.jks</rest:keystore>
+      <rest:keystorePass>changeit</rest:keystorePass>
+      <rest:truststore>client.jks</rest:truststore>
+      <rest:truststorePass>changeit</rest:truststorePass>
+    </rest:ssl>
+</rest:binding.rest>

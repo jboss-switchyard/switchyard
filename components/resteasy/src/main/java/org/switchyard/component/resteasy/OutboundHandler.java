@@ -29,7 +29,6 @@ import org.switchyard.ServiceDomain;
 import org.switchyard.common.type.Classes;
 import org.switchyard.common.util.ProviderRegistry;
 import org.switchyard.component.common.composer.MessageComposer;
-import org.switchyard.component.resteasy.RestEasyLogger;
 import org.switchyard.component.resteasy.composer.RESTEasyComposition;
 import org.switchyard.component.resteasy.composer.RESTEasyBindingData;
 import org.switchyard.component.resteasy.config.model.RESTEasyBindingModel;

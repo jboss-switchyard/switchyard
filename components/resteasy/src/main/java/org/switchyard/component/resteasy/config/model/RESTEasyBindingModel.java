@@ -181,6 +181,12 @@ public interface RESTEasyBindingModel extends BindingModel {
     public RESTEasyBindingModel setContextParamsConfig(ContextParamsModel contextParamsConfig);
 
     /**
+     * Gets the SSL context.
+     * @return the SSL config
+     */
+    public SSLContextModel getSSLContextConfig();
+
+    /**
      * Gets the global configuration.
      * 
      * @return the environment/global config

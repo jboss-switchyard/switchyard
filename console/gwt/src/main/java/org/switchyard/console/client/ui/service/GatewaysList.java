@@ -100,7 +100,7 @@ public class GatewaysList extends AbstractDataTable<Binding> {
             @Override
             public String getValue(Binding binding) {
                 return binding.getState() == null
-                        || EnumSet.<State> of(State.NONE, State.STOPPING).contains(binding.getState()) ? Singleton.MESSAGES.label_start()
+                        || EnumSet.<State> of(State.NONE, State.STOPPING, State.STOPPED).contains(binding.getState()) ? Singleton.MESSAGES.label_start()
                         : Singleton.MESSAGES.label_stop();
             }
         };

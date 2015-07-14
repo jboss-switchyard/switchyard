@@ -40,7 +40,11 @@ public interface Lifecycle {
          * In the process of stopping, i.e. stop() has been invoked, but has not
          * yet completed.
          */
-        STOPPING;
+        STOPPING,
+        /** 
+         * The object has stopped.
+         */
+        STOPPED;
     }
 
     /**

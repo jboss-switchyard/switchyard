@@ -24,5 +24,7 @@ public enum State {
     /** Started. */
     STARTED,
     /** Stopping. */
-    STOPPING;
+    STOPPING,
+    /** Stopped. */
+    STOPPED;
 }

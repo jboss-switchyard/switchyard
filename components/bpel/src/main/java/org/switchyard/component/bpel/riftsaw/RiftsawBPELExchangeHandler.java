@@ -161,10 +161,17 @@ public class RiftsawBPELExchangeHandler extends BaseServiceHandler implements BP
 
         java.net.URL url = Thread.currentThread().
                 getContextClassLoader().getResource(DEPLOY_XML);
-        int index = url.toString().indexOf(".jar");
-
+        int jarIndex = url.toString().indexOf(".jar");
+        int warIndex = url.toString().indexOf(".war");
+        	
+        boolean approvedDeployment = (
+        			(url.toString().indexOf(".ear") != -1)
+        		|| (url.toString().indexOf(".war") != -1)
+        		|| (url.toString().indexOf(".jar") != -1)
+        		);
+        
         // Check if url contains a jar
-        if (index != -1) {
+        if (approvedDeployment) {
 
             if (url.getProtocol().equals(VFS_SCHEME)) {
                 // AS7 deployment

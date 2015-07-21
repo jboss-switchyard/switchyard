@@ -288,4 +288,14 @@ public class DomainImpl implements SecureServiceDomain {
         return "ServiceDomain [name=" + _name + "]";
     }
 
+    @Override
+    public void removeObserver(EventObserver observer) {
+        _eventManager.removeObserver(observer);
+    }
+
+    @Override
+    public void removeObserverForEvent(
+            EventObserver observer, Class<? extends EventObject> eventType) {
+        _eventManager.removeObserverForEvent(observer, eventType);
+    }
 }

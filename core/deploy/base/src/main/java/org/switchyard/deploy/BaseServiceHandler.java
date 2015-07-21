@@ -46,7 +46,7 @@ public class BaseServiceHandler extends BaseHandler implements ServiceHandler {
             // already started
             return;
         } else if ((_state == State.STARTING) || (_state == State.STARTED)
-        			|| (_state == State.STOPPING)) {
+            || (_state == State.STOPPING)) {
             throw BaseDeployMessages.MESSAGES.invalidHandlerState();
         }
         final ClassLoader oldTCCL = Thread.currentThread().getContextClassLoader();

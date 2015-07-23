@@ -18,9 +18,11 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Properties;
 
 import org.jboss.logging.Logger;
 import org.switchyard.Property;
+import org.switchyard.common.codec.Base64;
 import org.switchyard.remote.RemoteInvoker;
 import org.switchyard.remote.RemoteMessage;
 import org.switchyard.remote.RemoteMessages;
@@ -38,9 +40,15 @@ public class HttpInvoker implements RemoteInvoker {
      */
     public static final String SERVICE_HEADER = "switchyard-service";
 
+    /** Property name for username used for authentication. */
+    public static final String AUTH_USERNAME = "auth.username";
+    /** Property name for password used for authentication. */
+    public static final String AUTH_PASSWORD = "auth.password";
+
     private static Logger _log = Logger.getLogger(HttpInvoker.class);
     private Serializer _serializer = SerializerFactory.create(FormatType.JSON, null, true);
     private URL _endpoint;
+    private Properties _properties = new Properties();
     
     /**
      * Create a new HttpInvoker from the specified URL string.
@@ -78,6 +86,7 @@ public class HttpInvoker implements RemoteInvoker {
         for (Property prop : request.getContext().getProperties(HttpInvokerLabel.HEADER.label())) {
             conn.addRequestProperty(prop.getName(), prop.getValue().toString());
         }
+        setupAuthentication(conn);
         
         conn.connect();
         OutputStream os = conn.getOutputStream();
@@ -103,5 +112,23 @@ public class HttpInvoker implements RemoteInvoker {
         }
         
         return reply;
+    }
+
+    private void setupAuthentication(HttpURLConnection conn) {
+        if (_properties.getProperty(AUTH_USERNAME) != null) {
+            conn.setRequestProperty("Authorization",
+                    "Basic " + Base64.encodeFromString(_properties.getProperty(AUTH_USERNAME) + ":" + _properties.getProperty(AUTH_PASSWORD)));
+        }
+    }
+
+    /**
+     * Sets invoker property.
+     * @param key property key
+     * @param value property value
+     * @return this instance
+     */
+    public HttpInvoker setProperty(Object key, Object value) {
+        _properties.put(key, value);
+        return this;
     }
 }

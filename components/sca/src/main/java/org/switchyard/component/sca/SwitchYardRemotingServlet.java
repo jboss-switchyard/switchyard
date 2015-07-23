@@ -16,6 +16,7 @@ package org.switchyard.component.sca;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -39,6 +40,9 @@ import org.switchyard.component.common.SynchronousInOutHandler;
 import org.switchyard.deploy.internal.Deployment;
 import org.switchyard.remote.RemoteMessage;
 import org.switchyard.remote.http.HttpInvoker;
+import org.switchyard.security.SecurityServices;
+import org.switchyard.security.context.SecurityContextManager;
+import org.switchyard.security.credential.Credential;
 import org.switchyard.serial.FormatType;
 import org.switchyard.serial.Serializer;
 import org.switchyard.serial.SerializerFactory;
@@ -85,6 +89,13 @@ public class SwitchYardRemotingServlet extends HttpServlet {
             Exchange ex = msg.getOperation() == null
                     ? service.createExchange(replyHandler)
                     : service.createExchange(msg.getOperation(), replyHandler);
+              
+            Set<Credential> credentials = SecurityServices.getServletRequestCredentialExtractor().extract(request);
+            if (credentials != null && !credentials.isEmpty()) {
+                SecurityContextManager scm = new SecurityContextManager(domain);
+                scm.addCredentials(ex, credentials);
+            }
+            
             Message m = ex.createMessage();
             if (msg.getContext() != null) {
                 m.getContext().setProperties(msg.getContext().getProperties());

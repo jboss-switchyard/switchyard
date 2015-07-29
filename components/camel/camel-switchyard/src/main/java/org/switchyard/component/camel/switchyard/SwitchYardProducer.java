@@ -78,7 +78,7 @@ public class SwitchYardProducer extends DefaultProducer {
     @Override
     public void process(final org.apache.camel.Exchange camelExchange) throws Exception {
         final String namespace = camelExchange.getProperty(CamelConstants.APPLICATION_NAMESPACE, String.class);
-        final String targetUri = camelExchange.getProperty(org.apache.camel.Exchange.TO_ENDPOINT, String.class);
+        final String targetUri = getEndpoint().getEndpointUri();
         ServiceDomain domain = ((SwitchYardCamelContext) camelExchange.getContext()).getServiceDomain();
         final ServiceReference serviceRef = lookupServiceReference(targetUri, namespace, domain, 
                 camelExchange.getProperty(SwitchYardConsumer.COMPONENT_NAME, QName.class));

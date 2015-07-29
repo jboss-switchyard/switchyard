@@ -32,10 +32,19 @@
             <sca:service name="OrderService" >
                 <sca:interface.java interface="org.switchyard.component.camel.deploy.support.OrderService"/>
             </sca:service>
+            <sca:reference name="EnrichService">
+                <sca:interface.java interface="org.switchyard.component.camel.deploy.support.EnrichService"/>
+            </sca:reference>
             <sca:reference name="WarehouseService">
                 <sca:interface.java interface="org.switchyard.component.camel.deploy.support.WarehouseService"/>
             </sca:reference>
             <sca:property name="prop.component" value="prop.component value"/>
+        </sca:component>
+        <sca:component name="EnrichComponent">
+            <bean:implementation.bean class="org.switchyard.component.camel.deploy.support.EnrichServiceImpl"/>
+            <sca:service name="EnrichService" >
+                <sca:interface.java interface="org.switchyard.component.camel.deploy.support.EnrichService"/>
+            </sca:service>
         </sca:component>
         <sca:property name="prop.composite" value="prop.composite value"/>
     </sca:composite>

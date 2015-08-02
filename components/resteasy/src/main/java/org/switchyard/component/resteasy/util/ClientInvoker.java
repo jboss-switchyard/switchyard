@@ -493,7 +493,7 @@ public class ClientInvoker extends ClientInterceptorRepositoryImpl implements Me
         }
         ClientRequest request = new ClientRequest(uriBuilder, _executor, _providerFactory);
         if (_accepts != null) {
-            request.header(HttpHeaders.ACCEPT, _accepts.toString());
+            request.header(HttpHeaders.ACCEPT, RESTEasyUtil.mediaTypeToString(_accepts));
         }
         for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
             String name = entry.getKey();

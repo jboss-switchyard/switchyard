@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ExceptionMapper;
 
 import org.jboss.logging.Logger;
@@ -36,6 +37,8 @@ public final class RESTEasyUtil {
     private static final Logger LOGGER = Logger.getLogger(RESTEasyUtil.class);
 
     private static final String CLIENT_ERROR_INTERCEPTORS = "resteasy.client.error.interceptors";
+
+    private static final char[] QUOTEDCHARS = "()<>@,;:\\\"/[]?= \t\r\n".toCharArray();
 
     private RESTEasyUtil() {
     }
@@ -126,6 +129,42 @@ public final class RESTEasyUtil {
             }
         }
         return interceptorInstances;
+    }
+
+    private static boolean quoted(String str) {
+        for (char c : str.toCharArray()) {
+            for (char q : QUOTEDCHARS) {
+                if (c == q) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Converts MediaType to String.
+     *
+     * @param type MediaType to convert
+     * @return String
+     */
+    public static String mediaTypeToString(MediaType type) {
+        StringBuffer buf = new StringBuffer();
+
+        buf.append(type.getType().toLowerCase()).append("/").append(type.getSubtype().toLowerCase());
+        if (type.getParameters() == null || type.getParameters().size() == 0) {
+            return buf.toString();
+        }
+        for (String name : type.getParameters().keySet()) {
+            buf.append(';').append(name).append('=');
+            String val = type.getParameters().get(name);
+            if (quoted(val)) {
+                buf.append('"').append(val).append('"');
+            } else {
+                buf.append(val);
+            }
+        }
+        return buf.toString();
     }
 
 }

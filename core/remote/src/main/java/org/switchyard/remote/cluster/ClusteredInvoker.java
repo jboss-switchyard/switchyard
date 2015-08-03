@@ -14,6 +14,7 @@
 package org.switchyard.remote.cluster;
 
 import java.io.IOException;
+import java.util.WeakHashMap;
 
 import org.switchyard.remote.RemoteEndpoint;
 import org.switchyard.remote.RemoteInvoker;
@@ -29,7 +30,8 @@ import org.switchyard.remote.http.HttpInvoker;
 public class ClusteredInvoker implements RemoteInvoker {
     
     private LoadBalanceStrategy _loadBalancer;
-    
+    private WeakHashMap<String,HttpInvoker> _invokers = new WeakHashMap<String,HttpInvoker>();
+
     /**
      * Create a new ClusteredInvoker with the default load balance strategy (RoundRobin).
      * @param registry remote registry
@@ -54,7 +56,16 @@ public class ClusteredInvoker implements RemoteInvoker {
         if (ep == null) {
             throw RemoteMessages.MESSAGES.noRemoteEndpointFound(request.getService().toString());
         }
-        return new HttpInvoker(ep.getEndpoint()).invoke(request);
+        return getInvoker(ep.getEndpoint()).invoke(request);
     }
     
+    private synchronized HttpInvoker getInvoker(String endpoint) {
+        HttpInvoker invoker = _invokers.get(endpoint);
+        if (invoker == null) {
+            invoker = new HttpInvoker(endpoint);
+            _invokers.put(endpoint, invoker);
+            
+        }
+        return invoker;
+    }
 }

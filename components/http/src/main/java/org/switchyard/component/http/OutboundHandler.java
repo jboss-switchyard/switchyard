@@ -176,7 +176,9 @@ public class OutboundHandler extends BaseServiceHandler {
         try {
             url = new URL(_baseAddress);
         } catch (MalformedURLException mue) {
-            throw HttpMessages.MESSAGES.invalidHttpURL(mue);
+            final String m = HttpMessages.MESSAGES.invalidHttpURL();
+            LOGGER.error(m, mue);
+            throw new HttpConsumeException(m, mue);
         }
         if (realm == null) {
             realm = AuthScope.ANY_REALM;
@@ -203,7 +205,9 @@ public class OutboundHandler extends BaseServiceHandler {
         exchange.getContext().setProperty(ExchangeCompletionEvent.GATEWAY_NAME, _bindingName, Scope.EXCHANGE)
                 .addLabels(BehaviorLabel.TRANSIENT.label());
         if (getState() != State.STARTED) {
-            throw HttpMessages.MESSAGES.bindingNotStarted(_referenceName, _bindingName);
+            final String m = HttpMessages.MESSAGES.bindingNotStarted(_referenceName, _bindingName);
+            LOGGER.error(m);
+            throw new HandlerException(m);
         }
 
         HttpClient httpclient = new DefaultHttpClient();
@@ -294,7 +298,9 @@ public class OutboundHandler extends BaseServiceHandler {
                 exchange.sendFault(out);
             }
         } catch (Exception e) {
-            throw HttpMessages.MESSAGES.unexpectedExceptionHandlingHTTPMessage(e);
+            final String m = HttpMessages.MESSAGES.unexpectedExceptionHandlingHTTPMessage();
+            LOGGER.error(m, e);
+            throw new HandlerException(m, e);
         } finally {
             // When HttpClient instance is no longer needed,
             // shut down the connection manager to ensure

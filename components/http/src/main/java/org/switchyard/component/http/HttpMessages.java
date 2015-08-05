@@ -1,13 +1,11 @@
 package org.switchyard.component.http;
 
-import java.net.MalformedURLException;
 import java.util.Set;
 
 import org.jboss.logging.Cause;
 import org.jboss.logging.Messages;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageBundle;
-import org.switchyard.HandlerException;
 import org.switchyard.SwitchYardException;
 import org.switchyard.metadata.ServiceOperation;
 /**
@@ -63,28 +61,26 @@ public interface HttpMessages {
 
     /**
      * invalidHttpURL method definition.
-     * @param mue the mue
-     * @return  HttpConsumeException
+     * @return  String
      */
     @Message(id = 36405, value = "The address URL seem to be invalid")
-    HttpConsumeException invalidHttpURL(@Cause MalformedURLException mue);
+    String invalidHttpURL();
 
     /**
      * bindingNotStarted method definition.
      * @param _referenceName the _referenceName
      * @param _bindingName the _bindingName
-     * @return  HandlerException
+     * @return  String
      */
     @Message(id = 36406, value = "Reference binding '%s/%s' is not started.")
-    HandlerException bindingNotStarted(String _referenceName, String _bindingName);
+    String bindingNotStarted(String _referenceName, String _bindingName);
 
     /**
      * unexpectedExceptionHandlingHTTPMessage method definition.
-     * @param e the e
-     * @return  HandlerException
+     * @return  String
      */
     @Message(id = 36407, value = "Unexpected exception handling HTTP Message")
-    HandlerException unexpectedExceptionHandlingHTTPMessage(@Cause Exception e);
+    String unexpectedExceptionHandlingHTTPMessage();
 
 }
 

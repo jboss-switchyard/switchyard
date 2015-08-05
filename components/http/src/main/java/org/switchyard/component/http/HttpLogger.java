@@ -62,7 +62,7 @@ public interface HttpLogger {
     void unexpectedExceptionInvokingSwitchyardServcie(@Cause Exception e);
 
     /**
-     * removingProhibitedRequestHeader
+     * removingProhibitedRequestHeader.
      * @param header header
      */
     @LogMessage(level = Level.WARN)

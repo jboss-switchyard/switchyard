@@ -62,6 +62,7 @@
         <version.felix.maven>2.4.0</version.felix.maven>
         <version.wildfly.maven>1.0.2.Final</version.wildfly.maven>
         <version.org.fusesource.mqtt-client>1.6</version.org.fusesource.mqtt-client>
+        <version.org.fusesource.hawtdispatch>1.22</version.org.fusesource.hawtdispatch>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -116,6 +117,19 @@
             <groupId>org.fusesource.mqtt-client</groupId>
             <artifactId>mqtt-client</artifactId>
             <version>${version.org.fusesource.mqtt-client}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.fusesource.hawtdispatch</groupId>
+            <artifactId>hawtdispatch</artifactId>
+            <version>${version.org.fusesource.hawtdispatch}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.fusesource.hawtdispatch</groupId>
+            <artifactId>hawtdispatch-transport</artifactId>
+            <version>${version.org.fusesource.hawtdispatch}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <build>

@@ -20,6 +20,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.concurrent.TimeUnit;
 
+import org.fusesource.hawtdispatch.Dispatch;
 import org.fusesource.mqtt.client.BlockingConnection;
 import org.fusesource.mqtt.client.MQTT;
 import org.fusesource.mqtt.client.Message;
@@ -80,6 +81,7 @@ public final class MQTTClient {
             if (subscribeConnection != null && subscribeConnection.isConnected()) {
                 subscribeConnection.disconnect();
             }
+            Dispatch.shutdown();
         }
     }
 }

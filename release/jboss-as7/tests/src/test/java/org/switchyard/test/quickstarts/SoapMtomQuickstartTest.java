@@ -32,7 +32,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.switchyard.common.xml.XMLHelper;
-import org.switchyard.component.soap.util.SOAPUtil;
 import org.switchyard.test.ArquillianUtil;
 
 /*

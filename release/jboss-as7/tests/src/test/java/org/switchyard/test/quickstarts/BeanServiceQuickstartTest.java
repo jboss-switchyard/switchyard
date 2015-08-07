@@ -18,8 +18,6 @@ import java.io.StringReader;
 
 import javax.xml.namespace.QName;
 
-import junit.framework.Assert;
-
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -29,6 +27,7 @@ import org.jboss.as.arquillian.container.ManagementClient;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.dmr.ModelNode;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.switchyard.common.type.Classes;

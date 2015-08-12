@@ -96,9 +96,7 @@ public class CertificateLoginModule extends SwitchYardLoginModule {
             return false;
         } else {
             Set<Principal> principals = getSubject().getPrincipals();
-            String userName = _verifiedCallerCertificate.getSubjectX500Principal().getName();
-            // get the CN from the DN.
-            userName = userName.substring(userName.indexOf('=') + 1, userName.indexOf(','));
+            String userName = getUserName();
             UserPrincipal authenticatedPrincipal = new UserPrincipal(userName);
             principals.add(authenticatedPrincipal);
             // maybe add roles
@@ -165,4 +163,13 @@ public class CertificateLoginModule extends SwitchYardLoginModule {
         return null;
     }
 
+    private String getUserName() {
+        String userName = _verifiedCallerCertificate.getSubjectX500Principal().getName();
+        if (Boolean.parseBoolean(getOption("useDistinguishedName", false))) {
+            return userName;
+        } else {
+            // get the CN from the DN.
+            return userName.substring(userName.indexOf('=') + 1, userName.indexOf(','));
+        }
+    }
 }

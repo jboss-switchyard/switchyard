@@ -6,7 +6,7 @@
  * You may obtain a copy of the License at
  * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,  
+ * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
@@ -23,7 +23,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.xml.namespace.QName;
 
 import junit.framework.Assert;
-
 import org.apache.camel.Processor;
 import org.apache.camel.builder.LoggingErrorHandlerBuilder;
 import org.apache.camel.spi.RouteContext;
@@ -108,7 +107,7 @@ public class CamelExchangeBusTest {
 
         assertNoCause("Service is not implemented", exchange);
     }
-    
+
     /**
      * Verify consumer callback is called when fault occurs on InOnly.
      */
@@ -118,7 +117,7 @@ public class CamelExchangeBusTest {
         MockHandler consumer = new MockHandler();
         Exchange exchange = ref.createExchange(consumer);
         exchange.send(exchange.createMessage().setContent("test"));
-        
+
         Assert.assertEquals(1, consumer.waitForFaultMessage().getFaults().size());
     }
 
@@ -129,14 +128,14 @@ public class CamelExchangeBusTest {
     public void testBeforeProviderErrorInOut() {
         ErrorInterceptor interceptor = new ErrorInterceptor(false, ExchangeInterceptor.PROVIDER);
         _camelContext.getWritebleRegistry().put("interceptor", interceptor);
-
+        _provider.init(_domain);
         ServiceReference ref = registerInOutService("inOut");
         Exchange exchange = sendMessage(ref, TEST_CONTENT);
 
         assertNoCause("Error before on target Provider", exchange);
         Assert.assertEquals(2, interceptor.getCount());
     }
-    
+
     /**
      * Basic dispatcher test which verifies erroneous interceptor.
      */
@@ -144,14 +143,14 @@ public class CamelExchangeBusTest {
     public void testAfterProviderErrorInOut() {
         ErrorInterceptor interceptor = new ErrorInterceptor(true, ExchangeInterceptor.PROVIDER);
         _camelContext.getWritebleRegistry().put("interceptor", interceptor);
-        
+        _provider.init(_domain);
         ServiceReference ref = registerInOutService("inOut");
         Exchange exchange = sendMessage(ref, TEST_CONTENT);
 
         assertNoCause("Error after on target Provider", exchange);
         Assert.assertEquals(2, interceptor.getCount());
     }
-    
+
     /**
      * Basic dispatcher test which verifies erroneous interceptor.
      */
@@ -159,14 +158,14 @@ public class CamelExchangeBusTest {
     public void testBeforeProviderErrorInOnly() {
         ErrorInterceptor interceptor = new ErrorInterceptor(false, ExchangeInterceptor.PROVIDER);
         _camelContext.getWritebleRegistry().put("interceptor", interceptor);
-
+        _provider.init(_domain);
         ServiceReference ref = registerInOnlyService("inOnly", new MockHandler());
         Exchange exchange = sendMessage(ref, TEST_CONTENT);
 
         assertNoCause("Error before on target Provider", exchange);
         Assert.assertEquals(2, interceptor.getCount());
     }
-    
+
     /**
      * Basic dispatcher test which verifies erroneous interceptor.
      */
@@ -174,7 +173,7 @@ public class CamelExchangeBusTest {
     public void testAfterProviderErrorInOnly() {
         ErrorInterceptor interceptor = new ErrorInterceptor(true, ExchangeInterceptor.PROVIDER);
         _camelContext.getWritebleRegistry().put("interceptor", interceptor);
-
+        _provider.init(_domain);
         ServiceReference ref = registerInOnlyService("inOnly", new MockHandler());
         Exchange exchange = sendMessage(ref, TEST_CONTENT);
 
@@ -190,7 +189,7 @@ public class CamelExchangeBusTest {
         RuntimeErrorInterceptor interceptor = new RuntimeErrorInterceptor(
                 false, ExchangeInterceptor.PROVIDER);
         _camelContext.getWritebleRegistry().put("interceptor", interceptor);
-
+        _provider.init(_domain);
         ServiceReference ref = registerInOutService("inOut");
         Exchange exchange = sendMessage(ref, TEST_CONTENT);
 
@@ -206,7 +205,7 @@ public class CamelExchangeBusTest {
         RuntimeErrorInterceptor interceptor = new RuntimeErrorInterceptor(
                 true, ExchangeInterceptor.PROVIDER);
         _camelContext.getWritebleRegistry().put("interceptor", interceptor);
-
+        _provider.init(_domain);
         ServiceReference ref = registerInOutService("inOut");
         Exchange exchange = sendMessage(ref, TEST_CONTENT);
 
@@ -223,6 +222,7 @@ public class CamelExchangeBusTest {
         ErrorInterceptor afterFault = new ErrorInterceptor(true, ExchangeInterceptor.PROVIDER);
         _camelContext.getWritebleRegistry().put("beforeFault", beforeFault);
         _camelContext.getWritebleRegistry().put("afterFault", afterFault);
+        _provider.init(_domain);
         ServiceReference ref = registerInOutService("inOut");
         Exchange exchange = sendMessage(ref, TEST_CONTENT);
 
@@ -247,12 +247,12 @@ public class CamelExchangeBusTest {
         assertTrue(fired.get());
         assertCause("Runtime error", exchange);
     }
-    
+
     @Test
     public void testContentTypes() throws Exception {
         TypeInterceptor types = new TypeInterceptor();
         _camelContext.getWritebleRegistry().put("types", types);
-        
+        _provider.init(_domain);
         QName inType = new QName("urn:foo", "in");
         QName outType = new QName("urn:bar", "out");
 
@@ -319,7 +319,7 @@ public class CamelExchangeBusTest {
         reference.setDispatcher(_provider.createDispatcher(reference));
         return reference;
     }
-    
+
     private ServiceReference registerInOutService(String name, ExchangeHandler handler) {
         ServiceReferenceImpl reference = new ServiceReferenceImpl(
                 new QName(name), new InOutService(), _domain, null);
@@ -333,10 +333,10 @@ public class CamelExchangeBusTest {
         exchange.send(exchange.createMessage().setContent(content));
         return exchange;
     }
-    
+
     private ServiceReference registerInOutServiceWithTypes(
             String serviceName, QName inputType, QName outputType, ExchangeHandler handler) {
-        
+
         InOutService intf = new InOutService(new InOutOperation("process", inputType, outputType));
         ServiceReferenceImpl reference = new ServiceReferenceImpl(
                 new QName(serviceName),  intf, _domain, null);

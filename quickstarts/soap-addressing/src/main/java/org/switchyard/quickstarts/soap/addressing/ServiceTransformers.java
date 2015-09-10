@@ -75,17 +75,6 @@ public class ServiceTransformers {
         return toElement(ackXml.toString());
     }
 
-    @Transformer(to = "{urn:switchyard-quickstart:soap-addressing:1.0}ItemNotAvailable")
-    public Element transformFromItemNotAvailable(ItemNotAvailable fault) {
-        StringBuffer ackXml = new StringBuffer()
-            .append("<SOAP-ENV:Fault xmlns:ns4=\"http://www.w3.org/2003/05/soap-envelope\">")
-            .append("<faultcode>SOAP-ENV:Server</faultcode>")
-            .append("<faultstring>" + fault.getMessage() + "</faultstring>")
-            .append("</SOAP-ENV:Fault>");
-
-        return toElement(ackXml.toString());
-    }
-
     /**
      * Returns the text value of a child node of parent.
      */

@@ -26,6 +26,9 @@
     <description>Library used to communicate with remote SwitchYard instances</description>
     <url>http://switchyard.org</url>
     <properties>
+        <!-- override jgroups, no 3.2.14.Final publicly available -->
+        <version.org.jgroups>3.2.13.Final</version.org.jgroups>
+        
         <switchyard.osgi.export.pkg>
             org.switchyard.remote.*
         </switchyard.osgi.export.pkg>
@@ -78,4 +81,13 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.jgroups</groupId>
+                <artifactId>jgroups</artifactId>
+                <version>${version.org.jgroups}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 </project>

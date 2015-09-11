@@ -17,7 +17,7 @@
     <parent>
         <groupId>org.jboss.integration-platform</groupId>
         <artifactId>jboss-integration-platform-parent</artifactId>
-        <version>6.0.0-SNAPSHOT</version>
+        <version>6.0.0.CR27</version>
     </parent>
     <groupId>org.switchyard</groupId>
     <artifactId>switchyard-parent</artifactId>
@@ -63,7 +63,7 @@
         <!-- consider moving to integration platform bom -->
         <version.camelsap>6.2.0.redhat-064</version.camelsap>
         <version.org.fusesource.mqtt-client>1.6</version.org.fusesource.mqtt-client>
-	<version.org.jboss.as>7.5.0.Final-redhat-21</version.org.jboss.as>
+        <version.org.jboss.as>7.5.0.Final-redhat-21</version.org.jboss.as>
         <!--  RiftSaw -->
         <version.activity.monitor.model>1.2.2.Final</version.activity.monitor.model>
         <version.overlord-commons>2.0.2.Final</version.overlord-commons>
@@ -78,6 +78,8 @@
         <version.org.jbpm>6.2.0.CR3</version.org.jbpm>
         <!-- Require investigation and/or will be removed  -->
         <version.jbossws.jboss720.server.integration>4.2.0.Final</version.jbossws.jboss720.server.integration>
+        <version.org.jgroups>3.2.13.Final</version.org.jgroups>
+        <version.org.jboss.jbossts.xts>4.17.29.Final</version.org.jboss.jbossts.xts>
         <!-- Plugin versions -->
         <version.felix.maven>2.4.0</version.felix.maven>
         <version.maven.clean.plugin>2.5</version.maven.clean.plugin>
@@ -785,6 +787,11 @@
                 <groupId>org.jboss.soa.bpel</groupId>
                 <artifactId>riftsaw-bpel-dao</artifactId>
                 <version>${version.riftsaw.ode}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jgroups</groupId>
+                <artifactId>jgroups</artifactId>
+                <version>${version.org.jgroups}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.soa.bpel</groupId>
@@ -1635,6 +1642,201 @@
                 <artifactId>switchyard-demo-security-propagation-basic</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            
+            
+            <!-- Need to add because ip-bom is using 4.17.30 but there is no 4.17.30 community release -->
+            <dependency>
+                <groupId>org.jboss.jbossts.xts</groupId>
+                <artifactId>jbossxts</artifactId>
+                <version>${version.org.jboss.jbossts.xts}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>byteman</artifactId>
+                        <groupId>org.jboss.byteman</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>byteman-submit</artifactId>
+                        <groupId>org.jboss.byteman</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>commons-httpclient</artifactId>
+                        <groupId>commons-httpclient</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>emma</artifactId>
+                        <groupId>emma</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>emma_ant</artifactId>
+                        <groupId>emma</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>jacorb</artifactId>
+                        <groupId>jacorb</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>idl</artifactId>
+                        <groupId>jacorb</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>jfreechart</artifactId>
+                        <groupId>jfree</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>jcommon</artifactId>
+                        <groupId>jfree</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>jboss-corba-ots-spi</artifactId>
+                        <groupId>org.jboss.integration</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>jboss-transaction-api</artifactId>
+                        <groupId>org.jboss.javaee</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>jboss-server-manager</artifactId>
+                        <groupId>org.jboss.jbossas</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>arjunacore</artifactId>
+                        <groupId>org.jboss.jbossts.arjunacore</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>jdeparser</artifactId>
+                        <groupId>org.jboss.jdeparser</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>jboss-logging-processor</artifactId>
+                        <groupId>org.jboss.logging</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>jboss-logging-spi</artifactId>
+                        <groupId>org.jboss.logging</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>jboss-logging-generator</artifactId>
+                        <groupId>org.jboss.logging</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>jboss-remoting</artifactId>
+                        <groupId>org.jboss.remoting</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>jfreechart</artifactId>
+                        <groupId>org.jfree</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>jcommon</artifactId>
+                        <groupId>org.jfree</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>wrapper</artifactId>
+                        <groupId>tanukisoft</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>hornetq-core</artifactId>
+                        <groupId>org.hornetq</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.jbossts.xts</groupId>
+                <artifactId>jbossxts</artifactId>
+                <version>${version.org.jboss.jbossts.xts}</version>
+                <classifier>api</classifier>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>byteman</artifactId>
+                        <groupId>org.jboss.byteman</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>byteman-submit</artifactId>
+                        <groupId>org.jboss.byteman</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>commons-httpclient</artifactId>
+                        <groupId>commons-httpclient</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>emma</artifactId>
+                        <groupId>emma</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>emma_ant</artifactId>
+                        <groupId>emma</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>idl</artifactId>
+                        <groupId>jacorb</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>jacorb</artifactId>
+                        <groupId>jacorb</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>jfreechart</artifactId>
+                        <groupId>jfree</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>jcommon</artifactId>
+                        <groupId>jfree</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>jboss-corba-ots-spi</artifactId>
+                        <groupId>org.jboss.integration</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>jboss-server-manager</artifactId>
+                        <groupId>org.jboss.jbossas</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>arjunacore</artifactId>
+                        <groupId>org.jboss.jbossts.arjunacore</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>jdeparser</artifactId>
+                        <groupId>org.jboss.jdeparser</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>jboss-logging-processor</artifactId>
+                        <groupId>org.jboss.logging</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>jboss-logging-spi</artifactId>
+                        <groupId>org.jboss.logging</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>jboss-logging-generator</artifactId>
+                        <groupId>org.jboss.logging</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>jboss-transaction-api</artifactId>
+                        <groupId>org.jboss.javaee</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>jboss-remoting</artifactId>
+                        <groupId>org.jboss.remoting</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>jfreechart</artifactId>
+                        <groupId>org.jfree</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>jcommon</artifactId>
+                        <groupId>org.jfree</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>wrapper</artifactId>
+                        <groupId>tanukisoft</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>hornetq-core</artifactId>
+                        <groupId>org.hornetq</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+        
         </dependencies>
     </dependencyManagement>
     <distributionManagement>

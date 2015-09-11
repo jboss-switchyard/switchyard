@@ -42,6 +42,9 @@
         </license>
     </licenses>
     <properties>
+        <!-- override jgroups, no 3.2.14.Final publicly available -->
+        <version.org.jgroups>3.2.13.Final</version.org.jgroups>
+        
         <skipTests>true</skipTests>
         <deploy.skip>true</deploy.skip>
         <wildfly.port>9999</wildfly.port>
@@ -58,6 +61,11 @@
                 <version>${project.version}</version>
                 <scope>import</scope>
                 <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>org.jgroups</groupId>
+                <artifactId>jgroups</artifactId>
+                <version>${version.org.jgroups}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

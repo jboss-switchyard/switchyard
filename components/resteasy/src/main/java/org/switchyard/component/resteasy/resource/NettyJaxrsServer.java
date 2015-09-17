@@ -14,6 +14,7 @@
  
 package org.switchyard.component.resteasy.resource;
 
+import org.jboss.logging.Logger;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelPipelineFactory;
@@ -45,6 +46,8 @@ import javax.net.ssl.SSLContext;
  */
 public class NettyJaxrsServer implements EmbeddedJaxrsServer
 {
+   private static final Logger LOGGER = Logger.getLogger(NettyJaxrsServer.class);
+   
    protected ServerBootstrap bootstrap;
    protected Channel channel;
    protected int port = ResourcePublisher.DEFAULT_PORT;
@@ -153,6 +156,10 @@ public class NettyJaxrsServer implements EmbeddedJaxrsServer
 
       // Bind and start to accept incoming connections.
       channel = bootstrap.bind(new InetSocketAddress(getPort()));
+      
+      if (LOGGER.isTraceEnabled()) {
+          LOGGER.trace("Started Netty JAXRS Server: port=" + getPort() + ", resources=" + deployment.getResources());
+      }
    }
 
    @Override
@@ -160,6 +167,10 @@ public class NettyJaxrsServer implements EmbeddedJaxrsServer
    {
       channel.close().awaitUninterruptibly();
       bootstrap.releaseExternalResources();
+      bootstrap.shutdown();
       deployment.stop();
+      if (LOGGER.isTraceEnabled()) {
+          LOGGER.trace("Stopped Netty JAXRS Server: port=" + getPort() + ", resources=" + deployment.getResources());
+      }
    }
 }

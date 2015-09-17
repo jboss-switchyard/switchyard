@@ -15,6 +15,7 @@
 package org.switchyard.bus.camel;
 
 import org.apache.camel.ProducerTemplate;
+import org.apache.camel.component.direct.DirectEndpoint;
 import org.apache.camel.impl.DefaultExchange;
 import org.apache.camel.model.ModelCamelContext;
 import org.switchyard.Exchange;
@@ -84,7 +85,13 @@ public class ExchangeDispatcher implements Dispatcher {
                     Throttling.MAX_REQUESTS, throttling.getMaxRequests())
                     .addLabels(BehaviorLabel.TRANSIENT.label());
         }
-        _producer.send("direct:" + exchange.getConsumer().getName(), camelEx.getExchange());
+        
+        String uri = "direct:" + exchange.getConsumer().getName();
+        DirectEndpoint ep = _context.getEndpoint(uri, DirectEndpoint.class);
+        if (ep.getConsumer() == null) {
+            throw BusMessages.MESSAGES.consumerForinternalCamelRouteNotFound(uri);
+        }
+        _producer.send(ep, camelEx.getExchange());
         
     }
 

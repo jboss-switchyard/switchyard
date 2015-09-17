@@ -81,10 +81,16 @@ public final class RESTEasyProxy implements InvocationHandler {
         if (methodName.equals("toString")) {
             return this.toString();
         } else if (methodName.equals("equals")) {
-            return this.equals(proxy);
+            if (proxy == null || args[0] == null) {
+                return false;
+            } else if (proxy == args[0]) {
+                return true;
+            }
+            return false;
         } else if (methodName.equals("hashCode")) {
             return this.hashCode();
         }
+
         RESTEasyBindingData requestData = new RESTEasyBindingData();
         HttpHeaders headers = ResteasyProviderFactory.getContextData(HttpHeaders.class);
         if (headers != null) {

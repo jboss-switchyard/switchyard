@@ -22,18 +22,29 @@ import org.switchyard.component.common.Endpoint;
  * @author Magesh Kumar B <mageshbk@jboss.com> (C) 2012 Red Hat Inc.
  */
 public class StandaloneResource implements Endpoint {
+    
+    private final Callback _callback;
+
+    public StandaloneResource(Callback cb) {
+        _callback = cb;
+    }
 
     /**
      * {@inheritDoc}
      */
     public void start() {
-        // NO OP
+        _callback.onStart();
     }
 
     /**
      * {@inheritDoc}
      */
     public void stop() {
-        // NO OP
+        _callback.onStop();
+    }
+    
+    interface Callback {
+        public void onStart();
+        public void onStop();
     }
 }

@@ -47,6 +47,17 @@ public class RESTEasyBindingTest {
     public void setProperties() {
         System.setProperty("org.switchyard.component.resteasy.standalone.port", "8081");
         System.setProperty("org.switchyard.component.resteasy.standalone.path", "");
+        if (ResourcePublisherFactory.ignoreContext()) {
+            // Context paths are irrelevant for NettyJaxrs server
+            BASE_URL = "http://localhost:8081";
+        }
+    }
+
+    @Test
+    public void test500() throws Exception {
+        // Runtime error
+        int status = http.sendStringAndGetStatus(BASE_URL + "/order/error", "", HTTPMixIn.HTTP_GET);
+        Assert.assertEquals(500, status);
     }
 
     /**
@@ -55,10 +66,6 @@ public class RESTEasyBindingTest {
      */
     @Test
     public void orderServiceRESTEndpoint() throws Exception {
-
-        // Runtime error
-        int status = http.sendStringAndGetStatus(BASE_URL + "/order/error", "", HTTPMixIn.HTTP_GET);
-        Assert.assertEquals(500, status);
 
         // Create our inventory
         String response = null;
@@ -92,7 +99,7 @@ public class RESTEasyBindingTest {
         Assert.assertEquals(SUCCESS, response);
 
         // Try to delete item with wrong composite ID
-        status = http.sendStringAndGetStatus(BASE_URL + "/order/1", "", HTTPMixIn.HTTP_DELETE);
+        int status = http.sendStringAndGetStatus(BASE_URL + "/order/1", "", HTTPMixIn.HTTP_DELETE);
         Assert.assertEquals(400, status);
 
         // Look at our order
@@ -125,13 +132,6 @@ public class RESTEasyBindingTest {
     }
 
     private static String BASE_URL = "http://localhost:8081/rest-binding";
-
-    static {
-        if (ResourcePublisherFactory.ignoreContext()) {
-            // Context paths are irrelevant for NettyJaxrs server
-            BASE_URL = "http://localhost:8081";
-        }
-    }
 
     private static final String SUCCESS = "SUCCESS";
     private static final String ORDER = "<order>"

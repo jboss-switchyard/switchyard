@@ -140,5 +140,11 @@ public interface BusMessages {
     @Message(id = 10816, value = "Camel Bus accepts only CamelExchanges")
     IllegalArgumentException onlyCamelExchanges();
     
-    
+    /**
+     * consumerForInternalCamelRouteNotFound method definition.
+     * @param uri URI string representation
+     * @return SwitchYardException
+     */
+    @Message(id = 10817, value = "Fatal Error - a consumer for internal camel route '%s' not found. SwitchYard deployment is broken for some reason.")
+    SwitchYardException consumerForinternalCamelRouteNotFound(String uri);
 }

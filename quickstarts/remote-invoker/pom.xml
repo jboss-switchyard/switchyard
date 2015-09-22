@@ -43,9 +43,6 @@
         </license>
     </licenses>
     <properties>
-        <!-- override jgroups, no 3.2.14.Final publicly available -->
-        <version.org.jgroups>3.2.13.Final</version.org.jgroups>
-        
         <!-- Bundle symbolic name may not contain dashes -->
         <bundle.symbolic.name>${project.groupId}.switchyard.remote.invoker</bundle.symbolic.name>
         <deploy.skip>true</deploy.skip>
@@ -77,11 +74,6 @@
         </dependencies>
     </dependencyManagement>
     <dependencies>
-        <dependency>
-            <groupId>org.jgroups</groupId>
-            <artifactId>jgroups</artifactId>
-            <version>${version.org.jgroups}</version>
-        </dependency>
         <dependency>
             <groupId>org.switchyard</groupId>
             <artifactId>switchyard-api</artifactId>

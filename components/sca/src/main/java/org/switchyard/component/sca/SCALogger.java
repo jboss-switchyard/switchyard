@@ -1,6 +1,6 @@
 package org.switchyard.component.sca;
 
-import org.jboss.logging.Cause;
+import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.Logger;
 import org.jboss.logging.Logger.Level;
 import org.jboss.logging.annotations.LogMessage;
@@ -72,6 +72,14 @@ public interface SCALogger {
     @LogMessage(level = Level.WARN)
     @Message(id = 39206, value = "Transaction context was received through remote SCA invocation, but remote transaction bridging is disabled on this node. Ignoring.")
     void ignoringReceivedTransactionContext();
+
+    /**
+     * ignoringReceivedWebServiceSecurityHeader method definition.
+     * @param cause cause
+     */
+    @LogMessage(level = Level.WARN)
+    @Message(id = 39207, value = "Web Service Security header was received through remote SCA invocation, but it failed to be parsed due to '%s'. Ignoring.")
+    void ignoringReceivedWebServiceSecurityHeader(String cause);
 
 }
 

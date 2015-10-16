@@ -15,10 +15,16 @@ package org.switchyard.remote.http;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
+
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.jboss.logging.Logger;
 import org.switchyard.Property;
@@ -29,6 +35,7 @@ import org.switchyard.remote.RemoteMessages;
 import org.switchyard.serial.FormatType;
 import org.switchyard.serial.Serializer;
 import org.switchyard.serial.SerializerFactory;
+import org.w3c.dom.Node;
 
 /**
  * Remote service invoker which uses HTTP as a transport.
@@ -39,11 +46,17 @@ public class HttpInvoker implements RemoteInvoker {
      * HTTP header used to communicate the domain name for a service invocation.
      */
     public static final String SERVICE_HEADER = "switchyard-service";
+    /**
+     * HTTP header used to communicate the Web Service Security header.
+     */
+    public static final String WS_SECURITY_HEADER = "switchyard-webservice-security";
 
     /** Property name for username used for authentication. */
     public static final String AUTH_USERNAME = "auth.username";
     /** Property name for password used for authentication. */
     public static final String AUTH_PASSWORD = "auth.password";
+    /** Property name for Web Service Security header element. */
+    public static final String WS_SECURITY = "webservice.security";
 
     private static Logger _log = Logger.getLogger(HttpInvoker.class);
     private Serializer _serializer = SerializerFactory.create(FormatType.JSON, null, true);
@@ -118,6 +131,24 @@ public class HttpInvoker implements RemoteInvoker {
         if (_properties.getProperty(AUTH_USERNAME) != null) {
             conn.setRequestProperty("Authorization",
                     "Basic " + Base64.encodeFromString(_properties.getProperty(AUTH_USERNAME) + ":" + _properties.getProperty(AUTH_PASSWORD)));
+        }
+        
+        if (_properties.get(WS_SECURITY) != null) {
+            Object wsse = _properties.get(WS_SECURITY);
+            if (wsse instanceof Node) {
+                Node wsseNode = Node.class.cast(wsse);
+                StringWriter sw = new StringWriter();
+                try {
+                    Transformer tr = TransformerFactory.newInstance().newTransformer();
+                    tr.transform(new DOMSource(wsseNode), new StreamResult(sw));
+                } catch (Exception e) {
+                    throw RemoteMessages.MESSAGES.invalidWebServiceSecurityHeader(wsse, e);
+                }
+                wsse = sw.toString();
+            } else if (!(wsse instanceof String)) {
+                throw RemoteMessages.MESSAGES.unsupportedWebServiceSecurityHeaderType(wsse.getClass().getName());
+            }
+            conn.setRequestProperty(WS_SECURITY_HEADER, Base64.encodeFromString(wsse.toString()));
         }
     }
 

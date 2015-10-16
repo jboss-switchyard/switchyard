@@ -16,6 +16,8 @@ package org.switchyard.component.sca;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.StringReader;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.servlet.ServletException;
@@ -23,6 +25,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.soap.MessageFactory;
+import javax.xml.soap.SOAPMessage;
 
 import org.jboss.logging.Logger;
 import org.jboss.jbossts.txbridge.inbound.InboundBridge;
@@ -35,6 +40,7 @@ import org.switchyard.Message;
 import org.switchyard.ServiceDomain;
 import org.switchyard.ServiceReference;
 import org.switchyard.SwitchYardException;
+import org.switchyard.common.codec.Base64;
 import org.switchyard.common.type.Classes;
 import org.switchyard.component.common.SynchronousInOutHandler;
 import org.switchyard.deploy.internal.Deployment;
@@ -43,9 +49,13 @@ import org.switchyard.remote.http.HttpInvoker;
 import org.switchyard.security.SecurityServices;
 import org.switchyard.security.context.SecurityContextManager;
 import org.switchyard.security.credential.Credential;
+import org.switchyard.security.credential.extractor.SOAPMessageCredentialExtractor;
 import org.switchyard.serial.FormatType;
 import org.switchyard.serial.Serializer;
 import org.switchyard.serial.SerializerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
 
 import com.arjuna.mw.wst.TxContext;
 import com.arjuna.mw.wst11.TransactionManagerFactory;
@@ -91,6 +101,7 @@ public class SwitchYardRemotingServlet extends HttpServlet {
                     : service.createExchange(msg.getOperation(), replyHandler);
               
             Set<Credential> credentials = SecurityServices.getServletRequestCredentialExtractor().extract(request);
+            credentials.addAll(extractWebServiceSecurityCredentials(request));
             if (credentials != null && !credentials.isEmpty()) {
                 SecurityContextManager scm = new SecurityContextManager(domain);
                 scm.addCredentials(ex, credentials);
@@ -154,6 +165,34 @@ public class SwitchYardRemotingServlet extends HttpServlet {
                 Classes.setTCCL(setTCCL);
             }
         }
+    }
+    
+    private Set<Credential> extractWebServiceSecurityCredentials(HttpServletRequest request) {
+        Set<Credential> credentials = new HashSet<Credential>();
+        String wsseHeader = request.getHeader(HttpInvoker.WS_SECURITY_HEADER);
+        if (wsseHeader != null) {
+            wsseHeader = Base64.decodeToString(wsseHeader);
+            if (_log.isDebugEnabled()) {
+                _log.debug("WebService Security header is found in request message: " + wsseHeader);
+            }
+            
+            try {
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                factory.setNamespaceAware(true);
+                Document doc = factory.newDocumentBuilder().parse(new InputSource(new StringReader(wsseHeader)));
+                
+                SOAPMessage msg = MessageFactory.newInstance().createMessage();
+                Node wsseNode = msg.getSOAPHeader().getOwnerDocument().importNode(doc.getDocumentElement(), true);
+                msg.getSOAPHeader().appendChild(wsseNode);
+                credentials.addAll(new SOAPMessageCredentialExtractor().extract(msg));
+            } catch (Exception e) {
+                SCALogger.ROOT_LOGGER.ignoringReceivedWebServiceSecurityHeader(e.getMessage());
+                if (_log.isDebugEnabled()) {
+                    _log.warn("",e);
+                }
+            }
+        }
+        return credentials;
     }
     
     private boolean bridgeIncomingTransaction(HttpServletRequest request) {

@@ -6,7 +6,6 @@ import org.jboss.logging.Messages;
 import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageBundle;
-
 import org.switchyard.SwitchYardException;
 
 /**
@@ -38,4 +37,21 @@ public interface RemoteMessages {
      */
     @Message(id = 13401, value = "Invalid URL for remote endpoint: %s")
     IllegalArgumentException invalidURLForEndpoint(String endpoint, @Cause MalformedURLException mue);
+
+    /**
+     * unsupportedWebServiceSecurityHeaderType method definition.
+     * @param type type
+     * @return IllegalArgumentException
+     */
+    @Message(id = 13402, value = "Unsupported Web Service Security header type '%s': only String or DOM Node is supported")
+    IllegalArgumentException unsupportedWebServiceSecurityHeaderType(String type);
+
+    /**
+     * invalidWebServiceSecurityHeader method definition.
+     * @param wsse wsse
+     * @param e cause
+     * @return IllegalArgumentException
+     */
+    @Message(id = 13403, value = "Invalid Web Service Security header '%s'")
+    IllegalArgumentException invalidWebServiceSecurityHeader(Object wsse, @Cause Exception e);
 }

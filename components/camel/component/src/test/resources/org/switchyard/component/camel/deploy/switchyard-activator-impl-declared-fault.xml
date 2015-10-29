@@ -25,6 +25,14 @@
                 <sca:interface.java interface="org.switchyard.component.camel.deploy.support.OrderServiceWithFault"/>
             </sca:service>
         </sca:component>
+        <sca:component name="CamelComponentInOnly">
+            <camel:implementation.camel xmlns="urn:switchyard-component-camel:config:1.0">
+                <xml path="org/switchyard/component/camel/deploy/error-route-inonly.xml"/>
+            </camel:implementation.camel>
+            <sca:service name="OrderServiceInOnly" >
+                <sca:interface.java interface="org.switchyard.component.camel.deploy.support.OrderServiceWithFaultInOnly"/>
+            </sca:service>
+        </sca:component>
     </sca:composite>
 
 </switchyard>

@@ -17,12 +17,14 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.switchyard.HandlerException;
 import org.switchyard.component.camel.deploy.support.CustomException;
+import org.switchyard.component.camel.deploy.support.UndeclaredFaultException;
 import org.switchyard.component.test.mixins.cdi.CDIMixIn;
+import org.switchyard.test.InvocationFaultException;
 import org.switchyard.test.Invoker;
 import org.switchyard.test.ServiceOperation;
 import org.switchyard.test.SwitchYardRunner;
@@ -41,29 +43,88 @@ public class CamelImplementationDeclaredFaultHandlingTest {
     @ServiceOperation("OrderService.getTitleForItem")
     private Invoker _getTitleForItem;
 
-    @Rule
-    public SwitchYardExpectedException thrown = SwitchYardExpectedException.none();
+    @ServiceOperation("OrderServiceInOnly.getTitleForItem")
+    private Invoker _getTitleForItemInOnly;
 
     private CamelContext _camelContext;
 
-    @Before
-    public void setupMockEndpoint() {
+    @Test
+    public void shouldThrowDeclaredExceptionFromCamelRoute() throws Exception {
         final MockEndpoint endpoint = _camelContext.getEndpoint("mock://throw", MockEndpoint.class);
-        endpoint.whenAnyExchangeReceived(new ExceptionThrowingProcesor());
+        endpoint.whenAnyExchangeReceived(new DeclaredExceptionThrowingProcessor());
+        try {
+            _getTitleForItem.sendInOut("10");
+            Assert.fail("Expected Exception was not thrown");
+        } catch (InvocationFaultException e) {
+            e.printStackTrace();
+            Throwable cause = e.getCause();
+            Assert.assertTrue("Unexpected Exception is thrown: " + cause.getClass().getName(), cause instanceof CustomException);
+            Assert.assertEquals("dummy exception", cause.getMessage());
+        }
     }
 
-    @Test 
-    public void shouldThrowDeclaredExceptionFromCamelRoute() throws Exception {
-        thrown.expect(CustomException.class);
-        thrown.expectMessage("dummy exception");
-        _getTitleForItem.sendInOut("10");
+    @Test
+    public void shouldWrapUndeclaredExceptionWithHandlerException() throws Exception {
+        final MockEndpoint endpoint = _camelContext.getEndpoint("mock://throw", MockEndpoint.class);
+        endpoint.whenAnyExchangeReceived(new UndeclaredExceptionThrowingProcessor());
+        try {
+            _getTitleForItem.sendInOut("10");
+            Assert.fail("Expected Exception was not thrown");
+        } catch (InvocationFaultException e) {
+            e.printStackTrace();
+            Throwable he = e.getCause();
+            Assert.assertTrue("Undeclared fault should be wrapped with HandlerException", he instanceof HandlerException);
+            Throwable cause = he.getCause();
+            Assert.assertTrue("Unexpected Exception is thrown: " + cause.getClass().getName(), cause instanceof UndeclaredFaultException);
+            Assert.assertEquals("dummy undeclared exception", cause.getMessage());
+        }
     }
-    
-    private class ExceptionThrowingProcesor implements Processor {
+
+    @Test
+    public void shouldWrapDeclaredExceptionWithHandlerExceptionOnInOnly() throws Exception {
+        final MockEndpoint endpoint = _camelContext.getEndpoint("mock://throw", MockEndpoint.class);
+        endpoint.whenAnyExchangeReceived(new DeclaredExceptionThrowingProcessor());
+        try {
+            _getTitleForItemInOnly.sendInOnly("10");
+            Assert.fail("Expected Exception was not thrown");
+        } catch (InvocationFaultException e) {
+            e.printStackTrace();
+            Throwable he = e.getCause();
+            Assert.assertTrue("On IN_ONLY, any fault should be wrapped with HandlerException", he instanceof HandlerException);
+            Throwable cause = he.getCause();
+            Assert.assertTrue("Unexpected Exception is thrown: " + cause.getClass().getName(), cause instanceof CustomException);
+            Assert.assertEquals("dummy exception", cause.getMessage());
+        }
+    }
+
+    @Test
+    public void shouldWrapUndeclaredExceptionWithHandlerExceptionOnInOnly() throws Exception {
+        final MockEndpoint endpoint = _camelContext.getEndpoint("mock://throw", MockEndpoint.class);
+        endpoint.whenAnyExchangeReceived(new UndeclaredExceptionThrowingProcessor());
+        try {
+            _getTitleForItemInOnly.sendInOnly("10");
+            Assert.fail("Expected Exception was not thrown");
+        } catch (InvocationFaultException e) {
+            e.printStackTrace();
+            Throwable he = e.getCause();
+            Assert.assertTrue("On IN_ONLY, any fault should be wrapped with HandlerException", he instanceof HandlerException);
+            Throwable cause = he.getCause();
+            Assert.assertTrue("Unexpected Exception is thrown: " + cause.getClass().getName(), cause instanceof UndeclaredFaultException);
+            Assert.assertEquals("dummy undeclared exception", cause.getMessage());
+        }
+    }
+
+    private class DeclaredExceptionThrowingProcessor implements Processor {
         @Override
         public void process(Exchange exchange) throws Exception {
             throw new CustomException("dummy exception");
         }
     }
 
+    private class UndeclaredExceptionThrowingProcessor implements Processor {
+        @Override
+        public void process(Exchange exchange) throws Exception {
+            throw new UndeclaredFaultException("dummy undeclared exception");
+        }
+    }
 }

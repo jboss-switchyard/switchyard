@@ -108,12 +108,17 @@ public class SwitchYardConsumer extends DefaultConsumer implements ServiceHandle
                 }
             }
 
+            // SWITCHYARD-2814 - since fault type is never declared on IN_ONLY operation,
+            // any Throwable will be wrapped with HandlerException. Even if the Java interface
+            // declares any Exception on service operation, that will be ignored.
             if (camelFault != null && declaredFault != null && declaredFault.isAssignableFrom(camelFault.getClass())) {
                 Message msg = switchyardExchange.createMessage().setContent(camelFault);
                 switchyardExchange.sendFault(msg);
             } else if (camelFault instanceof Throwable) {
                 throw new HandlerException(Throwable.class.cast(camelFault));
             } else if (camelFault instanceof Node) {
+                // TODO SWITCHYARD-2816 - Check if the fault is declared in WSDL, otherwise
+                // wrap the fault with HandlerException
                 Message msg = switchyardExchange.createMessage().setContent((Node)camelFault);
                 switchyardExchange.sendFault(msg);
             } else {

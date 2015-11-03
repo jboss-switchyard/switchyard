@@ -56,10 +56,38 @@
       </output>
     </operation>
   </binding>
+
+  <message name="heartBeatRequest">
+  </message>
+
+  <portType name="HeartBeatService">
+    <operation name="heartBeat">
+      <input message="tns:heartBeatRequest"/>
+      <output message="string"/>
+    </operation>
+  </portType>
+
+  <binding name="HeartBeatServiceBinding" type="tns:HeartBeatService">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+    <operation name="heartBeat">
+      <soap:operation soapAction="urn:switchyard-component-soap:test-ws:1.0"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+  </binding>
   
   <service name="OrderService">
     <port name="OrderServicePort" binding="tns:OrderServiceBinding">
       <soap:address location="http://localhost:18001/OrderService"/>
+    </port>
+  </service>
+  <service name="HeartBeatService">
+    <port name="HeartBeatServicePort" binding="tns:HeartBeatServiceBinding">
+      <soap:address location="REPLACE_WITH_ACTUAL_URL"/>
     </port>
   </service>
 </definitions>

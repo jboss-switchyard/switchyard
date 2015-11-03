@@ -371,13 +371,19 @@ outer:      while (services.hasNext()) {
             if (!documentStyle && (elementName.getLocalPart().equals(operation.getName()))) {
                 return operation;
             } else {
-                // Note: WS-I Profile allows only one child under SOAPBody.
-                Part part = (Part)operation.getInput().getMessage().getParts().values().iterator().next();
-                if ((part.getElementName() != null) && elementName.equals(part.getElementName())
-                    || (part.getTypeName() != null) && elementName.equals(part.getTypeName())) {
-                    return operation;
-                } else if (elementName.getLocalPart().equals(operation.getName())) {
-                    return operation;
+                    if ((operation.getInput() != null)
+                        && (operation.getInput().getMessage() != null)
+                        && (operation.getInput().getMessage().getParts() != null)
+                        && !operation.getInput().getMessage().getParts().isEmpty()) {
+                        // Note: WS-I Profile allows only one child under SOAPBody.
+                        Part part = (Part)operation.getInput().getMessage().getParts().values().iterator().next();
+                        if ((part.getElementName() != null) && elementName.equals(part.getElementName())
+                            || (part.getTypeName() != null) && elementName.equals(part.getTypeName())) {
+                            return operation;
+                        } else if (elementName.getLocalPart().equals(operation.getName())) {
+                            return operation;
+                        }
+             //       }
                 }
             }
         }
@@ -574,8 +580,37 @@ outer:      while (services.hasNext()) {
             String namespace = targetNamespace.endsWith(delimiter) ? targetNamespace.substring(0, targetNamespace.length()-2) : targetNamespace;
             if (operation.getInput().getName() != null) {
                 action = namespace + delimiter + port.getBinding().getPortType().getQName().getLocalPart() + delimiter + operation.getInput().getName();
+                System.out.println("1." + action);
+                StringBuffer test = new StringBuffer(namespace);
+                test.append(delimiter);
+                if ((port.getBinding() != null)
+                    && (port.getBinding().getPortType() != null)
+                    && (port.getBinding().getPortType().getQName() != null)
+                    && (port.getBinding().getPortType().getQName().getLocalPart() != null)) {
+                    test.append(port.getBinding().getPortType().getQName().getLocalPart());
+                }
+                test.append(delimiter);
+                if (operation.getInput() != null) {
+                    test.append(operation.getInput().getName());
+                }
+                action = test.toString();
+                System.out.println("1a." + action);
             } else {
                 action = namespace + delimiter + port.getBinding().getPortType().getQName().getLocalPart() + delimiter + operation.getName() + REQUEST_SUFFIX;
+                System.out.println("2." + action);
+                StringBuffer test = new StringBuffer(namespace);
+                test.append(delimiter);
+                if ((port.getBinding() != null)
+                    && (port.getBinding().getPortType() != null)
+                    && (port.getBinding().getPortType().getQName() != null)
+                    && (port.getBinding().getPortType().getQName().getLocalPart() != null)) {
+                    test.append(port.getBinding().getPortType().getQName().getLocalPart());
+                }
+                test.append(delimiter);
+                test.append(operation.getName());
+                test.append(REQUEST_SUFFIX);
+                action = test.toString();
+                System.out.println("2a." + action);
             }
         }
 
@@ -613,8 +648,38 @@ outer:      while (services.hasNext()) {
             String namespace = targetNamespace.endsWith(delimiter) ? targetNamespace.substring(0, targetNamespace.length()-2) : targetNamespace;
             if (operation.getOutput().getName() != null) {
                 action = namespace + delimiter + port.getBinding().getPortType().getQName().getLocalPart() + delimiter + operation.getOutput().getName();
+                System.out.println("3." + action);
+                StringBuffer test = new StringBuffer(namespace);
+                test.append(delimiter);
+                if ((port.getBinding() != null)
+                    && (port.getBinding().getPortType() != null)
+                    && (port.getBinding().getPortType().getQName() != null)
+                    && (port.getBinding().getPortType().getQName().getLocalPart() != null)) {
+                    test.append(port.getBinding().getPortType().getQName().getLocalPart());
+                }
+                test.append(delimiter);
+                if (operation.getInput() != null) {
+                    test.append(operation.getOutput().getName());
+                }
+                action = test.toString();
+                System.out.println("3a." + action);
             } else {
                 action = namespace + delimiter + port.getBinding().getPortType().getQName().getLocalPart() + delimiter + operation.getName() + RESPONSE_SUFFIX;
+
+                System.out.println("4." + action);
+                StringBuffer test = new StringBuffer(namespace);
+                test.append(delimiter);
+                if ((port.getBinding() != null)
+                    && (port.getBinding().getPortType() != null)
+                    && (port.getBinding().getPortType().getQName() != null)
+                    && (port.getBinding().getPortType().getQName().getLocalPart() != null)) {
+                    test.append(port.getBinding().getPortType().getQName().getLocalPart());
+                }
+                test.append(delimiter);
+                test.append(operation.getName());
+                test.append(RESPONSE_SUFFIX);
+                action = test.toString();
+                System.out.println("4a." + action);
             }
         }
 
@@ -664,6 +729,25 @@ outer:      while (services.hasNext()) {
             String namespace = targetNamespace.endsWith(delimiter) ? targetNamespace.substring(0, targetNamespace.length()-2) : targetNamespace;
             action = namespace + delimiter + port.getBinding().getPortType().getQName().getLocalPart() + delimiter
                             + operationName.getLocalPart() + delimiter + STR_FAULT + delimiter + fault.getName();
+            System.out.println("5." + action);
+            StringBuffer test = new StringBuffer(namespace);
+            test.append(delimiter);
+            if ((port.getBinding() != null)
+                && (port.getBinding().getPortType() != null)
+                && (port.getBinding().getPortType().getQName() != null)
+                && (port.getBinding().getPortType().getQName().getLocalPart() != null)) {
+                test.append(port.getBinding().getPortType().getQName().getLocalPart());
+            }
+            test.append(delimiter);
+            test.append(operationName.getLocalPart());
+            test.append(delimiter);
+            test.append(STR_FAULT);
+            test.append(delimiter);
+            if (fault != null) {
+                test.append(fault.getName());
+            }
+            action = test.toString();
+            System.out.println("5a." + action);
         }
 
         return action;

@@ -19,6 +19,7 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.xml.namespace.QName;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -32,9 +33,11 @@ import org.junit.runner.RunWith;
 import org.switchyard.Message;
 import org.switchyard.ServiceDomain;
 import org.switchyard.common.net.SocketAddr;
+import org.switchyard.component.soap.PortName;
 import org.switchyard.component.soap.config.model.SOAPBindingModel;
 import org.switchyard.component.soap.config.model.SOAPNamespace;
 import org.switchyard.component.soap.config.model.v1.V1SOAPBindingModel;
+import org.switchyard.component.soap.util.WSDLUtil;
 import org.switchyard.config.model.ModelPuller;
 import org.switchyard.config.model.composite.CompositeModel;
 import org.switchyard.config.model.composite.CompositeReferenceModel;
@@ -61,11 +64,14 @@ public class StandardDocLitTest {
     
     private ServiceDomain _domain = new ServiceDomainManager().createDomain();
     private SOAPBindingModel _config;
+    private SOAPBindingModel _config2;
     private static URL _serviceURL;
     private InboundHandler _soapInbound;
     private OutboundHandler _soapOutbound;
+    private InboundHandler _soapInbound2;
+    private OutboundHandler _soapOutbound2;
     
-    @org.switchyard.test.ServiceOperation("webservice-consumer")
+    @org.switchyard.test.ServiceOperation("{urn:soap:test:1.0}OrderService")
     private Invoker consumerService;
 
     private static ModelPuller<CompositeModel> _puller;
@@ -84,7 +90,6 @@ public class StandardDocLitTest {
         
         CompositeServiceModel compositeService = composite.getServices().get(0);
         _config = (SOAPBindingModel)compositeService.getBindings().get(0);
-
         _domain.registerService(_config.getServiceName(), new OrderServiceInterface(), provider);
         _domain.registerServiceReference(_config.getServiceName(), new OrderServiceInterface());
         
@@ -97,18 +102,40 @@ public class StandardDocLitTest {
         _serviceURL = new URL("http://" + host + ":" + port + "/OrderService");
 
         // A WS Consumer as Service
-        SOAPBindingModel config2 = new V1SOAPBindingModel(SOAPNamespace.DEFAULT.uri()) {
+        SOAPBindingModel outConfig = new V1SOAPBindingModel(SOAPNamespace.DEFAULT.uri()) {
             @Override
             public CompositeReferenceModel getReference() {
                 return new V1CompositeReferenceModel();
             }
         };
-        config2.setWsdl(_serviceURL.toExternalForm() + "?wsdl");
-        config2.setServiceName(consumerService.getServiceName());
-        config2.setName("testGateway");
-        _soapOutbound = new OutboundHandler(config2);
+        outConfig.setWsdl(_serviceURL.toExternalForm() + "?wsdl");
+        outConfig.setServiceName(_config.getServiceName());
+        outConfig.setName("testGateway");
+        _soapOutbound = new OutboundHandler(outConfig);
         _soapOutbound.start();
-        _domain.registerService(consumerService.getServiceName(), new OrderServiceInterface(), _soapOutbound);
+        _domain.registerService(_config.getServiceName(), new OrderServiceInterface(), _soapOutbound);
+
+        compositeService = composite.getServices().get(1);
+        _config2 = (SOAPBindingModel)compositeService.getBindings().get(0);
+        _domain.registerService(_config2.getServiceName(), new HeartBeatServiceInterface(), provider);
+        _domain.registerServiceReference(_config2.getServiceName(), new HeartBeatServiceInterface());
+        _config2.setSocketAddr(new SocketAddr(host, Integer.parseInt(port)));
+        _soapInbound2 = new InboundHandler(_config2, _domain);
+        _soapInbound2.start();
+
+        _serviceURL = new URL("http://" + host + ":" + port + "/HeartBeatService");
+        SOAPBindingModel outConfig2 = new V1SOAPBindingModel(SOAPNamespace.DEFAULT.uri()) {
+            @Override
+            public CompositeReferenceModel getReference() {
+                return new V1CompositeReferenceModel();
+            }
+        };
+        outConfig2.setWsdl(_serviceURL.toExternalForm() + "?wsdl");
+        outConfig2.setServiceName(_config2.getServiceName());
+        outConfig2.setName("heartBeat");
+        _soapOutbound2 = new OutboundHandler(outConfig2);
+        _soapOutbound2.start();
+        _domain.registerService(_config2.getServiceName(), new HeartBeatServiceInterface(), _soapOutbound2);
         
         XMLUnit.setIgnoreWhitespace(true);
     }
@@ -116,6 +143,10 @@ public class StandardDocLitTest {
     @After
     public void tearDown() throws Exception {
         // NOOP
+        _soapOutbound.stop();
+        _soapInbound.stop();
+        _soapOutbound2.stop();
+        _soapInbound2.stop();
     }
 
     @Test
@@ -127,6 +158,18 @@ public class StandardDocLitTest {
         _testKit.compareXMLToResource(response, "/doclit_response.xml");
         
     }
+
+    @Test
+    public void standardDocLitNoInputOperation() throws Exception {
+        
+        try {
+            PortName portName = new PortName("HeartBeatService:HeartBeatServicePort");
+            WSDLUtil.getOperationByElement(WSDLUtil.getPort(WSDLUtil.getService(WSDLUtil.readWSDL("/DoclitOrderService.wsdl"), portName), portName), QName.valueOf("{urn:soap:test:1.0}ping"), true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+    }
     
     private static class OrderServiceInterface extends BaseService {
         private static Set<ServiceOperation> _operations = new HashSet<ServiceOperation>(2);
@@ -134,6 +177,16 @@ public class StandardDocLitTest {
             _operations.add(new InOutOperation("submitOrder"));
         }
         public OrderServiceInterface() {
+            super(_operations);
+        }
+    }
+    
+    private static class HeartBeatServiceInterface extends BaseService {
+        private static Set<ServiceOperation> _operations = new HashSet<ServiceOperation>(1);
+        static {
+            _operations.add(new InOutOperation("heartBeat"));
+        }
+        public HeartBeatServiceInterface() {
             super(_operations);
         }
     }

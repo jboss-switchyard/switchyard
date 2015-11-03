@@ -19,6 +19,7 @@ package org.switchyard.quickstarts.soap.mtom;
 import java.awt.Image;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.switchyard.component.test.mixins.cdi.CDIMixIn;
@@ -42,6 +43,7 @@ public class SoapMtomTest {
         System.setProperty("org.switchyard.component.soap.client.port", "8081");
     }
 
+    @Ignore("SWITCHYARD-2821")
     @Test
     public void testSwitchYardWebService() throws Exception {
         Image image = SoapMtomClient.sendMessage(WSDL);

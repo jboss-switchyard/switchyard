@@ -19,6 +19,7 @@ package org.switchyard.quickstarts.soap.attachment;
 import javax.xml.soap.SOAPMessage;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.switchyard.component.bean.config.model.BeanSwitchYardScanner;
@@ -43,6 +44,7 @@ public class SoapAttachmentTest {
         System.setProperty("org.switchyard.component.soap.client.port", "8081");
     }
 
+    @Ignore("SWITCHYARD-2821 : please reenable after fixing")
     @Test
     public void testSwitchYardWebService() throws Exception {
         SOAPMessage response = SoapAttachmentClient.sendMessage(SWITCHYARD_WEB_SERVICE);

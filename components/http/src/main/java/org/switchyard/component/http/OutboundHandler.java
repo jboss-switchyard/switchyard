@@ -18,13 +18,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.jboss.logging.Logger;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
@@ -57,14 +57,17 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HTTP;
+import org.jboss.logging.Logger;
+import org.switchyard.Context;
 import org.switchyard.Exchange;
 import org.switchyard.HandlerException;
 import org.switchyard.Message;
+import org.switchyard.Property;
 import org.switchyard.Scope;
 import org.switchyard.ServiceDomain;
 import org.switchyard.component.common.composer.MessageComposer;
-import org.switchyard.component.http.composer.HttpComposition;
 import org.switchyard.component.http.composer.HttpBindingData;
+import org.switchyard.component.http.composer.HttpComposition;
 import org.switchyard.component.http.composer.HttpRequestBindingData;
 import org.switchyard.component.http.composer.HttpResponseBindingData;
 import org.switchyard.component.http.config.model.HttpBindingModel;
@@ -89,6 +92,9 @@ public class OutboundHandler extends BaseServiceHandler {
     private static final String HTTP_OPTIONS = "OPTIONS";
     private static final Set<String> REQUEST_HEADER_BLACKLIST
         = new HashSet<String>(Arrays.asList(HTTP.CONTENT_LEN, HTTP.TRANSFER_ENCODING));
+
+    private static final String MAP_AUTH_SCOPE_KEY = "auth_scope";
+    private static final String MAP_AUTH_CACHE_KEY = "auth_cache";
 
     private final HttpBindingModel _config;
     private final String _bindingName;
@@ -140,13 +146,15 @@ public class OutboundHandler extends BaseServiceHandler {
         if (_config.hasAuthentication()) {
             // Set authentication
             if (_config.isBasicAuth()) {
-                _authScope = createAuthScope(_config.getBasicAuthConfig().getHost(), _config.getBasicAuthConfig().getPort(), _config.getBasicAuthConfig().getRealm());
+                _authScope = createAuthScope(_config.getBasicAuthConfig().getHost(), _config
+                    .getBasicAuthConfig().getPort(), _config.getBasicAuthConfig().getRealm(), _baseAddress);
                 _credentials = new UsernamePasswordCredentials(_config.getBasicAuthConfig().getUser(), _config.getBasicAuthConfig().getPassword());
                 // Create AuthCache instance
                 _authCache = new BasicAuthCache();
                 _authCache.put(new HttpHost(_authScope.getHost(), _authScope.getPort()), new BasicScheme(ChallengeState.TARGET));
             } else {
-                _authScope = createAuthScope(_config.getNtlmAuthConfig().getHost(), _config.getNtlmAuthConfig().getPort(), _config.getNtlmAuthConfig().getRealm());
+                _authScope = createAuthScope(_config.getNtlmAuthConfig().getHost(), _config
+                    .getNtlmAuthConfig().getPort(), _config.getNtlmAuthConfig().getRealm(), _baseAddress);
                 _credentials = new NTCredentials(_config.getNtlmAuthConfig().getUser(),
                                     _config.getNtlmAuthConfig().getPassword(),
                                     "",
@@ -160,7 +168,8 @@ public class OutboundHandler extends BaseServiceHandler {
                 _proxyHost = new HttpHost(_config.getProxyConfig().getHost(), -1);
             }
             if (_config.getProxyConfig().getUser() != null) {
-                _authScope = createAuthScope(_config.getProxyConfig().getHost(), _config.getProxyConfig().getPort(), null);
+                _authScope = createAuthScope(_config.getProxyConfig().getHost(), _config.getProxyConfig()
+                    .getPort(), null, _baseAddress);
                 _credentials = new UsernamePasswordCredentials(_config.getProxyConfig().getUser(), _config.getProxyConfig().getPassword());
                 if (_authCache == null) {
                     _authCache = new BasicAuthCache();
@@ -171,10 +180,12 @@ public class OutboundHandler extends BaseServiceHandler {
         _timeout = _config.getTimeout();
     }
 
-    private AuthScope createAuthScope(String host, String portStr, String realm) throws HttpConsumeException {
+
+    private AuthScope createAuthScope(String host, String portStr, String realm, String address)
+        throws HttpConsumeException {
         URL url = null;
         try {
-            url = new URL(_baseAddress);
+            url = new URL(address);
         } catch (MalformedURLException mue) {
             final String m = HttpMessages.MESSAGES.invalidHttpURL();
             LOGGER.error(m, mue);
@@ -193,6 +204,104 @@ public class OutboundHandler extends BaseServiceHandler {
         return new AuthScope(host, port, realm);
     }
 
+    private Map<String, Object> composeAuthScope(String address) {
+        Map<String, Object> authMap = new HashMap<String, Object>();
+        AuthScope authScope = _authScope;
+        AuthCache authCache = _authCache;
+        if (_config.hasAuthentication()) {
+            // Set authentication
+            if (_config.isBasicAuth()) {
+                authScope = createAuthScope(_config.getBasicAuthConfig().getHost(), _config
+                    .getBasicAuthConfig().getPort(), _config.getBasicAuthConfig().getRealm(), address);
+
+                authCache = new BasicAuthCache();
+                authCache.put(new HttpHost(authScope.getHost(), authScope.getPort()),
+                              new BasicScheme(ChallengeState.TARGET));
+            } else {
+                authScope = createAuthScope(_config.getNtlmAuthConfig().getHost(), _config
+                    .getNtlmAuthConfig().getPort(), _config.getNtlmAuthConfig().getRealm(), address);
+
+            }
+        }
+        if (_proxyHost != null) {
+            if (_config.getProxyConfig().getUser() != null) {
+                authScope = createAuthScope(_config.getProxyConfig().getHost(), _config.getProxyConfig()
+                    .getPort(), null, address);
+            }
+        }
+        authMap.put(MAP_AUTH_CACHE_KEY, authCache);
+        authMap.put(MAP_AUTH_SCOPE_KEY, authScope);
+        return authMap;
+    }
+
+    private Map<String, String> decomposeQueryParams(String queryString) {
+        Map<String, String> params = new HashMap<String, String>();
+        if (queryString != null && !queryString.isEmpty()) {
+            if (queryString.startsWith("?")) {
+                queryString = queryString.substring(1);
+            }
+            String[] parametersArray = queryString.split("&");
+            if (parametersArray.length > 0) {
+                for (String parameter_uri : parametersArray) {
+                    if (parameter_uri.contains("=")) {
+                        String[] paramVal = parameter_uri.split("=");
+                        if (paramVal.length == 2) {
+                            params.put(paramVal[0], paramVal[1]);
+                        }
+                    }
+                }
+            }
+        }
+
+        return params;
+    }
+
+    private String composeAddress(Context context) {
+        String uri;
+        if (context.getProperty(org.apache.camel.Exchange.HTTP_URI) != null) {
+            LOGGER.info("HTTP Outbound Handler Message Property Changed: URI="
+                        + context.getProperty(org.apache.camel.Exchange.HTTP_URI).getValue());
+            uri = (String)context.getProperty(org.apache.camel.Exchange.HTTP_URI).getValue();
+        } else {
+            uri = _baseAddress;
+        }
+        if (context.getProperty(org.apache.camel.Exchange.HTTP_QUERY) != null) {
+            LOGGER.info("HTTP Outbound Handler Message Property Changed: HttpQuery="
+                        + context.getProperty(org.apache.camel.Exchange.HTTP_QUERY).getValue());
+            String queryString = (String)context.getProperty(org.apache.camel.Exchange.HTTP_QUERY).getValue();
+            Map<String, String> params = new HashMap<String, String>();
+            // Get the parameters from the URI
+            if (uri.contains("?")) {
+                String uri_query = uri.substring(uri.lastIndexOf("?") + 1);
+                params.putAll(decomposeQueryParams(uri_query));
+            }
+            params.putAll(decomposeQueryParams(queryString));
+            // Build the uri again with these params
+
+            String baseUri;
+            if (uri.contains("?")) {
+                baseUri = uri.substring(0, uri.lastIndexOf("?"));
+            } else {
+                baseUri = uri;
+            }
+            if (params.size() > 0) {
+                uri = baseUri + "?";
+                int i = 0;
+                for (String param_key : params.keySet()) {
+                    uri += param_key + "=" + params.get(param_key);
+                    if (i < params.size() - 1) {
+                        uri += "&";
+                    }
+                    i++;
+                }
+            } else {
+                uri = baseUri;
+            }
+            LOGGER.info("HTTP Outbound Handler Message Property Changed: ComposedURI=" + uri);
+
+        }
+        return uri;
+    }
     /**
      * The handler method that invokes the actual HTTP service when the
      * component is used as a HTTP consumer.
@@ -217,8 +326,22 @@ public class OutboundHandler extends BaseServiceHandler {
             HttpConnectionParams.setSoTimeout(httpParams, _timeout);
         }
         try {
+            String address = composeAddress(exchange.getMessage().getContext());
+            AuthScope authScope;
+            AuthCache authCache;
+            if (address.equals(_baseAddress)) {
+                authScope = _authScope;
+                authCache = _authCache;
+
+            } else {
+                Map<String, Object> authValues = composeAuthScope(address);
+                authCache = (AuthCache)authValues.get(MAP_AUTH_CACHE_KEY);
+                authScope = (AuthScope)authValues.get(MAP_AUTH_SCOPE_KEY);
+            }
             if (_credentials != null) {
-                ((DefaultHttpClient)httpclient).getCredentialsProvider().setCredentials(_authScope, _credentials);
+
+                ((DefaultHttpClient)httpclient).getCredentialsProvider().setCredentials(authScope,
+                                                                                        _credentials);
                 List<String> authpref = new ArrayList<String>();
                 authpref.add(AuthPolicy.NTLM);
                 authpref.add(AuthPolicy.BASIC);
@@ -229,21 +352,52 @@ public class OutboundHandler extends BaseServiceHandler {
             }
             HttpBindingData httpRequest = _messageComposer.decompose(exchange, new HttpRequestBindingData());
             HttpRequestBase request = null;
-            if (_httpMethod.equals(HTTP_GET)) {
-                request = new HttpGet(_baseAddress);
-            } else if (_httpMethod.equals(HTTP_POST)) {
-                request = new HttpPost(_baseAddress);
-                ((HttpPost) request).setEntity(new BufferedHttpEntity(new InputStreamEntity(httpRequest.getBodyBytes(), httpRequest.getBodyBytes().available())));
-            } else if (_httpMethod.equals(HTTP_DELETE)) {
-                request = new HttpDelete(_baseAddress);
-            } else if (_httpMethod.equals(HTTP_HEAD)) {
-                request = new HttpHead(_baseAddress);
-            } else if (_httpMethod.equals(HTTP_PUT)) {
-                request = new HttpPut(_baseAddress);
-                ((HttpPut) request).setEntity(new BufferedHttpEntity(new InputStreamEntity(httpRequest.getBodyBytes(), httpRequest.getBodyBytes().available())));
-            } else if (_httpMethod.equals(HTTP_OPTIONS)) {
-                request = new HttpOptions(_baseAddress);
+            Property httpMethodProp = exchange.getMessage().getContext()
+                .getProperty(org.apache.camel.Exchange.HTTP_METHOD);
+
+
+            if (httpMethodProp != null && !httpMethodProp.getValue().equals("")) {
+                String httpMethod = (String)httpMethodProp.getValue();
+                LOGGER.info("HTTP Outbound Handler Message Property Changed: URL_Method=" + httpMethod);
+                if(httpMethod.equals(HTTP_GET)){
+                    request = new HttpGet(address);
+                }
+                else if(httpMethod.equals(HTTP_POST)){
+                    request = new HttpPost(address);
+                    ((HttpPost) request).setEntity(new BufferedHttpEntity(new InputStreamEntity(httpRequest.getBodyBytes(), httpRequest.getBodyBytes().available())));
+                }
+                else if(httpMethod.equals(HTTP_DELETE)){
+                    request = new HttpDelete(address);
+                }
+                else if(httpMethod.equals(HTTP_HEAD)){
+                    request = new HttpHead(address);
+                }
+                else if(httpMethod.equals(HTTP_PUT)){
+                    request = new HttpPut(address);
+                    ((HttpPut) request).setEntity(new BufferedHttpEntity(new InputStreamEntity(httpRequest.getBodyBytes(), httpRequest.getBodyBytes().available())));
+                }
+                else if(httpMethod.equals(HTTP_OPTIONS)){
+                    request = new HttpOptions(address);
+                }
             }
+            if (request == null) {
+                if (_httpMethod.equals(HTTP_GET)) {
+                    request = new HttpGet(address);
+                } else if (_httpMethod.equals(HTTP_POST)) {
+                    request = new HttpPost(address);
+                    ((HttpPost) request).setEntity(new BufferedHttpEntity(new InputStreamEntity(httpRequest.getBodyBytes(), httpRequest.getBodyBytes().available())));
+                } else if (_httpMethod.equals(HTTP_DELETE)) {
+                    request = new HttpDelete(address);
+                } else if (_httpMethod.equals(HTTP_HEAD)) {
+                    request = new HttpHead(address);
+                } else if (_httpMethod.equals(HTTP_PUT)) {
+                    request = new HttpPut(address);
+                    ((HttpPut) request).setEntity(new BufferedHttpEntity(new InputStreamEntity(httpRequest.getBodyBytes(), httpRequest.getBodyBytes().available())));
+                } else if (_httpMethod.equals(HTTP_OPTIONS)) {
+                    request = new HttpOptions(address);
+                }
+            }
+
             Iterator<Map.Entry<String, List<String>>> entries = httpRequest.getHeaders().entrySet().iterator();
             while (entries.hasNext()) {
                 Map.Entry<String, List<String>> entry = entries.next();
@@ -264,12 +418,12 @@ public class OutboundHandler extends BaseServiceHandler {
             HttpResponse response = null;
             if ((_credentials != null) && (_credentials instanceof NTCredentials)) {
                 // Send a request for the Negotiation
-                response = httpclient.execute(new HttpGet(_baseAddress));
+                response = httpclient.execute(new HttpGet(address));
                 HttpClientUtils.closeQuietly(response);
             }
-            if (_authCache != null) {
+            if (authCache != null) {
                 BasicHttpContext context = new BasicHttpContext();
-                context.setAttribute(ClientContext.AUTH_CACHE, _authCache);
+                context.setAttribute(ClientContext.AUTH_CACHE, authCache);
                 response = httpclient.execute(request, context);
             } else {
                 response = httpclient.execute(request);

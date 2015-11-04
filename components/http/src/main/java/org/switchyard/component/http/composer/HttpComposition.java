@@ -52,6 +52,16 @@ public final class HttpComposition {
             HttpMessageComposer smc = (HttpMessageComposer)mc;
             smc.setComposerConfig(mcm);
         }
+        String includes = mc.getContextMapper().getModel().getIncludes();
+        if (includes != null && !includes.equals("")) {
+            if (!includes.contains(HttpMessageComposer.CAMEL_HTTP_HEADER)) {
+                mc.getContextMapper().getModel()
+                    .setIncludes(includes.concat(" , ").concat(HttpMessageComposer.CAMEL_HTTP_HEADER));
+            }
+        } else {
+            mc.getContextMapper().getModel().setIncludes(HttpMessageComposer.CAMEL_HTTP_HEADER);
+        }
+
         return mc;
     }
 

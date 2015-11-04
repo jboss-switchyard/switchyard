@@ -40,6 +40,8 @@ public class HttpMessageComposer extends BaseMessageComposer<HttpBindingData> {
 
     private MessageComposerModel _config;
 
+    public static final String CAMEL_HTTP_HEADER = "CamelHttp";
+
     /**
      * {@inheritDoc}
      */
@@ -86,11 +88,12 @@ public class HttpMessageComposer extends BaseMessageComposer<HttpBindingData> {
                     }
                     HttpResponseBindingData response = (HttpResponseBindingData) target;
                     response.setStatus(status);
+
                 }
             }
             setContent(content, target);
-        }
 
+        }
         getContextMapper().mapTo(exchange.getContext(), target);
 
         return target;

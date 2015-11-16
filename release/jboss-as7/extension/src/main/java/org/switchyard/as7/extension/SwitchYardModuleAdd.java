@@ -17,10 +17,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.jboss.as.connector.util.ConnectorServices;
 import org.jboss.as.controller.AbstractAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.PathAddress;
+import org.jboss.as.controller.ReloadRequiredWriteAttributeHandler;
 import org.jboss.as.controller.ServiceVerificationHandler;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.as.controller.registry.Resource;
@@ -47,11 +49,10 @@ import org.switchyard.deploy.Component;
  */
 public final class SwitchYardModuleAdd extends AbstractAddStepHandler {
 
-    private static final Logger LOG = Logger.getLogger("org.switchyard");
+    private static final ExtensionLogger LOG = ExtensionLogger.ROOT_LOGGER;
 
-    // TODO use ConnectorServices.RA_REPOSITORY_SERVICE instead once JBoss AS is updated to 7.1.1 or later
-    //private static final ServiceName RA_REPOSITORY_SERVICE_NAME = ConnectorServices.RA_REPOSITORY_SERVICE;
-    private static final ServiceName RA_REPOSITORY_SERVICE_NAME = ServiceName.JBOSS.append("rarepository");
+    private static final ServiceName RA_REPOSITORY_SERVICE_NAME = ConnectorServices.RA_REPOSITORY_SERVICE;
+    //private static final ServiceName RA_REPOSITORY_SERVICE_NAME = ServiceName.JBOSS.append("rarepository");
 
     static final SwitchYardModuleAdd INSTANCE = new SwitchYardModuleAdd();
 
@@ -78,19 +79,11 @@ public final class SwitchYardModuleAdd extends AbstractAddStepHandler {
         return _componentNames;
     }
 
-    @Override
-    protected void populateModel(final ModelNode operation, final Resource resource) {
-        final ModelNode model = resource.getModel();
-
-        populateModel(operation, model);
-    }
 
     @Override
-    protected void populateModel(ModelNode operation, ModelNode subModel) {
-        subModel.get(CommonAttributes.IMPLCLASS).set(operation.get(CommonAttributes.IMPLCLASS));
-        if (operation.hasDefined(CommonAttributes.PROPERTIES)) {
-            subModel.get(CommonAttributes.PROPERTIES).set(operation.get(CommonAttributes.PROPERTIES));
-        }
+    protected void populateModel(ModelNode operation, ModelNode model) throws OperationFailedException {
+        Attributes.IMPLCLASS.validateAndSet(operation, model);
+        Attributes.PROPERTIES.validateAndSet(operation, model);
     }
 
     @Override

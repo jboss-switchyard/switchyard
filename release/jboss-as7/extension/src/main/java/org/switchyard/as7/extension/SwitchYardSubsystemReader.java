@@ -31,13 +31,13 @@ import static org.switchyard.as7.extension.CommonAttributes.SOCKET_BINDING;
 
 import java.util.Collections;
 import java.util.List;
-
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
+import org.jboss.as.controller.operations.common.Util;
 import org.jboss.dmr.ModelNode;
 import org.jboss.staxmapper.XMLElementReader;
 import org.jboss.staxmapper.XMLExtendedStreamReader;
@@ -65,7 +65,7 @@ final class SwitchYardSubsystemReader implements XMLStreamConstants, XMLElementR
         // Require no attributes
         requireNoAttributes(reader);
         // Add our subsystem's 'add' operation
-        ModelNode subsystem = SwitchYardExtension.createAddSubsystemOperation();
+        ModelNode subsystem = Util.createAddOperation(PathAddress.pathAddress(SwitchYardExtension.SUBSYSTEM_PATH));
         list.add(subsystem);
         // Elements
         while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
@@ -86,9 +86,7 @@ final class SwitchYardSubsystemReader implements XMLStreamConstants, XMLElementR
                                     throw unexpectedAttribute(reader, i);
                             }
                         }
-                        if (sockets != null) {
-                            subsystem.get(SOCKET_BINDING).set(sockets);
-                        }
+                        Attributes.SOCKET_BINDING.parseAndSetParameter(sockets, subsystem, reader);
                         requireNoContent(reader);
                         break;
                     case SECURITY_CONFIGS:
@@ -191,18 +189,21 @@ final class SwitchYardSubsystemReader implements XMLStreamConstants, XMLElementR
     }
 
     void parseModuleElement(XMLExtendedStreamReader reader, List<ModelNode> list) throws XMLStreamException {
+        ModelNode moduleAdd = Util.createAddOperation();
+
+
         String identifier = null;
-        String implClass = null;
         final int count = reader.getAttributeCount();
         for (int i = 0; i < count; i++) {
             requireNoNamespaceAttribute(reader, i);
             final Attribute attribute = Attribute.forName(reader.getAttributeLocalName(i));
+            String value = reader.getAttributeValue(i);
             switch (attribute) {
                 case IDENTIFIER:
-                    identifier = reader.getAttributeValue(i);
+                    identifier = value;
                     break;
                 case IMPLCLASS:
-                    implClass = reader.getAttributeValue(i);
+                    Attributes.IMPLCLASS.parseAndSetParameter(value, moduleAdd, reader);
                     break;
                 default:
                     throw unexpectedAttribute(reader, i);
@@ -211,16 +212,12 @@ final class SwitchYardSubsystemReader implements XMLStreamConstants, XMLElementR
         if (identifier == null) {
             throw missingRequired(reader, Collections.singleton(Attribute.IDENTIFIER));
         }
-        if (implClass == null) {
-            throw missingRequired(reader, Collections.singleton(Attribute.IMPLCLASS));
-        }
 
         //Add the 'add' operation for each 'module' child
-        ModelNode moduleAdd = new ModelNode();
-        moduleAdd.get(OP).set(ModelDescriptionConstants.ADD);
-        PathAddress addr = PathAddress.pathAddress(PathElement.pathElement(SUBSYSTEM, SwitchYardExtension.SUBSYSTEM_NAME), PathElement.pathElement(MODULE, identifier));
+        PathAddress addr = PathAddress.pathAddress(SwitchYardExtension.SUBSYSTEM_PATH, PathElement.pathElement(MODULE, identifier));
         moduleAdd.get(OP_ADDR).set(addr.toModelNode());
-        moduleAdd.get(IMPLCLASS).set(implClass);
+
+
 
         while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
             final Element element1 = Element.forName(reader.getLocalName());

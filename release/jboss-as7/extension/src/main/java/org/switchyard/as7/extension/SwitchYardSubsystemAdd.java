@@ -13,9 +13,6 @@
  */
 package org.switchyard.as7.extension;
 
-import static org.switchyard.as7.extension.CommonAttributes.MODULE;
-import static org.switchyard.as7.extension.CommonAttributes.SECURITY_CONFIG;
-import static org.switchyard.as7.extension.CommonAttributes.PROPERTIES;
 import static org.switchyard.as7.extension.CommonAttributes.SOCKET_BINDING;
 
 import java.util.List;
@@ -28,7 +25,6 @@ import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.ServiceVerificationHandler;
-import org.jboss.as.controller.registry.Resource;
 import org.jboss.as.network.SocketBinding;
 import org.jboss.as.server.AbstractDeploymentChainStep;
 import org.jboss.as.server.DeploymentProcessorTarget;
@@ -67,26 +63,16 @@ public final class SwitchYardSubsystemAdd extends AbstractBoottimeAddStepHandler
     private SwitchYardSubsystemAdd() {
     }
 
+
+
     @Override
-    protected void populateModel(final ModelNode operation, final Resource resource) throws OperationFailedException {
-        final ModelNode submodel = resource.getModel();
-        populateModel(operation, submodel);
+    protected void populateModel(final ModelNode operation, final ModelNode model) throws OperationFailedException {
+        Attributes.PROPERTIES.validateAndSet(operation, model);
+        Attributes.SOCKET_BINDING.validateAndSet(operation, model);
     }
 
     @Override
-    protected void populateModel(final ModelNode operation, final ModelNode submodel) throws OperationFailedException {
-        if (operation.hasDefined(SOCKET_BINDING)) {
-            submodel.get(SOCKET_BINDING).set(operation.require(SOCKET_BINDING));
-        }
-        if (operation.hasDefined(PROPERTIES)) {
-            submodel.get(PROPERTIES).set(operation.require(PROPERTIES));
-        }
-        submodel.get(SECURITY_CONFIG).setEmptyObject();
-        submodel.get(MODULE).setEmptyObject();
-    }
-
-    @Override
-    protected void performBoottime(OperationContext context, ModelNode operation, ModelNode model, ServiceVerificationHandler verificationHandler, List<ServiceController<?>> newControllers) {
+    protected void performBoottime(OperationContext context, ModelNode operation, ModelNode model, ServiceVerificationHandler verificationHandler, List<ServiceController<?>> newControllers) throws OperationFailedException {
         LOG.trace("Performing boot time operation " + operation);
         context.addStep(new AbstractDeploymentChainStep() {
             protected void execute(DeploymentProcessorTarget processorTarget) {
@@ -97,13 +83,13 @@ public final class SwitchYardSubsystemAdd extends AbstractBoottimeAddStepHandler
                 processorTarget.addDeploymentProcessor(SwitchYardExtension.SUBSYSTEM_NAME, Phase.INSTALL, priority++, new SwitchYardDeploymentProcessor());
             }
         }, OperationContext.Stage.RUNTIME);
-        LOG.info("Activating SwitchYard Subsystem");
+        LOG.trace("Activating SwitchYard Subsystem");
 
         ServerUtil.setRegistry(context.getServiceRegistry(false));
         final SwitchYardInjectorService injectorService = new SwitchYardInjectorService();
         final ServiceBuilder<Map<String, String>> injectorServiceBuilder = context.getServiceTarget().addService(SwitchYardInjectorService.SERVICE_NAME, injectorService);
-        if (operation.has(SOCKET_BINDING)) {
-            StringTokenizer sockets = new StringTokenizer(operation.get(SOCKET_BINDING).asString(), ",");
+        if (model.hasDefined(SOCKET_BINDING)) {
+            StringTokenizer sockets = new StringTokenizer(Attributes.SOCKET_BINDING.resolveModelAttribute(context,model).asString(), ",");
             while (sockets.hasMoreTokens()) {
                 String socketName = sockets.nextToken();
                 injectorServiceBuilder.addDependency(SocketBinding.JBOSS_BINDING_NAME.append(socketName), SocketBinding.class, injectorService.getSocketBinding(socketName));

@@ -22,7 +22,6 @@ import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.ServiceVerificationHandler;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
-import org.jboss.as.controller.registry.Resource;
 import org.jboss.as.server.AbstractDeploymentChainStep;
 import org.jboss.as.server.DeploymentProcessorTarget;
 import org.jboss.as.server.deployment.Phase;
@@ -48,23 +47,13 @@ public final class SwitchYardExtensionAdd extends AbstractAddStepHandler {
 
     /**
      * Get the list of configured extension names.
-     * 
+     *
      * @return the list of extensions
      */
     public static List<String> getExtensionNames() {
         return _extensionNames;
     }
 
-    @Override
-    protected void populateModel(final ModelNode operation, final Resource resource) {
-        final ModelNode model = resource.getModel();
-
-        populateModel(operation, model);
-    }
-
-    @Override
-    protected void populateModel(ModelNode operation, ModelNode subModel) {
-    }
 
     @Override
     protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model,

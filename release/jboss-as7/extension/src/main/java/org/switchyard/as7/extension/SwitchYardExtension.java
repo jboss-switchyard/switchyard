@@ -26,6 +26,7 @@ import java.util.Locale;
 import org.jboss.as.controller.Extension;
 import org.jboss.as.controller.ExtensionContext;
 import org.jboss.as.controller.PathElement;
+import org.jboss.as.controller.ReloadRequiredRemoveStepHandler;
 import org.jboss.as.controller.ReloadRequiredWriteAttributeHandler;
 import org.jboss.as.controller.ResourceBuilder;
 import org.jboss.as.controller.ResourceDefinition;
@@ -68,10 +69,10 @@ public class SwitchYardExtension implements Extension {
     /** Namespace for this subsystem. */
     public static final String NAMESPACE = "urn:jboss:domain:switchyard:1.0";
 
-    private static final PathElement SUBSYSTEM_PATH = PathElement.pathElement(SUBSYSTEM, SUBSYSTEM_NAME);
-    private static final PathElement SECURITY_CONFIG_PATH = PathElement.pathElement(SECURITY_CONFIG);
-    private static final PathElement MODULE_PATH = PathElement.pathElement(MODULE);
-    private static final PathElement EXTENSION_PATH = PathElement.pathElement(EXTENSION);
+    static final PathElement SUBSYSTEM_PATH = PathElement.pathElement(SUBSYSTEM, SUBSYSTEM_NAME);
+    static final PathElement SECURITY_CONFIG_PATH = PathElement.pathElement(SECURITY_CONFIG);
+    static final PathElement MODULE_PATH = PathElement.pathElement(MODULE);
+    static final PathElement EXTENSION_PATH = PathElement.pathElement(EXTENSION);
     private static final String RESOURCE_NAME = SwitchYardExtension.class.getPackage().getName() + ".LocalDescriptions";
 
     /**
@@ -106,14 +107,13 @@ public class SwitchYardExtension implements Extension {
         ResourceBuilder modulesResource = ResourceBuilder.Factory.create(MODULE_PATH, getResourceDescriptionResolver(MODULE))
                 .setAddOperation(SwitchYardModuleAdd.INSTANCE)
                 .setRemoveOperation(SwitchYardModuleRemove.INSTANCE)
-                .addReadWriteAttribute(Attributes.IDENTIFIER, null, new ReloadRequiredWriteAttributeHandler(Attributes.IDENTIFIER))
+                //.addReadWriteAttribute(Attributes.IDENTIFIER, null, new ReloadRequiredWriteAttributeHandler(Attributes.IDENTIFIER)) // not an attribute but part of address
                 .addReadWriteAttribute(Attributes.IMPLCLASS, null, new ReloadRequiredWriteAttributeHandler(Attributes.IMPLCLASS))
                 .addReadWriteAttribute(Attributes.PROPERTIES, null, new ReloadRequiredWriteAttributeHandler(Attributes.PROPERTIES));
 
         ResourceBuilder extensionsResource = ResourceBuilder.Factory.create(EXTENSION_PATH, getResourceDescriptionResolver(EXTENSION))
                 .setAddOperation(SwitchYardExtensionAdd.INSTANCE)
-                .setRemoveOperation(SwitchYardExtensionRemove.INSTANCE)
-                .addReadWriteAttribute(Attributes.IDENTIFIER, null, new ReloadRequiredWriteAttributeHandler(Attributes.IDENTIFIER));
+                .setRemoveOperation(ReloadRequiredRemoveStepHandler.INSTANCE);
 
         ResourceDefinition subsystemResource = ResourceBuilder.Factory.createSubsystemRoot(SUBSYSTEM_PATH, getResourceDescriptionResolver(), SwitchYardSubsystemAdd.INSTANCE, SwitchYardSubsystemRemove.INSTANCE)
                 .addReadWriteAttribute(Attributes.SOCKET_BINDING, null, new ReloadRequiredWriteAttributeHandler(Attributes.SOCKET_BINDING))
@@ -136,13 +136,6 @@ public class SwitchYardExtension implements Extension {
                 .pushChild(extensionsResource).pop()
                 .build();
         subsystem.registerSubsystemModel(subsystemResource);
-
-        DescriptionProvider nullDescriptionProvider = new DescriptionProvider() {
-            @Override
-            public ModelNode getModelDescription(Locale locale) {
-                return new ModelNode();
-            }
-        };
 
         final ManagementResourceRegistration registration = subsystem.registerDeploymentModel(new SimpleResourceDefinition(SUBSYSTEM_PATH, getResourceDescriptionResolver("deployment")));
         registration.registerSubModel(new SimpleResourceDefinition(PathElement.pathElement(SwitchYardModelConstants.APPLICATION), getResourceDescriptionResolver()));

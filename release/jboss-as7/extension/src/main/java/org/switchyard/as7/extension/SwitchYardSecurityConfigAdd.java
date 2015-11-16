@@ -22,7 +22,6 @@ import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.ServiceVerificationHandler;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
-import org.jboss.as.controller.registry.Resource;
 import org.jboss.dmr.ModelNode;
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController;
@@ -46,16 +45,8 @@ public final class SwitchYardSecurityConfigAdd extends AbstractAddStepHandler {
     private SwitchYardSecurityConfigAdd() {}
 
     @Override
-    protected void populateModel(final ModelNode operation, final Resource resource) {
-        final ModelNode model = resource.getModel();
-        populateModel(operation, model);
-    }
-
-    @Override
-    protected void populateModel(ModelNode operation, ModelNode subModel) {
-        if (operation.hasDefined(CommonAttributes.PROPERTIES)) {
-            subModel.get(CommonAttributes.PROPERTIES).set(operation.get(CommonAttributes.PROPERTIES));
-        }
+    protected void populateModel(ModelNode operation, ModelNode model) throws OperationFailedException {
+        Attributes.PROPERTIES.validateAndSet(operation, model);
     }
 
     @Override

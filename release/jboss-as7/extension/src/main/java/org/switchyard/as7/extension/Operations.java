@@ -17,6 +17,7 @@ package org.switchyard.as7.extension;
 import org.jboss.as.controller.OperationDefinition;
 import org.jboss.as.controller.SimpleAttributeDefinition;
 import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
+import org.jboss.as.controller.SimpleListAttributeDefinition;
 import org.jboss.as.controller.SimpleOperationDefinitionBuilder;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.as.controller.descriptions.NonResolvingResourceDescriptionResolver;
@@ -137,65 +138,109 @@ interface Operations {
             .setAllowNull(true)
             .build();
 
-    SimpleAttributeDefinition GATEWAYS = SimpleAttributeDefinitionBuilder.create(SwitchYardModelConstants.GATEWAYS, ModelType.LIST)
+    SimpleAttributeDefinition GATEWAY = SimpleAttributeDefinitionBuilder.create(SwitchYardModelConstants.GATEWAY, ModelType.STRING)
+            .setAllowExpression(true)
+            .setAllowNull(true)
+            .build();
+
+    SimpleListAttributeDefinition GATEWAYS = SimpleListAttributeDefinition.Builder.of(SwitchYardModelConstants.GATEWAYS, GATEWAY)
             .setAllowExpression(true)
             .setAllowNull(true)
             .setMinSize(2)
             .setMaxSize(2)
             .build();
 
-    SimpleAttributeDefinition REFERENCES = SimpleAttributeDefinitionBuilder.create(SwitchYardModelConstants.GATEWAYS, ModelType.LIST)
+    SimpleAttributeDefinition REFERENCE = SimpleAttributeDefinitionBuilder.create(SwitchYardModelConstants.REFERENCE, ModelType.STRING)
+            .setAllowExpression(true)
+            .setAllowNull(true)
+            .build();
+
+    SimpleListAttributeDefinition REFERENCES = SimpleListAttributeDefinition.Builder.of(SwitchYardModelConstants.REFERENCES, REFERENCE)
             .setAllowExpression(true)
             .setAllowNull(true)
             .setMinSize(2)
             .setMaxSize(2)
             .build();
 
-    SimpleAttributeDefinition TRANSFORMERS = SimpleAttributeDefinitionBuilder.create(SwitchYardModelConstants.TRANSFORMERS, ModelType.LIST)
+    SimpleAttributeDefinition TRANSFORMER = SimpleAttributeDefinitionBuilder.create(SwitchYardModelConstants.TRANSFORMER, ModelType.STRING)
+            .setAllowExpression(true)
+            .setAllowNull(true)
+            .build();
+
+    SimpleListAttributeDefinition TRANSFORMERS = SimpleListAttributeDefinition.Builder.of(SwitchYardModelConstants.TRANSFORMERS, TRANSFORMER)
             .setAllowExpression(true)
             .setAllowNull(true)
             .setMinSize(3)
             .setMaxSize(3)
             .build();
 
-    SimpleAttributeDefinition ARTIFACTS = SimpleAttributeDefinitionBuilder.create(SwitchYardModelConstants.ARTIFACTS, ModelType.LIST)
+    SimpleAttributeDefinition ARTIFACT = SimpleAttributeDefinitionBuilder.create(SwitchYardModelConstants.ARTIFACT, ModelType.STRING)
+            .setAllowExpression(true)
+            .setAllowNull(true)
+            .build();
+            
+    SimpleListAttributeDefinition ARTIFACTS = SimpleListAttributeDefinition.Builder.of(SwitchYardModelConstants.ARTIFACTS, ARTIFACT)
             .setAllowExpression(true)
             .setAllowNull(true)
             .setMinSize(2)
             .setMaxSize(2)
             .build();
 
-    SimpleAttributeDefinition VALIDATORS = SimpleAttributeDefinitionBuilder.create(SwitchYardModelConstants.VALIDATORS, ModelType.LIST)
+    SimpleAttributeDefinition VALIDATOR = SimpleAttributeDefinitionBuilder.create(SwitchYardModelConstants.VALIDATOR, ModelType.STRING)
+            .setAllowExpression(true)
+            .setAllowNull(true)
+            .build();
+
+    SimpleListAttributeDefinition VALIDATORS = SimpleListAttributeDefinition.Builder.of(SwitchYardModelConstants.VALIDATORS, VALIDATOR)
             .setAllowExpression(true)
             .setAllowNull(true)
             .setMinSize(2)
             .setMaxSize(2)
             .build();
 
-    SimpleAttributeDefinition PROPERTIES = SimpleAttributeDefinitionBuilder.create(ModelDescriptionConstants.PROPERTIES, ModelType.LIST)
+    SimpleAttributeDefinition PROPERTY = SimpleAttributeDefinitionBuilder.create(ModelDescriptionConstants.PROPERTY, ModelType.STRING)
+            .setAllowExpression(true)
+            .setAllowNull(true)
+            .build();
+
+    SimpleListAttributeDefinition PROPERTIES = SimpleListAttributeDefinition.Builder.of(ModelDescriptionConstants.PROPERTIES, PROPERTY)
             .setAllowExpression(true)
             .setAllowNull(true)
             .setMinSize(2)
             .setMaxSize(2)
             .build();
 
-    SimpleAttributeDefinition SERVICES = SimpleAttributeDefinitionBuilder.create(SwitchYardModelConstants.SERVICES, ModelType.LIST)
+    SimpleAttributeDefinition SERVICE = SimpleAttributeDefinitionBuilder.create(SwitchYardModelConstants.SERVICE, ModelType.STRING)
+            .setAllowExpression(true)
+            .setAllowNull(true)
+            .build();
+
+    SimpleListAttributeDefinition SERVICES = SimpleListAttributeDefinition.Builder.of(SwitchYardModelConstants.SERVICES, SERVICE)
             .setAllowExpression(true)
             .setAllowNull(true)
             .setMinSize(5)
             .setMaxSize(5)
             .build();
 
-    SimpleAttributeDefinition COMPONENT_SERVICES = SimpleAttributeDefinitionBuilder.create(SwitchYardModelConstants.COMPONENT_SERVICES, ModelType.LIST)
+    SimpleAttributeDefinition COMPONENT_SERVICE = SimpleAttributeDefinitionBuilder.create(SwitchYardModelConstants.COMPONENT_SERVICE, ModelType.STRING)
+            .setAllowExpression(true)
+            .setAllowNull(true)
+            .build();
+
+    SimpleAttributeDefinition COMPONENT_SERVICES = SimpleAttributeDefinitionBuilder.create(SwitchYardModelConstants.COMPONENT_SERVICES, COMPONENT_SERVICE)
             .setAllowExpression(true)
             .setAllowNull(true)
             .setMinSize(5)
             .setMaxSize(5)
             .build();
 
-    SimpleAttributeDefinition THROTTLING = SimpleAttributeDefinitionBuilder.create(SwitchYardModelConstants.THROTTLING, ModelType.OBJECT)
+    SimpleAttributeDefinition THROTTLING = SimpleAttributeDefinitionBuilder.create(SwitchYardModelConstants.THROTTLING, ModelType.STRING)
             .setAllowExpression(true)
             .build();
+
+    /* 
+     * Operation definitions
+     */
 
     OperationDefinition GET_VERSION = new SimpleOperationDefinitionBuilder(SwitchYardModelConstants.GET_VERSION, new NonResolvingResourceDescriptionResolver())
             .setReadOnly()
@@ -229,7 +274,7 @@ interface Operations {
             .setRuntimeOnly()
             .setParameters(NAME)
             .setReplyParameters(NAME, SERVICES, COMPONENT_SERVICES, TRANSFORMERS, ARTIFACTS, VALIDATORS, PROPERTIES)
-            .setReplyType(ModelType.LIST)
+            .setReplyType(ModelType.OBJECT)
             .build();
 
     OperationDefinition READ_REFERENCE = new SimpleOperationDefinitionBuilder(SwitchYardModelConstants.READ_REFERENCE, new NonResolvingResourceDescriptionResolver())
@@ -237,7 +282,7 @@ interface Operations {
             .setRuntimeOnly()
             .setParameters(REFERENCE_NAME, APPLICATION_NAME)
             .setReplyParameters(NAME, APPLICATION, INTERFACE, PROMOTED_REFERENCE, GATEWAYS)
-            .setReplyType(ModelType.LIST)
+            .setReplyType(ModelType.OBJECT)
             .build();
 
     OperationDefinition READ_SERVICE = new SimpleOperationDefinitionBuilder(SwitchYardModelConstants.READ_SERVICE, new NonResolvingResourceDescriptionResolver())
@@ -245,7 +290,7 @@ interface Operations {
             .setRuntimeOnly()
             .setParameters(SERVICE_NAME, APPLICATION_NAME)
             .setReplyParameters(NAME, APPLICATION, INTERFACE, PROMOTED_SERVICE, GATEWAYS)
-            .setReplyType(ModelType.LIST)
+            .setReplyType(ModelType.OBJECT)
             .build();
 
     OperationDefinition USES_ARTIFACT = new SimpleOperationDefinitionBuilder(SwitchYardModelConstants.USES_ARTIFACT, new NonResolvingResourceDescriptionResolver())

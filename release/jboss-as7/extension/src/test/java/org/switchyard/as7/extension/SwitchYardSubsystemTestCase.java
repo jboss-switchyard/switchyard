@@ -38,12 +38,9 @@ public class SwitchYardSubsystemTestCase extends AbstractSubsystemBaseTest {
         super(SwitchYardExtension.SUBSYSTEM_NAME, new SwitchYardExtension());
     }
 
-
     @Override
     protected String getSubsystemXml() throws IOException {
         return readResource("switchyard-1.0.xml");
     }
-
-
 
 }

@@ -98,6 +98,10 @@ public final class SwitchYardModelConstants {
      */
     public static final String APPLICATION_NAME = "application-name";
     /**
+     * Constant for model key: componentService.
+     */
+    public static final String COMPONENT_SERVICE = "componentService";
+    /**
      * Constant for model key: componentServices.
      */
     public static final String COMPONENT_SERVICES = "componentServices";
@@ -142,6 +146,10 @@ public final class SwitchYardModelConstants {
      */
     public static final String REFERENCE_NAME = "reference-name";
     /**
+     * Constant for model key: reference.
+     */
+    public static final String REFERENCE = "reference";
+    /**
      * Constant for model key: references.
      */
     public static final String REFERENCES = "references";
@@ -149,6 +157,10 @@ public final class SwitchYardModelConstants {
      * Constant for model key: service-name.
      */
     public static final String SERVICE_NAME = "service-name";
+    /**
+     * Constant for model key: service.
+     */
+    public static final String SERVICE = "service";
     /**
      * Constant for model key: services.
      */
@@ -166,9 +178,17 @@ public final class SwitchYardModelConstants {
      */
     public static final String TO = "to";
     /**
+     * Constant for model key: transformation.
+     */
+    public static final String TRANSFORMER = "transformer";
+    /**
      * Constant for model key: transformations.
      */
     public static final String TRANSFORMERS = "transformers";
+    /**
+     * Constant for model key: artifact.
+     */
+    public static final String ARTIFACT = "artifact";
     /**
      * Constant for model key: artifacts.
      */
@@ -177,6 +197,10 @@ public final class SwitchYardModelConstants {
      * Constant for model key: url.
      */
     public static final String URL = "url";
+    /**
+     * Constant for model key: validator.
+     */
+    public static final String VALIDATOR = "validator";
     /**
      * Constant for model key: validators.
      */

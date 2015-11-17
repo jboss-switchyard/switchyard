@@ -21,8 +21,6 @@ import static org.switchyard.as7.extension.CommonAttributes.EXTENSION;
 import static org.switchyard.as7.extension.CommonAttributes.MODULE;
 import static org.switchyard.as7.extension.CommonAttributes.SECURITY_CONFIG;
 
-import java.util.Locale;
-
 import org.jboss.as.controller.Extension;
 import org.jboss.as.controller.ExtensionContext;
 import org.jboss.as.controller.PathElement;
@@ -32,7 +30,6 @@ import org.jboss.as.controller.ResourceBuilder;
 import org.jboss.as.controller.ResourceDefinition;
 import org.jboss.as.controller.SimpleResourceDefinition;
 import org.jboss.as.controller.SubsystemRegistration;
-import org.jboss.as.controller.descriptions.DescriptionProvider;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.as.controller.descriptions.StandardResourceDescriptionResolver;
 import org.jboss.as.controller.parsing.ExtensionParsingContext;
@@ -100,14 +97,12 @@ public class SwitchYardExtension implements Extension {
 
         ResourceBuilder securityConfigsResource = ResourceBuilder.Factory.create(SECURITY_CONFIG_PATH, getResourceDescriptionResolver(SECURITY_CONFIG))
                 .setAddOperation(SwitchYardSecurityConfigAdd.INSTANCE)
-                .setRemoveOperation(SwitchYardSecurityConfigRemove.INSTANCE)
-                .addReadWriteAttribute(Attributes.IDENTIFIER, null, new ReloadRequiredWriteAttributeHandler(Attributes.IDENTIFIER))
+                .setRemoveOperation(ReloadRequiredRemoveStepHandler.INSTANCE)
                 .addReadWriteAttribute(Attributes.PROPERTIES, null, new ReloadRequiredWriteAttributeHandler(Attributes.PROPERTIES));
 
         ResourceBuilder modulesResource = ResourceBuilder.Factory.create(MODULE_PATH, getResourceDescriptionResolver(MODULE))
                 .setAddOperation(SwitchYardModuleAdd.INSTANCE)
-                .setRemoveOperation(SwitchYardModuleRemove.INSTANCE)
-                //.addReadWriteAttribute(Attributes.IDENTIFIER, null, new ReloadRequiredWriteAttributeHandler(Attributes.IDENTIFIER)) // not an attribute but part of address
+                .setRemoveOperation(ReloadRequiredRemoveStepHandler.INSTANCE)
                 .addReadWriteAttribute(Attributes.IMPLCLASS, null, new ReloadRequiredWriteAttributeHandler(Attributes.IMPLCLASS))
                 .addReadWriteAttribute(Attributes.PROPERTIES, null, new ReloadRequiredWriteAttributeHandler(Attributes.PROPERTIES));
 
@@ -115,7 +110,7 @@ public class SwitchYardExtension implements Extension {
                 .setAddOperation(SwitchYardExtensionAdd.INSTANCE)
                 .setRemoveOperation(ReloadRequiredRemoveStepHandler.INSTANCE);
 
-        ResourceDefinition subsystemResource = ResourceBuilder.Factory.createSubsystemRoot(SUBSYSTEM_PATH, getResourceDescriptionResolver(), SwitchYardSubsystemAdd.INSTANCE, SwitchYardSubsystemRemove.INSTANCE)
+        ResourceDefinition subsystemResource = ResourceBuilder.Factory.createSubsystemRoot(SUBSYSTEM_PATH, getResourceDescriptionResolver(), SwitchYardSubsystemAdd.INSTANCE, ReloadRequiredRemoveStepHandler.INSTANCE)
                 .addReadWriteAttribute(Attributes.SOCKET_BINDING, null, new ReloadRequiredWriteAttributeHandler(Attributes.SOCKET_BINDING))
                 .addReadWriteAttribute(Attributes.PROPERTIES, null, new ReloadRequiredWriteAttributeHandler(Attributes.PROPERTIES))
                 .addOperation(Operations.GET_VERSION, SwitchYardSubsystemGetVersion.INSTANCE)

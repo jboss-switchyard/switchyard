@@ -23,6 +23,7 @@ import org.jboss.as.controller.PathElement;
 import org.jboss.as.naming.context.NamespaceContextSelector;
 import org.jboss.as.server.deployment.AttachmentKey;
 import org.jboss.as.server.deployment.Attachments;
+import org.jboss.as.server.deployment.DeploymentResourceSupport;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.dmr.ModelNode;
 import org.jboss.modules.Module;
@@ -229,7 +230,8 @@ public class SwitchYardDeployment {
             return;
         }
 
-        ModelNode deployNode = _deployUnit.createDeploymentSubModel(SwitchYardExtension.SUBSYSTEM_NAME,
+        DeploymentResourceSupport drs = _deployUnit.getAttachment(Attachments.DEPLOYMENT_RESOURCE_SUPPORT);
+        ModelNode deployNode = drs.getDeploymentSubModel(SwitchYardExtension.SUBSYSTEM_NAME,
                 PathElement.pathElement(SwitchYardModelConstants.APPLICATION, applicationName.toString()));
 
         Application application = switchYard.getApplication(applicationName);
@@ -244,7 +246,8 @@ public class SwitchYardDeployment {
         if (applicationName == null) {
             return;
         }
-        _deployUnit.createDeploymentSubModel(SwitchYardExtension.SUBSYSTEM_NAME,
+        DeploymentResourceSupport drs = _deployUnit.getAttachment(Attachments.DEPLOYMENT_RESOURCE_SUPPORT);
+        drs.getDeploymentSubModel(SwitchYardExtension.SUBSYSTEM_NAME,
                 PathElement.pathElement(SwitchYardModelConstants.APPLICATION, applicationName.toString())).clear();
     }
 

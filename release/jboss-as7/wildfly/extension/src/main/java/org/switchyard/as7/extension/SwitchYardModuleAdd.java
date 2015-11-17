@@ -17,22 +17,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.jboss.as.connector.util.ConnectorServices;
 import org.jboss.as.controller.AbstractAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.PathAddress;
-import org.jboss.as.controller.ServiceVerificationHandler;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.as.controller.registry.Resource;
 import org.jboss.as.server.AbstractDeploymentChainStep;
 import org.jboss.as.server.DeploymentProcessorTarget;
 import org.jboss.as.server.deployment.Phase;
-//import org.jboss.as.web.WebSubsystemServices;
 import org.jboss.dmr.ModelNode;
 import org.jboss.jca.core.spi.rar.ResourceAdapterRepository;
-import org.jboss.logging.Logger;
 import org.jboss.msc.service.ServiceBuilder;
-import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
 import org.jboss.msc.service.ServiceName;
 import org.switchyard.as7.extension.deployment.SwitchYardModuleDependencyProcessor;
@@ -47,11 +44,7 @@ import org.switchyard.deploy.Component;
  */
 public final class SwitchYardModuleAdd extends AbstractAddStepHandler {
 
-    private static final Logger LOG = Logger.getLogger("org.switchyard");
-
-    // TODO use ConnectorServices.RA_REPOSITORY_SERVICE instead once JBoss AS is updated to 7.1.1 or later
-    //private static final ServiceName RA_REPOSITORY_SERVICE_NAME = ConnectorServices.RA_REPOSITORY_SERVICE;
-    private static final ServiceName RA_REPOSITORY_SERVICE_NAME = ServiceName.JBOSS.append("rarepository");
+    private static final ServiceName RA_REPOSITORY_SERVICE_NAME = ConnectorServices.RA_REPOSITORY_SERVICE;
 
     static final SwitchYardModuleAdd INSTANCE = new SwitchYardModuleAdd();
 
@@ -94,8 +87,7 @@ public final class SwitchYardModuleAdd extends AbstractAddStepHandler {
     }
 
     @Override
-    protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model,
-                                  ServiceVerificationHandler verificationHandler, List<ServiceController<?>> newControllers) throws OperationFailedException {
+    protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model) throws OperationFailedException {
         final String moduleId = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.ADDRESS)).getLastElement().getValue();
         _componentNames.add(moduleId);
 
@@ -109,9 +101,8 @@ public final class SwitchYardModuleAdd extends AbstractAddStepHandler {
         final ServiceBuilder<Component> componentServiceBuilder = context.getServiceTarget().addService(SwitchYardComponentService.SERVICE_NAME.append(moduleId), componentService);
         componentServiceBuilder.addDependency(SwitchYardInjectorService.SERVICE_NAME, Map.class, componentService.getInjectedValues())
                 .addDependency(RA_REPOSITORY_SERVICE_NAME, ResourceAdapterRepository.class, componentService.getResourceAdapterRepository());
-        //componentServiceBuilder.addDependency(WebSubsystemServices.JBOSS_WEB);
         componentServiceBuilder.setInitialMode(Mode.ACTIVE);
-        newControllers.add(componentServiceBuilder.install());
+        componentServiceBuilder.install();
     }
 
 }

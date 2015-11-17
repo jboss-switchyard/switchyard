@@ -13,21 +13,15 @@
  */
 package org.switchyard.as7.extension.deployment;
 
-import java.util.List;
-
-import javax.enterprise.inject.spi.Extension;
-
-import org.apache.log4j.Logger;
+import org.jboss.logging.Logger;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.DeploymentUnitProcessor;
 import org.jboss.as.weld.WeldDeploymentMarker;
-import org.jboss.as.weld.deployment.WeldAttachments;
 import org.jboss.as.weld.deployment.WeldPortableExtensions;
 import org.jboss.modules.Module;
-import org.jboss.weld.bootstrap.spi.Metadata;
 import org.switchyard.as7.extension.ExtensionMessages;
 import org.switchyard.as7.extension.SwitchYardDeploymentMarker;
 

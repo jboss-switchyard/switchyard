@@ -67,12 +67,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.wildfly</groupId>
+            <groupId>org.wildfly.arquillian</groupId>
             <artifactId>wildfly-arquillian-container-managed</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.wildfly</groupId>
+            <groupId>org.wildfly.arquillian</groupId>
             <artifactId>wildfly-arquillian-common</artifactId>
             <scope>test</scope>
         </dependency>
@@ -90,11 +90,6 @@
         <dependency>
             <groupId>org.jboss.ws.cxf</groupId>
             <artifactId>jbossws-cxf-transports-httpserver</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-core</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -230,7 +225,7 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
                             </artifactItems>
-                            <excludes>application-roles.properties, application-users.properties</excludes>
+                            <excludes>application-roles.properties, application-users.properties, org/switchyard/test/quickstarts/util/ResourceDeployer.class</excludes>
                             <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
                         </configuration>
                     </execution>
@@ -333,10 +328,13 @@
                     </environmentVariables>
                     <systemPropertyVariables>
                         <arquillian.launch>jboss</arquillian.launch>
-                        <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
                         <jboss.home>${wildfly.home}</jboss.home>
-                        <module.path>${wildfly.home}/modules</module.path>
                         <jboss.options>-Xms256m -Xmx1024m -XX:MaxPermSize=512m</jboss.options>
+                        <!-- Uncomment if default 60secs timeout is too short for debugging
+                        <jbossas.startup.timeout>300</jbossas.startup.timeout>
+                        -->
+                        <hornetqmixin.http.upgrade.enabled>true</hornetqmixin.http.upgrade.enabled>
+                        <hornetqmixin.port>8080</hornetqmixin.port>
                     </systemPropertyVariables>
                     <redirectTestOutputToFile>false</redirectTestOutputToFile>
                     <excludes>

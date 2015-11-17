@@ -15,15 +15,18 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<messaging-deployment xmlns="urn:jboss:messaging-deployment:1.0">
-    <hornetq-server>
-        <jms-destinations>
-            <jms-queue name="EAROrderRequestQueue">
-                <entry name="EAROrderRequestQueue"/>
-            </jms-queue>
-            <jms-queue name="EAROrderReplyQueue">
-                <entry name="EAROrderReplyQueue"/>
-            </jms-queue>
-         </jms-destinations>
-    </hornetq-server>
-</messaging-deployment>
+<!DOCTYPE log4j:configuration SYSTEM "http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/xml/doc-files/log4j.dtd">
+<log4j:configuration xmlns:log4j='http://jakarta.apache.org/log4j/'>
+
+    <appender name="STDOUT" class="org.apache.log4j.ConsoleAppender">
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{HH:mm:ss,SSS} %-5p [%c] %m%n"/>
+        </layout>
+    </appender>
+
+    <root>
+        <level value="INFO"/>
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+</log4j:configuration>

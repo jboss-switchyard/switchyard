@@ -1,0 +1,4 @@
+if (outcome != success) of /subsystem=messaging/hornetq-server=default/jms-queue=EAROrderRequestQueue:read-resource
+    jms-queue add --queue-address=EAROrderRequestQueue --entries=EAROrderRequestQueue
+    jms-queue add --queue-address=EAROrderReplyQueue --entries=EAROrderReplyQueue
+end-if

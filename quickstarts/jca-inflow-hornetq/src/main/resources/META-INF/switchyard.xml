@@ -18,10 +18,10 @@
     <composite xmlns="http://docs.oasis-open.org/ns/opencsa/sca/200912" name="jca-inflow-hornetq" targetNamespace="urn:switchyard-quickstart:jca-inflow-hornetq:0.1.0">
         <service name="GreetingService" promote="GreetingService/GreetingService">
             <interface.java interface="org.switchyard.quickstarts.jca.inflow.GreetingGateway"/>
-            <binding.jca xmlns="urn:switchyard-component-jca:config:1.0">
+            <binding.jca xmlns="urn:switchyard-component-jca:config:2.0">
                 <swyd:operationSelector.xpath xmlns:swyd="urn:switchyard-config:switchyard:1.0" expression="//person/language"/>
                 <inboundConnection>
-                    <resourceAdapter name="hornetq-ra.rar"/>
+                    <resourceAdapter name="${resourceAdapterName}"/>
                     <activationSpec>
                         <property name="destinationType" value="javax.jms.Queue"/>
                         <property name="destination" value="queue/JCAInflowGreetingServiceQueue"/>
@@ -44,4 +44,9 @@
     <transforms xmlns:xform="urn:switchyard-config:transform:1.0">
         <xform:transform.jaxb contextPath="org.switchyard.quickstarts.jca.inflow" from="{urn:switchyard-quickstart:jca-inflow-hornetq:0.1.0}person" to="java:org.switchyard.quickstarts.jca.inflow.Person"/>
     </transforms>
+    <domain>
+        <properties>
+            <property name="resourceAdapterName" value="${org.switchyard.quickstarts.jca.resourceAdapterName:hornetq-ra.rar}"/>
+        </properties>
+    </domain>
 </switchyard>

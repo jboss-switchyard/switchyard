@@ -19,7 +19,7 @@ import static org.switchyard.as7.extension.SwitchYardModelConstants.SERVICE_NAME
 
 import javax.xml.namespace.QName;
 
-import org.apache.log4j.Logger;
+import org.jboss.logging.Logger;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.OperationStepHandler;

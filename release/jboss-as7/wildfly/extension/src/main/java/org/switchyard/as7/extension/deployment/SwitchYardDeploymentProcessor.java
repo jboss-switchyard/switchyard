@@ -16,7 +16,6 @@ package org.switchyard.as7.extension.deployment;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.jboss.as.clustering.infinispan.subsystem.CacheService;
 import org.jboss.as.connector.util.ConnectorServices;
 import org.jboss.as.ee.component.EEModuleDescription;
 import org.jboss.as.ee.weld.WeldDeploymentMarker;
@@ -54,6 +53,7 @@ import org.switchyard.config.model.composite.CompositeReferenceModel;
 import org.switchyard.config.model.composite.CompositeServiceModel;
 import org.switchyard.deploy.Component;
 import org.switchyard.deploy.ServiceDomainManager;
+import org.wildfly.clustering.infinispan.spi.service.CacheServiceName;
 
 /**
  * Deployment processor that installs the SwitchYard service and all other dependent services.
@@ -183,7 +183,8 @@ public class SwitchYardDeploymentProcessor implements DeploymentUnitProcessor {
             parent.putAttachment(SwitchYardMetaData.SERVICENAME_ATTACHMENT_KEY, switchyardServiceName);
         }
 
-        switchyardServiceBuilder.addDependency(DependencyType.OPTIONAL, CacheService.getServiceName("cluster", null));
+        // TODO find an alternative to using DependencyType.OPTIONAL
+        switchyardServiceBuilder.addDependency(DependencyType.OPTIONAL, CacheServiceName.CACHE.getServiceName("cluster"));
 
         switchyardServiceBuilder.setInitialMode(Mode.ACTIVE);
         switchyardServiceBuilder.install();

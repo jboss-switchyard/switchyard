@@ -1,0 +1,4 @@
+if (outcome == success) of /subsystem=messaging/hornetq-server=default/jms-queue=EAROrderRequestQueue:read-resource
+    jms-queue remove --queue-address=EAROrderRequestQueue
+    jms-queue remove --queue-address=EAROrderReplyQueue
+end-if

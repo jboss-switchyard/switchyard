@@ -3,7 +3,7 @@ package org.switchyard.as7.extension;
 import javax.xml.stream.XMLStreamException;
 
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
-import org.jboss.logging.Cause;
+import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.Messages;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageBundle;

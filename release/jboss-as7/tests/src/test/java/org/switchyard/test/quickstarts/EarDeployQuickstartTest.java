@@ -39,6 +39,8 @@ public class EarDeployQuickstartTest {
 
     @Deployment(testable = false)
     public static EnterpriseArchive createDeployment() throws IOException {
+        ResourceDeployer.addQueue(ORDER_QUEUE_NAME);
+        ResourceDeployer.addQueue(ORDERACK_QUEUE_NAME);
         return ArquillianUtil.createEarQSDeployment("switchyard-ear-deployment-ear-assembly");
     }
 

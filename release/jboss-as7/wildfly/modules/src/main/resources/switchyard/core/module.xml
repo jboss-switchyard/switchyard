@@ -24,6 +24,7 @@
         <module name="javaee.api"/>
         <module name="org.apache.log4j"/>
         <module name="org.hibernate"/>
+        <module name="org.jboss.common-beans"/>
         <module name="org.jboss.logging"/>
         <module name="org.infinispan"/>
         <module name="org.apache.camel.core"/>
@@ -63,6 +64,7 @@
         <module name="org.switchyard.component.jca"/>
         <module name="org.jboss.resteasy.resteasy-jaxrs"/>
         <module name="org.jboss.ws.jaxws-client" export="true"/>
+        <module name="org.wildfly.clustering.infinispan.spi"/>
         <module name="org.wildfly.extension.undertow" />
     </dependencies>
 </module>

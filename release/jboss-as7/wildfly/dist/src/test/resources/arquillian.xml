@@ -9,6 +9,13 @@
     <container qualifier="jboss" default="true">
         <configuration>
             <property name="serverConfig">../../../../test-classes/standalone-test.xml</property>
+            <property name="javaVmArguments">-Dorg.switchyard.quickstarts.jca.resourceAdapterName=activemq-ra.rar</property>
+            <!-- Uncomment if default 60secs timeout is too short for debugging
+            <property name="startupTimeoutInSeconds">300</property>
+            -->
+            <!-- Uncomment this to enable remote debug on server side
+            <property name="javaVmArguments">-Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=y -Dorg.switchyard.quickstarts.jca.resourceAdapterName=activemq-ra.rar</property>
+            -->
         </configuration>
     </container>
     <!--<engine>

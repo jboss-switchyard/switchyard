@@ -20,6 +20,11 @@
             <outputDirectory>/modules/system/layers/soa/org/switchyard/main</outputDirectory>
             <filtered>true</filtered>
         </file>
+        <file>
+            <source>src/main/resources/switchyard/core/security/module.xml</source>
+            <outputDirectory>/modules/system/layers/soa/org/switchyard/security/main</outputDirectory>
+            <filtered>true</filtered>
+        </file>
     </files>
     <dependencySets>
         <dependencySet>

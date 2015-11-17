@@ -19,6 +19,6 @@
     </resources>
     <dependencies>
         <!-- eclipse compiler found in "org.jboss.as.web" for eap, but found below for wildfly; we reference and export it here as a useful hook -->
-        <module name="io.undertow.jasper-jdt" export="true" optional="false"/>
+        <module name="org.eclipse.jdt.ecj" export="true" optional="false"/>
     </dependencies>
 </module>

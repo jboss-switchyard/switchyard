@@ -94,6 +94,10 @@ public final class SwitchYardModelConstants {
      */
     public static final String APPLICATION = "application";
     /**
+     * Constant for model key: deployment.
+     */
+    public static final String DEPLOYMENT = "deployment";
+    /**
      * Constant for model key: application-name.
      */
     public static final String APPLICATION_NAME = "application-name";

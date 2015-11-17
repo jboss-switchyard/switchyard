@@ -20,8 +20,6 @@ import java.util.ServiceLoader;
 
 import javax.xml.ws.WebServiceException;
 
-import org.jboss.as.security.plugins.SecurityDomainContext;
-import org.jboss.as.webservices.security.SecurityDomainContextAdaptor;
 import org.jboss.logging.Logger;
 import org.jboss.as.web.host.ServletBuilder;
 import org.jboss.as.web.host.WebDeploymentBuilder;
@@ -86,6 +84,7 @@ public class JBossWSEndpoint implements Endpoint {
         EndpointConfigModel epcModel = bindingModel.getEndpointConfig();
         JBossWebservicesMetaData jbwsMetadata = null;
         if (epcModel != null) {
+            String configName = epcModel.getConfigName();
             String configFile = epcModel.getConfigFile();
             if (configFile != null) {
                 URL jbwsURL = Classes.getResource(configFile, getClass());
@@ -96,16 +95,8 @@ public class JBossWSEndpoint implements Endpoint {
                     if (LOGGER.isDebugEnabled()) {
                         LOGGER.error("Unable to load jboss-webservices metadata", e);
                     }
-                    jbwsMetadata = new JBossWebservicesMetaData(jbwsURL);
-                    jbwsMetadata.setConfigFile(configFile);
+                    jbwsMetadata = new JBossWebservicesMetaData("/", configName, configFile, jbwsURL, null, null, null);
                 }
-            }
-            String configName = epcModel.getConfigName();
-            if (configName != null) {
-                if (jbwsMetadata == null) {
-                    jbwsMetadata = new JBossWebservicesMetaData(null);
-                }
-                jbwsMetadata.setConfigName(configName);
             }
         }
         ClassLoader tccl = Classes.getTCCL();

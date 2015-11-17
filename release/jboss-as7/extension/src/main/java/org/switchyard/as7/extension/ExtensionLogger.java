@@ -3,7 +3,7 @@ package org.switchyard.as7.extension;
 import static org.jboss.logging.Logger.Level.ERROR;
 import static org.jboss.logging.Logger.Level.WARN;
 
-import org.jboss.logging.Cause;
+import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.Logger;
 
 import org.jboss.logging.annotations.LogMessage;

@@ -27,20 +27,10 @@
     <properties>
         <common.sources.dir>${project.build.directory}/dependency/jboss-as7/java</common.sources.dir>
         <common.resources.dir>${project.build.directory}/dependency/jboss-as7/resources</common.resources.dir>
+        <common.test.sources.dir>${project.build.directory}/dependency/jboss-as7-test/java</common.test.sources.dir>
+        <common.test.resources.dir>${project.build.directory}/dependency/jboss-as7-test/resources</common.test.resources.dir>
     </properties>
     <dependencies>
-        <dependency>
-            <groupId>org.wildfly</groupId>
-            <artifactId>wildfly-web-common</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wildfly</groupId>
-            <artifactId>wildfly-undertow</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wildfly</groupId>
-            <artifactId>wildfly-weld</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.switchyard</groupId>
             <artifactId>switchyard-admin</artifactId>
@@ -80,6 +70,12 @@
         <dependency>
             <groupId>org.switchyard.components</groupId>
             <artifactId>switchyard-component-http</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jboss.spec.javax.servlet</groupId>
+                    <artifactId>jboss-servlet-api_3.0_spec</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.switchyard.components</groupId>
@@ -92,10 +88,30 @@
         <dependency>
             <groupId>org.switchyard.components</groupId>
             <artifactId>switchyard-component-sca</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jboss.spec.javax.servlet</groupId>
+                    <artifactId>jboss-servlet-api_3.0_spec</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.switchyard.components</groupId>
             <artifactId>switchyard-component-soap</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jboss.spec.javax.servlet</groupId>
+                    <artifactId>jboss-servlet-api_3.0_spec</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.cxf</groupId>
+                    <artifactId>cxf-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.cxf</groupId>
+                    <artifactId>cxf-rt-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- external dependencies -->
         <dependency>
@@ -108,7 +124,13 @@
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-api</artifactId>
+            <artifactId>cxf-core</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.codehaus.woodstox</groupId>
+                    <artifactId>woodstox-core-asl</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -117,7 +139,13 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
-        </dependency>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.codehaus.woodstox</groupId>
+                    <artifactId>woodstox-core-asl</artifactId>
+                </exclusion>
+            </exclusions>
+         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-ws-addr</artifactId>
@@ -134,10 +162,26 @@
         <dependency>
             <groupId>org.apache.neethi</groupId>
             <artifactId>neethi</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.codehaus.woodstox</groupId>
+                    <artifactId>woodstox-core-asl</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.ws.security</groupId>
             <artifactId>wss4j</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.wss4j</groupId>
+            <artifactId>wss4j-policy</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.wss4j</groupId>
+            <artifactId>wss4j-ws-security-dom</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -157,38 +201,6 @@
             <artifactId>jboss-dmr</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wildfly</groupId>
-            <artifactId>wildfly-clustering-infinispan</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wildfly</groupId>
-            <artifactId>wildfly-controller</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wildfly</groupId>
-            <artifactId>wildfly-ee</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wildfly</groupId>
-            <artifactId>wildfly-logging</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wildfly</groupId>
-            <artifactId>wildfly-naming</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wildfly</groupId>
-            <artifactId>wildfly-network</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wildfly</groupId>
-            <artifactId>wildfly-server</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wildfly</groupId>
-            <artifactId>wildfly-weld</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.jboss</groupId>
             <artifactId>jboss-vfs</artifactId>
         </dependency>
@@ -199,6 +211,10 @@
         <dependency>
             <groupId>org.jboss.com.sun.httpserver</groupId>
             <artifactId>httpserver</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.common</groupId>
+            <artifactId>jboss-common-beans</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jboss.ironjacamar</groupId>
@@ -241,6 +257,10 @@
             <artifactId>resteasy-jaxrs</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.jboss.spec.javax.servlet</groupId>
+            <artifactId>jboss-servlet-api_3.1_spec</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.jboss.ws</groupId>
             <artifactId>jbossws-spi</artifactId>
         </dependency>
@@ -248,6 +268,12 @@
             <groupId>org.jboss.ws.cxf</groupId>
             <artifactId>jbossws-cxf-server</artifactId>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.codehaus.woodstox</groupId>
+                    <artifactId>woodstox-core-asl</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.jboss.ws.cxf</groupId>
@@ -262,6 +288,47 @@
             <groupId>org.picketbox</groupId>
             <artifactId>picketbox</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-clustering-infinispan-spi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-ee</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-naming</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-undertow</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-web-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-weld</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wildfly.core</groupId>
+            <artifactId>wildfly-controller</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wildfly.core</groupId>
+            <artifactId>wildfly-network</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wildfly.core</groupId>
+            <artifactId>wildfly-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wildfly.core</groupId>
+            <artifactId>wildfly-subsystem-test-framework</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <build>
@@ -280,7 +347,9 @@
                             <tasks>
                                 <copy todir="${common.sources.dir}">
                                     <fileset dir="../../extension/src/main/java/" includes="**/*.java">
+                                        <exclude name="org/switchyard/as7/extension/SwitchYardExtension.java"/>
                                         <exclude name="org/switchyard/as7/extension/SwitchYardModuleAdd.java"/>
+                                        <exclude name="org/switchyard/as7/extension/SwitchYardSubsystemAdd.java"/>
                                         <exclude name="org/switchyard/as7/extension/cluster/RemoteEndpointListener.java"/>
                                         <exclude name="org/switchyard/as7/extension/deployment/SwitchYardCdiIntegrationProcessor.java"/>
                                         <exclude name="org/switchyard/as7/extension/deployment/SwitchYardDeployment.java"/>
@@ -291,12 +360,21 @@
                                         <exclude name="org/switchyard/as7/extension/resteasy/RESTEasyResource.java"/>
                                         <exclude name="org/switchyard/as7/extension/resteasy/RESTEasyResourcePublisher.java"/>
                                         <exclude name="org/switchyard/as7/extension/util/ServerUtil.java"/>
+                                        <exclude name="org/switchyard/as7/extension/ws/Interceptors.java"/>
                                         <exclude name="org/switchyard/as7/extension/ws/JBossWSEndpoint.java"/>
                                         <exclude name="org/switchyard/as7/extension/ws/JBossWSEndpointPublisher.java"/>
                                     </fileset>
                                 </copy>
                                 <copy todir="${common.resources.dir}">
-                                    <fileset dir="../../extension/src/main/resources/"/>
+                                    <fileset dir="../../extension/src/main/resources/">
+                                        <exclude name="org/switchyard/as7/extension/localDescriptions.properties"/>
+                                    </fileset>
+                                </copy>
+                                <copy todir="${common.test.sources.dir}">
+                                    <fileset dir="../../extension/src/test/java/" includes="**/*.java"/>
+                                </copy>
+                                 <copy todir="${common.test.resources.dir}">
+                                    <fileset dir="../../extension/src/test/resources/"/>
                                 </copy>
                             </tasks>
                         </configuration>
@@ -333,7 +411,33 @@
                             </resources>
                         </configuration>
                     </execution>
-                </executions>
+                    <execution>
+                        <id>add-common-test-sources-dir</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${common.test.sources.dir}</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-common-test-resources-dir</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>add-test-resource</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${common.test.resources.dir}</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                 </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

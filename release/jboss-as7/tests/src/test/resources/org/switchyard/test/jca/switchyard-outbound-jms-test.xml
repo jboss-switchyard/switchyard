@@ -23,7 +23,7 @@
             <binding.jca xmlns="urn:switchyard-component-jca:config:1.0">
                <operationSelector.regex xmlns="urn:switchyard-config:switchyard:1.0" expression="onMessage.*"/>
                <inboundConnection>
-                   <resourceAdapter name="hornetq-ra.rar"/>
+                   <resourceAdapter name="${resourceAdapterName}"/>
                    <activationSpec>
                        <property name="destinationType" value="javax.jms.Queue"/>
                        <property name="destination" value="queue/TestQueue"/>
@@ -38,7 +38,7 @@
             <binding.jca xmlns="urn:switchyard-component-jca:config:1.0">
                <operationSelector.regex xmlns="urn:switchyard-config:switchyard:1.0" expression="onMessage.*"/>
                <inboundConnection>
-                   <resourceAdapter name="hornetq-ra.rar"/>
+                   <resourceAdapter name="${resourceAdapterName}"/>
                    <activationSpec>
                        <property name="destinationType" value="javax.jms.Queue"/>
                        <property name="destination" value="queue/NonTransactedTestQueue"/>
@@ -58,7 +58,7 @@
                <jca:contextMapper class="org.switchyard.test.jca.MyJMSContextMapper"/>
                <jca:messageComposer class="org.switchyard.test.jca.MyJMSMessageComposer"/>
                <outboundConnection>
-                   <resourceAdapter name="hornetq-ra.rar"/>
+                   <resourceAdapter name="${resourceAdapterName}"/>
                    <connection jndiName="java:/JmsXA"/>
                </outboundConnection>
                <outboundInteraction>
@@ -74,7 +74,7 @@
                <jca:contextMapper class="org.switchyard.test.jca.MyJMSContextMapper"/>
                <jca:messageComposer class="org.switchyard.test.jca.MyJMSMessageComposer"/>
                <outboundConnection>
-                   <resourceAdapter name="hornetq-ra.rar"/>
+                   <resourceAdapter name="${resourceAdapterName}"/>
                    <connection jndiName="java:/JmsXA"/>
                </outboundConnection>
                <outboundInteraction>
@@ -92,7 +92,7 @@
                <jca:contextMapper class="org.switchyard.test.jca.MyJMSContextMapper"/>
                <jca:messageComposer class="org.switchyard.test.jca.MyJMSMessageComposer"/>
                <outboundConnection>
-                   <resourceAdapter name="hornetq-ra.rar"/>
+                   <resourceAdapter name="${resourceAdapterName}"/>
                    <connection jndiName="java:/JmsXA"/>
                </outboundConnection>
                <outboundInteraction>
@@ -108,7 +108,7 @@
             <binding.jca xmlns="urn:switchyard-component-jca:config:1.0">
                <contextMapper includes=".*"/>
                <outboundConnection>
-                   <resourceAdapter name="hornetq-ra.rar"/>
+                   <resourceAdapter name="${resourceAdapterName}"/>
                    <connection jndiName="java:/JmsXA"/>
                </outboundConnection>
                <outboundInteraction>
@@ -160,11 +160,12 @@
             </sca:reference>
         </sca:component>
     </sca:composite>
-<!-- 
     <domain>
         <properties>
-          <property name="org.switchyard.handlers.messageTrace.enabled" value="true"/>
+            <property name="resourceAdapterName" value="${org.switchyard.quickstarts.jca.resourceAdapterName:hornetq-ra.rar}"/>
+<!-- 
+            <property name="org.switchyard.handlers.messageTrace.enabled" value="true"/>
+ -->
         </properties>
     </domain>
- -->
 </switchyard>

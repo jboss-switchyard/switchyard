@@ -89,6 +89,11 @@
                             <goal>deploy-only</goal>
                         </goals>
                         <configuration>
+                            <beforeDeployment>
+                                <scripts>
+                                    <script>config.cli</script>
+                                </scripts>
+                            </beforeDeployment>
                             <skip>${deploy.skip}</skip>
                         </configuration>
                     </execution>
@@ -99,6 +104,11 @@
                             <goal>undeploy</goal>
                         </goals>
                         <configuration>
+                            <afterDeployment>
+                                <scripts>
+                                    <script>unconfig.cli</script>
+                                </scripts>
+                            </afterDeployment>
                             <skip>${deploy.skip}</skip>
                         </configuration>
                     </execution>

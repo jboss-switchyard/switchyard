@@ -13,7 +13,7 @@
  */
 package org.switchyard.as7.extension.deployment;
 
-import org.apache.log4j.Logger;
+import org.jboss.logging.Logger;
 import org.jboss.as.ee.weld.WeldDeploymentMarker;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;

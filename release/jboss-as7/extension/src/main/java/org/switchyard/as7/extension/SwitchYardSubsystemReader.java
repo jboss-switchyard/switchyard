@@ -23,11 +23,9 @@ import static org.jboss.as.controller.parsing.ParseUtils.requireNoNamespaceAttri
 import static org.jboss.as.controller.parsing.ParseUtils.unexpectedAttribute;
 import static org.jboss.as.controller.parsing.ParseUtils.unexpectedElement;
 import static org.switchyard.as7.extension.CommonAttributes.EXTENSION;
-import static org.switchyard.as7.extension.CommonAttributes.IMPLCLASS;
 import static org.switchyard.as7.extension.CommonAttributes.MODULE;
 import static org.switchyard.as7.extension.CommonAttributes.PROPERTIES;
 import static org.switchyard.as7.extension.CommonAttributes.SECURITY_CONFIG;
-import static org.switchyard.as7.extension.CommonAttributes.SOCKET_BINDING;
 
 import java.util.Collections;
 import java.util.List;

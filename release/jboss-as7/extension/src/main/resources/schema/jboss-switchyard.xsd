@@ -89,7 +89,7 @@
 
     <xs:complexType name="extensionsType">
         <xs:choice maxOccurs="unbounded" minOccurs="0">
-            <xs:element name="module" type="extensionType"/>
+            <xs:element name="extension" type="extensionType"/>
         </xs:choice>
     </xs:complexType>
 

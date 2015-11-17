@@ -53,11 +53,11 @@
           resources, i.e. build is platform dependent! -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.org.jboss.as.console>1.5.4.Final</version.org.jboss.as.console>
-        <version.redhat.eap6.bom>6.3.0.GA</version.redhat.eap6.bom>
+        <version.redhat.eap6.bom>6.4.4.GA</version.redhat.eap6.bom>
         <version.ip.bom>6.0.0-SNAPSHOT</version.ip.bom>
         <!-- This version is only used as a prefix for a jar included in release modules -->
-        <version.redhat.eap6>6.3</version.redhat.eap6>
-        <version.redhat.eap6.minor>0.GA</version.redhat.eap6.minor>
+        <version.redhat.eap6>6.4</version.redhat.eap6>
+        <version.redhat.eap6.minor>4.GA</version.redhat.eap6.minor>
         <version.org.fusesource.hawtdispatch>1.18</version.org.fusesource.hawtdispatch>
         <version.org.fusesource.hawtbuf>1.9</version.org.fusesource.hawtbuf>
         <!-- consider moving to integration platform bom -->

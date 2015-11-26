@@ -33,11 +33,15 @@ import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.enterprise.util.AnnotationLiteral;
 
+import org.switchyard.Context;
 import org.switchyard.Exchange;
 import org.switchyard.ExchangeHandler;
 import org.switchyard.ExchangeState;
+import org.switchyard.Property;
+import org.switchyard.Scope;
 import org.switchyard.ServiceReference;
 import org.switchyard.component.bean.deploy.BeanDeploymentMetaData;
+import org.switchyard.component.bean.internal.context.ContextProxy;
 import org.switchyard.component.common.SynchronousInOutHandler;
 import org.switchyard.extensions.java.JavaService;
 
@@ -77,6 +81,7 @@ public class ClientProxyBean implements Bean {
      * The dynamic proxy bean instance created from the supplied {@link #_serviceInterface}.
      */
     private Object _proxyBean;
+    
 
     /**
      * Public constructor.
@@ -285,8 +290,10 @@ public class ClientProxyBean implements Bean {
 
             if (method.getReturnType() != null && !Void.TYPE.isAssignableFrom(method.getReturnType())) {
                 SynchronousInOutHandler inOutHandler = new SynchronousInOutHandler();
-
+                
                 Exchange exchangeIn = createExchange(_service, method, inOutHandler);
+                //copy the properties from the current exchange to the new exchange that will be invoked
+                copyProperties(exchangeIn);
                 // Don't set the message content as an array unless there are multiple arguments
                 if (args != null && args.length == 1) {
                     exchangeIn.send(exchangeIn.createMessage().setContent(args[0]));
@@ -302,6 +309,8 @@ public class ClientProxyBean implements Bean {
                 }
             } else {
                 Exchange exchange = createExchange(_service, method, null);
+                //copy the properties from the current exchange to the new exchange that will be invoked
+                copyProperties(exchange);
                 // Don't set the message content as an array unless there are multiple arguments
                 if (args == null) {
                     exchange.send(exchange.createMessage());
@@ -345,6 +354,32 @@ public class ClientProxyBean implements Bean {
             } else {
                 throw BeanMessages.MESSAGES.beanComponentInvocationFailureServiceOperation(_serviceName, method.getName()).setFaultExchange(exchange);
             }
+        }
+
+        /**
+         * This method allows to copy the properties from the current context to
+         * the new exchange context
+         *
+         * @param newExchange
+         *            the new exchange object where the properties will be
+         *            copied
+         */
+        private void copyProperties(Exchange newExchange) {
+            ContextProxy context = new ContextProxy();
+            Context contextNew = newExchange.getContext();
+
+            for (org.switchyard.Property p : context
+                    .getProperties(Scope.EXCHANGE)) {
+                if (contextNew.getProperty(p.getName(), Scope.EXCHANGE) == null
+                        && !p.getName().startsWith("org.switchyard.bus.camel")) {
+                    Property newProp = newExchange.getContext().setProperty(
+                            p.getName(), p.getValue(), Scope.EXCHANGE);
+                    if (p.getLabels() != null && !p.getLabels().isEmpty()) {
+                        newProp.addLabels(p.getLabels());
+                    }
+                }
+            }
+
         }
         
     }

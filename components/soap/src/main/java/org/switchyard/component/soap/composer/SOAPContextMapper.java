@@ -28,14 +28,18 @@ import javax.xml.soap.SOAPMessage;
 import org.switchyard.Context;
 import org.switchyard.Property;
 import org.switchyard.Scope;
+import org.switchyard.ServiceDomain;
+import org.switchyard.ServiceReference;
 import org.switchyard.common.io.pull.ElementPuller;
 import org.switchyard.common.lang.Strings;
+import org.switchyard.common.property.PropertyConstants;
 import org.switchyard.common.xml.XMLHelper;
 import org.switchyard.component.common.composer.BaseRegexContextMapper;
 import org.switchyard.component.common.label.ComponentLabel;
 import org.switchyard.component.common.label.EndpointLabel;
 import org.switchyard.config.Configuration;
 import org.switchyard.config.ConfigurationPuller;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -47,16 +51,34 @@ import org.w3c.dom.Node;
  */
 public class SOAPContextMapper extends BaseRegexContextMapper<SOAPBindingData> {
 
+    private boolean _prefixPropagationSet = false;
+
+    private String _prefixPropertyPropagation;
+
+    protected void setPrefixPropertyPropagation(ServiceDomain serviceDomain) {
+        if (serviceDomain.getProperty(PropertyConstants.DOMAIN_PROPERTY_PROPAGATE_PREFIX) != null) {
+            _prefixPropertyPropagation = (String)serviceDomain.getProperty(PropertyConstants.DOMAIN_PROPERTY_PROPAGATE_PREFIX);
+        }
+    }
+
+    protected String getPrefixPropertyPropagation() {
+        return _prefixPropertyPropagation;
+    }
+
     /**
      * The HTTP responce code.
      */
     public static final String HTTP_RESPONSE_STATUS = "http_response_status";
+    // Property used to get the Service Domain from the CompositeContext
+    private static final String SERVICE_REFERENCE_PROPERTY = "org.switchyard.bus.camel.consumer";
     /**
     * Headers to be excluded.
     */
     public static final List<String> HTTP_HEADERS_EXCLUDED = Arrays.asList(new String[]{"content-type", "content-length"});
     private static final String[] SOAP_HEADER_LABELS = new String[]{ComponentLabel.SOAP.label(), EndpointLabel.SOAP.label()};
     private static final String[] SOAP_MIME_LABELS = new String[]{ComponentLabel.SOAP.label(), EndpointLabel.HTTP.label()};
+
+    private static final String HEADER_NAMESPACE_PROPAGATION = "org.switchyard.propagate.property";
 
     private SOAPHeadersType _soapHeadersType = null;
 
@@ -83,6 +105,7 @@ public class SOAPContextMapper extends BaseRegexContextMapper<SOAPBindingData> {
      */
     @Override
     public void mapFrom(SOAPBindingData source, Context context) throws Exception {
+        setPrefixPropertyPropagation(context);
         SOAPMessage soapMessage = source.getSOAPMessage();
         if (soapMessage.getSOAPBody().hasFault() && (source.getSOAPFaultInfo() != null)) {
             context.setProperty(SOAPComposition.SOAP_FAULT_INFO, source.getSOAPFaultInfo(), Scope.EXCHANGE).addLabels(SOAP_HEADER_LABELS);
@@ -94,7 +117,25 @@ public class SOAPContextMapper extends BaseRegexContextMapper<SOAPBindingData> {
             if (matches(key)) {
                 List<String> values = source.getHttpHeaders().get(key);
                 if (values != null) {
-                    context.setProperty(key, values).addLabels(SOAP_MIME_LABELS);
+                    if (_prefixPropertyPropagation != null && !_prefixPropertyPropagation.equals("") && key.startsWith(_prefixPropertyPropagation)) {
+                        Property p = null;
+                        if (values.size() == 1) {
+                            p = context.setProperty(key, values.get(0), Scope.EXCHANGE).addLabels(SOAP_MIME_LABELS);
+                        } else {
+                            p = context.setProperty(key, values, Scope.EXCHANGE).addLabels(SOAP_MIME_LABELS);
+                        }
+                    } else {
+                        // In case there is a List of String with one element,
+                        // it sets the property as a String.
+                        // This was one error of the Soap conversion. By default
+                        // it requires the values to be on a List.
+                        if (values.size() == 1) {
+                            context.setProperty(key, values.get(0)).addLabels(SOAP_MIME_LABELS);
+                        } else {
+                            context.setProperty(key, values).addLabels(SOAP_MIME_LABELS);
+                        }
+
+                    }
                 }
             }
         }
@@ -124,7 +165,12 @@ public class SOAPContextMapper extends BaseRegexContextMapper<SOAPBindingData> {
                 }
                 if (value != null) {
                     String name = qname.toString();
-                    context.setProperty(name, value).addLabels(SOAP_HEADER_LABELS);
+                    if (_prefixPropertyPropagation != null && !_prefixPropertyPropagation.equals("") && qname.getLocalPart().startsWith(_prefixPropertyPropagation)) {
+                        context.setProperty(name, value, Scope.EXCHANGE).addLabels(SOAP_HEADER_LABELS);
+
+                    } else {
+                        context.setProperty(name, value).addLabels(SOAP_HEADER_LABELS);
+                    }
                 }
             }
         }
@@ -137,11 +183,13 @@ public class SOAPContextMapper extends BaseRegexContextMapper<SOAPBindingData> {
     public void mapTo(Context context, SOAPBindingData target) throws Exception {
         SOAPMessage soapMessage = target.getSOAPMessage();
         SOAPHeader soapHeader = soapMessage.getSOAPHeader();
+        setPrefixPropertyPropagation(context);
         for (Property property : context.getProperties()) {
             Object value = property.getValue();
             if (value != null) {
                 String name = property.getName();
                 QName qname = XMLHelper.createQName(name);
+
                 boolean qualifiedForSoapHeader = Strings.trimToNull(qname.getNamespaceURI()) != null;
                 if (qualifiedForSoapHeader && matches(qname)) {
                     if (value instanceof Node) {
@@ -190,8 +238,32 @@ public class SOAPContextMapper extends BaseRegexContextMapper<SOAPBindingData> {
                             target.getHttpHeaders().put(name, Collections.singletonList((String)value));
                         }
                     }
+                } else if (_prefixPropertyPropagation != null && !_prefixPropertyPropagation.equals("") && property.getName().startsWith(_prefixPropertyPropagation)) {
+                    String v = value.toString();
+                    qname = new QName(HEADER_NAMESPACE_PROPAGATION, property.getName());
+                    if (SOAPHeadersType.XML.equals(_soapHeadersType)) {
+                        try {
+                            Element xmlElement = new ElementPuller().pull(new StringReader(v));
+                            Node xmlNode = soapHeader.getOwnerDocument().importNode(xmlElement, true);
+                            soapHeader.appendChild(xmlNode);
+                        } catch (Throwable t) {
+                            soapHeader.addChildElement(qname).setValue(v);
+                        }
+                    } else {
+                        soapHeader.addChildElement(qname).setValue(v);
+                    }
                 }
             }
+        }
+    }
+
+    private void setPrefixPropertyPropagation(Context context) {
+        if (!_prefixPropagationSet) {
+            if (context.getProperty(SERVICE_REFERENCE_PROPERTY) != null) {
+                ServiceDomain domain = ((ServiceReference)context.getProperty(SERVICE_REFERENCE_PROPERTY).getValue()).getDomain();
+                setPrefixPropertyPropagation(domain);
+            }
+            _prefixPropagationSet = true;
         }
     }
 

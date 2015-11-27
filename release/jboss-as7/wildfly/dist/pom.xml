@@ -225,7 +225,13 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
                             </artifactItems>
-                            <excludes>application-roles.properties, application-users.properties, org/switchyard/test/quickstarts/util/ResourceDeployer.class</excludes>
+                            <!--  excluding BPEL quickstart tests for now due to RIFTSAW-558 -->
+                            <excludes>application-roles.properties, application-users.properties,
+                            org/switchyard/test/quickstarts/util/ResourceDeployer.class,
+                            org/switchyard/test/quickstarts/BpelServiceQuickstartTest.class,
+                            org/switchyard/test/quickstarts/BpelServiceJmsBindingQuickstartTest.class,
+                            org/switchyard/test/quickstarts/BpelServiceLoanApprovalQuickstartTest.class,
+                            org/switchyard/test/quickstarts/BpelServiceSayHelloQuickstartTest.class</excludes>
                             <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
                         </configuration>
                     </execution>

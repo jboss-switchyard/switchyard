@@ -226,12 +226,14 @@
                                 </artifactItem>
                             </artifactItems>
                             <!--  excluding BPEL quickstart tests for now due to RIFTSAW-558 -->
+                            <!--  excluding LibraryDemoQuickstartTest for now due to JBWS-3959 -->
                             <excludes>application-roles.properties, application-users.properties,
                             org/switchyard/test/quickstarts/util/ResourceDeployer.class,
                             org/switchyard/test/quickstarts/BpelServiceQuickstartTest.class,
                             org/switchyard/test/quickstarts/BpelServiceJmsBindingQuickstartTest.class,
                             org/switchyard/test/quickstarts/BpelServiceLoanApprovalQuickstartTest.class,
-                            org/switchyard/test/quickstarts/BpelServiceSayHelloQuickstartTest.class</excludes>
+                            org/switchyard/test/quickstarts/BpelServiceSayHelloQuickstartTest.class,
+                            org/switchyard/test/quickstarts/demo/LibraryDemoQuickstartTest.class</excludes>
                             <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
                         </configuration>
                     </execution>

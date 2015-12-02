@@ -106,6 +106,9 @@ public class SwitchYardConsumer extends DefaultConsumer implements ServiceHandle
                     // Use Out body as a fault content if camelExchange.getException() returns null
                     camelFault = camelExchange.getOut().getBody();
                 }
+                else if (camelExchange.getIn().isFault()) {
+                    camelFault = camelExchange.getIn().getBody();
+                }
             }
 
             // SWITCHYARD-2814 - since fault type is never declared on IN_ONLY operation,

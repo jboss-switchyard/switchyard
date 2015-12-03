@@ -302,6 +302,7 @@ public class OutboundHandler extends BaseServiceHandler {
         }
         return uri;
     }
+    
     /**
      * The handler method that invokes the actual HTTP service when the
      * component is used as a HTTP consumer.
@@ -359,24 +360,19 @@ public class OutboundHandler extends BaseServiceHandler {
             if (httpMethodProp != null && !httpMethodProp.getValue().equals("")) {
                 String httpMethod = (String)httpMethodProp.getValue();
                 LOGGER.info("HTTP Outbound Handler Message Property Changed: URL_Method=" + httpMethod);
-                if(httpMethod.equals(HTTP_GET)){
+                if (httpMethod.equals(HTTP_GET)) {
                     request = new HttpGet(address);
-                }
-                else if(httpMethod.equals(HTTP_POST)){
+                } else if (httpMethod.equals(HTTP_POST)) {
                     request = new HttpPost(address);
                     ((HttpPost) request).setEntity(new BufferedHttpEntity(new InputStreamEntity(httpRequest.getBodyBytes(), httpRequest.getBodyBytes().available())));
-                }
-                else if(httpMethod.equals(HTTP_DELETE)){
+                } else if (httpMethod.equals(HTTP_DELETE)) {
                     request = new HttpDelete(address);
-                }
-                else if(httpMethod.equals(HTTP_HEAD)){
+                } else if (httpMethod.equals(HTTP_HEAD)) {
                     request = new HttpHead(address);
-                }
-                else if(httpMethod.equals(HTTP_PUT)){
+                } else if (httpMethod.equals(HTTP_PUT)) {
                     request = new HttpPut(address);
                     ((HttpPut) request).setEntity(new BufferedHttpEntity(new InputStreamEntity(httpRequest.getBodyBytes(), httpRequest.getBodyBytes().available())));
-                }
-                else if(httpMethod.equals(HTTP_OPTIONS)){
+                } else if (httpMethod.equals(HTTP_OPTIONS)) {
                     request = new HttpOptions(address);
                 }
             }

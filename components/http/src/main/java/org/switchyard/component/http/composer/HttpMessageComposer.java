@@ -40,6 +40,9 @@ public class HttpMessageComposer extends BaseMessageComposer<HttpBindingData> {
 
     private MessageComposerModel _config;
 
+    /**
+     * Camel HTTP Header.
+     */
     public static final String CAMEL_HTTP_HEADER = "CamelHttp";
 
     /**

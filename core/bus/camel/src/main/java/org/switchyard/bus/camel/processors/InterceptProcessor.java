@@ -45,7 +45,7 @@ public class InterceptProcessor implements Processor {
     private final MessageTraceHandler _trace;
     private static Logger _log = Logger.getLogger(InterceptProcessor.class);
 
-    private final Map<String, ExchangeInterceptor> interceptors;
+    private final Map<String, ExchangeInterceptor> _interceptors;
 
     /**
      * Create a new InterceptorProcessor.
@@ -59,7 +59,7 @@ public class InterceptProcessor implements Processor {
         _trace = new MessageTraceHandler();
         SwitchYardCamelContext camelContext = (SwitchYardCamelContext)domain
             .getProperty(SwitchYardCamelContext.CAMEL_CONTEXT_PROPERTY);
-        interceptors = camelContext.getRegistry().lookupByType(ExchangeInterceptor.class);
+        _interceptors = camelContext.getRegistry().lookupByType(ExchangeInterceptor.class);
     }
 
     @Override
@@ -94,14 +94,14 @@ public class InterceptProcessor implements Processor {
     }
 
     private void fireInterceptors(Exchange ex) throws HandlerException {
-        if (interceptors != null && interceptors.size() > 0) {
+        if (_interceptors != null && _interceptors.size() > 0) {
             CamelExchange syEx = new CamelExchange(ex);
             try {
                 // Seed these values up front so that interceptors don't mess with them
                 boolean callBefore = isBefore(ex);
                 boolean callAfter = isAfter(ex);
 
-                for (ExchangeInterceptor interceptor : interceptors.values()) {
+                for (ExchangeInterceptor interceptor : _interceptors.values()) {
                     // Is the interceptor targeting this processor?
                     if (!matchesTarget(interceptor)) {
                         continue;

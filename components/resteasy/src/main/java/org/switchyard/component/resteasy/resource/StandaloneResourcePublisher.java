@@ -26,7 +26,6 @@ import com.sun.net.httpserver.HttpServer;
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.plugins.server.servlet.ResteasyContextParameters;
 import org.jboss.resteasy.plugins.server.sun.http.HttpContextBuilder;
-import org.jboss.resteasy.spi.ResteasyDeployment;
 import org.switchyard.ServiceDomain;
 import org.switchyard.component.common.Endpoint;
 import org.switchyard.component.resteasy.RestEasyLogger;

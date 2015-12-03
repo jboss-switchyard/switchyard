@@ -25,6 +25,10 @@ public class StandaloneResource implements Endpoint {
     
     private final Callback _callback;
 
+    /**
+     * Constructor.
+     * @param cb cb
+     */
     public StandaloneResource(Callback cb) {
         _callback = cb;
     }

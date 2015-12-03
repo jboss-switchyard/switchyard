@@ -163,12 +163,12 @@ public class RiftsawBPELExchangeHandler extends BaseServiceHandler implements BP
                 getContextClassLoader().getResource(DEPLOY_XML);
         int jarIndex = url.toString().indexOf(".jar");
         int warIndex = url.toString().indexOf(".war");
-        	
+
         boolean approvedDeployment = (
-        			(url.toString().indexOf(".ear") != -1)
-        		|| (url.toString().indexOf(".war") != -1)
-        		|| (url.toString().indexOf(".jar") != -1)
-        		);
+               (url.toString().indexOf(".ear") != -1)
+                || (url.toString().indexOf(".war") != -1)
+                || (url.toString().indexOf(".jar") != -1)
+                );
         
         // Check if url contains a jar
         if (approvedDeployment) {

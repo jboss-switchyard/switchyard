@@ -44,7 +44,6 @@ public class SoapAttachmentTest {
         System.setProperty("org.switchyard.component.soap.client.port", "8081");
     }
 
-    @Ignore("SWITCHYARD-2821 : please reenable after fixing")
     @Test
     public void testSwitchYardWebService() throws Exception {
         SOAPMessage response = SoapAttachmentClient.sendMessage(SWITCHYARD_WEB_SERVICE);

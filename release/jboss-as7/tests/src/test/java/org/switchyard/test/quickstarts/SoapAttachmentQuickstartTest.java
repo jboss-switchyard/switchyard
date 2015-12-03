@@ -17,12 +17,14 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.Iterator;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.xml.namespace.QName;
 import javax.xml.soap.AttachmentPart;
 import javax.xml.soap.MessageFactory;
+import javax.xml.soap.MimeHeader;
 import javax.xml.soap.SOAPBodyElement;
 import javax.xml.soap.SOAPConnection;
 import javax.xml.soap.SOAPConnectionFactory;
@@ -53,7 +55,6 @@ public class SoapAttachmentQuickstartTest {
         return ArquillianUtil.createJarQSDeployment("switchyard-soap-attachment");
     }
 
-    @Ignore("SWITCHYARD-2821 : please reenable after fixing")
     @Test
     public void imageService() throws Exception {
         SOAPMessage response = sendMessage();
@@ -69,14 +70,18 @@ public class SoapAttachmentQuickstartTest {
         SOAPBodyElement bodyElement = msg.getSOAPBody().addBodyElement(new QName("urn:switchyard-quickstart:soap-attachment:1.0", "echoImage"));
         bodyElement.addTextNode("cid:switchyard.png");
 
-        // CXF does not set content-type.
-        msg.getMimeHeaders().addHeader("Content-Type", "multipart/related; type=\"text/xml\"; start=\"<root.message@cxf.apache.org>\"");
         msg.getSOAPPart().setContentId("<root.message@cxf.apache.org>");
 
         AttachmentPart ap = msg.createAttachmentPart();
         ap.setDataHandler(new DataHandler(new StreamDataSource()));
         ap.setContentId("<switchyard.png>");
         msg.addAttachmentPart(ap);
+        msg.saveChanges();
+
+        // SWITCHYARD-2818/CXF-6665 - CXF does not set content-type properly.
+        String contentType = msg.getMimeHeaders().getHeader("Content-Type")[0];
+        contentType += "; start=\"<root.message@cxf.apache.org>\"; start-info=\"application/soap+xml\"; action=\"urn:switchyard-quickstart:soap-attachment:1.0:echoImage\"";
+        msg.getMimeHeaders().setHeader("Content-Type", contentType);
 
         return connection.call(msg, new URL(SWITCHYARD_WEB_SERVICE));
     }

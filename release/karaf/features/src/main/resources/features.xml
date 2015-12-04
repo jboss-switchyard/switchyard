@@ -3,7 +3,6 @@
 
     <repository>mvn:org.ops4j.pax.cdi/pax-cdi-features/${version.org.ops4j.pax.cdi}/xml/features</repository>
     <repository>mvn:org.drools/drools-karaf-features/${version.org.drools}/xml/features</repository>
-    <repository>mvn:org.milyn/milyn-smooks-all/${version.org.milyn}/xml/features</repository>
 
     <!-- Switchyard Core -->
 
@@ -15,6 +14,17 @@
         <feature>switchyard-internal-core</feature>
         <bundle>mvn:org.switchyard.karaf/switchyard-karaf-deploy/${project.version}</bundle>
         <bundle>mvn:org.switchyard.karaf/switchyard-karaf-commands/${project.version}</bundle>
+    </feature>
+
+    <feature name="smooks" version="${version.org.milyn}">
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.antlr/${version.org.apache.servicemix.bundles.antlr}</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.freemarker/${version.org.apache.servicemix.bundles.freemarker}</bundle>
+        <bundle>mvn:org.codehaus.groovy/groovy-all/${version.org.codehaus.groovy}</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxen/${version.org.apache.servicemix.bundles.jaxen}</bundle>
+        <bundle>mvn:org.ow2.asm/asm-all/${version.org.ow2.asm}</bundle>
+        <bundle>mvn:commons-lang/commons-lang/${version.commons-lang}</bundle>
+        <bundle>mvn:org.ow2.bundles/ow2-bundles-externals-opencsv/${version.org.ow2.bundles.opencsv}</bundle>
+        <bundle>mvn:org.milyn/milyn-smooks-all/${version.org.milyn}</bundle>
     </feature>
 
     <feature name="switchyard-internal-core" version="${project.version}" resolver="(obr)">
@@ -42,6 +52,7 @@
         <bundle>mvn:org.codehaus.jackson/jackson-core-asl/${version.org.codehaus.jackson}</bundle>
         <bundle>mvn:org.codehaus.jackson/jackson-mapper-asl/${version.org.codehaus.jackson}</bundle>
         <feature dependency="true" version="${version.net.sf.dozer}">dozer</feature>
+        <bundle>mvn:org.javassist/javassist/${version.org.javassist}</bundle>
         <feature dependency="true" version="${version.org.milyn}">smooks</feature>
         <bundle>mvn:org.switchyard/switchyard-transform/${project.version}</bundle>
     </feature>

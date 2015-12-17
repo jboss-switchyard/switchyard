@@ -85,6 +85,21 @@
             <groupId>org.switchyard.components</groupId>
             <artifactId>switchyard-component-common</artifactId>
         </dependency>
+         <dependency>
+            <groupId>org.switchyard.components</groupId>
+            <artifactId>switchyard-component-bean</artifactId>
+            <scope>test</scope>
+        </dependency>
+         <dependency>
+            <groupId>org.switchyard</groupId>
+            <artifactId>switchyard-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+	      <groupId>org.switchyard.components</groupId>
+	      <artifactId>switchyard-component-test-mixin-cdi</artifactId>
+	      <scope>test</scope>
+	    </dependency>
         <dependency>
             <groupId>org.jboss.spec.javax.servlet</groupId>
             <artifactId>jboss-servlet-api_3.0_spec</artifactId>
@@ -176,6 +191,11 @@
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.compendium</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+        	<groupId>org.switchyard</groupId>
+        	<artifactId>switchyard-bus-camel</artifactId>
+        	<scope>test</scope>
         </dependency>
     </dependencies>
 </project>

@@ -381,7 +381,11 @@ public class InboundHandler extends BaseServiceHandler {
             if ((faultAction != null) && (msgContext != null)) {
                 msgContext.put(SOAPUtil.WSA_ACTION_STR, faultAction);
             }
-            throw new SOAPFaultException(SOAPUtil.createFault(ex, _bindingId, WSDLUtil.getFaultQName(operation, ex.getClass().getSimpleName())));
+            SOAPFaultException sfe = extractSOAPFaultException(ex);
+            if(sfe == null) {
+                sfe = new SOAPFaultException(SOAPUtil.createFault(ex, _bindingId, WSDLUtil.getFaultQName(operation, ex.getClass().getSimpleName())));
+            }
+            throw sfe;
         }
         if (exchange.getState() == ExchangeState.FAULT && soapResponse.getSOAPBody().getFault() == null) {
             return handleException(soapResponse, oneWay, 
@@ -394,7 +398,31 @@ public class InboundHandler extends BaseServiceHandler {
         return soapResponse;
     }
 
-    private void assertComposedMessageOK(Message soapMessage, Operation operation) throws SOAPException {
+    private SOAPFaultException extractSOAPFaultException(Throwable ex) {
+    	LOGGER.debugf("Searching recursively for %s in %s", SOAPFaultException.class.getName(), ex == null ? null : ex.getClass().getName());
+    	if(ex == null) {
+    		return null;
+    	}
+    	
+    	if(ex instanceof SOAPFaultException) {
+    		LOGGER.debugf("Found %s", SOAPFaultException.class.getName());
+    		return (SOAPFaultException)ex;
+    	}
+    	
+    	// Avoid endless recursion
+		if(ex.getCause() != null) {
+			if(!ex.equals(ex.getCause())) {
+				return extractSOAPFaultException(ex.getCause());
+			} else {
+				LOGGER.debugf("Break searching for %s due to recursive exception cause", SOAPFaultException.class.getName());
+			}
+		}
+		
+		LOGGER.debugf("Reached end of exception cause in search for %s, will return null", SOAPFaultException.class.getName());
+		return null;
+	}
+
+	private void assertComposedMessageOK(Message soapMessage, Operation operation) throws SOAPException {
         Node inputMessage = soapMessage.getContent(Node.class);
 
         String actualNS = inputMessage.getNamespaceURI();

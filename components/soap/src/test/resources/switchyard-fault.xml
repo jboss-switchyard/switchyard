@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sy:switchyard xmlns:bean="urn:switchyard-component-bean:config:2.0" xmlns:sca="http://docs.oasis-open.org/ns/opencsa/sca/200912" xmlns:soap="urn:switchyard-component-soap:config:2.0" xmlns:sy="urn:switchyard-config:switchyard:2.0" name="switchyard-soap-fault" targetNamespace="urn:com.example.switchyard:switchyard-soap-fault:1.0">
+  <sca:composite name="switchyard-soap-fault" targetNamespace="urn:com.example.switchyard:switchyard-soap-fault:1.0">
+    <sca:service name="SoapFaultThrower" promote="FaultBean/FaultBean">
+      <sca:interface.wsdl interface="wsdl.wsdl#wsdl.porttype(wsdl)"/>
+      <soap:binding.soap name="SoapFaultThrower">
+        <soap:contextMapper soapHeadersType="VALUE"/>
+        <soap:wsdl>wsdl.wsdl</soap:wsdl>
+        <soap:contextPath>soap-fault-thrower</soap:contextPath>
+      </soap:binding.soap>
+    </sca:service>
+    <sca:component name="FaultBean">
+      <bean:implementation.bean class="com.example.switchyard.switchyard_soap_fault.FaultBeanImpl"/>
+      <sca:service name="FaultBean">
+        <sca:interface.java interface="com.example.switchyard.switchyard_soap_fault.FaultBean"/>
+      </sca:service>
+    </sca:component>
+  </sca:composite>
+</sy:switchyard>

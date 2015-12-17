@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://fault.switchyard.org" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="wsdl" targetNamespace="http://fault.switchyard.org">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://fault.switchyard.org">
+      <xsd:element name="OperationARequest"/>
+      <xsd:element name="OperationAResponse"/>
+    </xsd:schema>
+  </wsdl:types>
+    <wsdl:message name="OperationARequest">
+    <wsdl:part element="tns:OperationARequest" name="parameters"/>
+  </wsdl:message>
+  <wsdl:message name="OperationAResponse">
+    <wsdl:part element="tns:OperationAResponse" name="parameters"/>
+  </wsdl:message>
+  <wsdl:portType name="wsdl">
+    <wsdl:operation name="OperationA">
+      <wsdl:input message="tns:OperationARequest"/>
+      <wsdl:output message="tns:OperationAResponse"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="wsdlSOAP" type="tns:wsdl">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="OperationA">
+      <soap:operation soapAction="http://fault.switchyard.org/OperationA"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="wsdl">
+    <wsdl:port binding="tns:wsdlSOAP" name="wsdlSOAP">
+      <soap:address location="http://www.example.org/"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -43,6 +43,12 @@ public final class CamelContextConfigurator {
             "org.switchyard.camel.PerformanceStatistics";
     
     /**
+     * Domain property used to configure MDC logging for Camel.
+     */
+    public static final String MDC_LOGGING_ENABLED =
+            "org.switchyard.camel.useMDCLogging";
+
+    /**
      * Property which contains the fully-qualified name of a class which implements 
      * CamelContextAware and can be used to configure the CamelContext used within SwitchYard.
      */
@@ -89,12 +95,19 @@ public final class CamelContextConfigurator {
                 configurePerformanceStatistics(context, value);
             } else if (name.equals(CAMEL_CONTEXT_CONFIG)) {
                 configureCamelContextAware(context, value);
+            } else if (name.equals(MDC_LOGGING_ENABLED)) {
+                configureMDCLogging(context, value);
             }
         } catch (Exception ex) {
             CommonCamelLogger.ROOT_LOGGER.camelContextConfigurationError(name, value, ex);
         }
     }
-    
+
+    private static void configureMDCLogging(CamelContext context, Object value) {
+        boolean enabled = Boolean.parseBoolean(value.toString());
+        context.setUseMDCLogging(enabled);
+    }
+
     private static void configureShutdownTimeout(CamelContext context, Object value) {
         int timeout = Integer.parseInt(value.toString());
         context.getShutdownStrategy().setTimeout(timeout);

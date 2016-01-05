@@ -37,6 +37,7 @@ import javax.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.configuration.security.ProxyAuthorizationPolicy;
 import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxws.DispatchImpl;
 import org.apache.cxf.transport.http.HTTPConduit;
@@ -139,6 +140,7 @@ public class OutboundHandler extends BaseServiceHandler {
                 // _dispatcher.getRequestContext().put("jaxws.response.throwExceptionIfSOAPFault", Boolean.FALSE);
 
                 Client client = ((DispatchImpl)_dispatcher).getClient();
+                client.setThreadLocalRequestContext(true);
                 if (_feature.isAddressingEnabled()) {
                     // Add handler to process WS-A headers
                     Interceptor<? extends org.apache.cxf.message.Message> addressingInterceptor = EndpointPublisherFactory.getEndpointPublisher().createAddressingInterceptor();
@@ -330,6 +332,13 @@ public class OutboundHandler extends BaseServiceHandler {
             httpHeaders.putAll(bindingData.getHttpHeaders());
 
             if (!_feature.isAddressingEnabled() && (action != null)) {
+                // SWITCHYARD-2942 - CXF keeps SOAPAction in PROTOCOL_HEADERS and ignore SOAP_ACTION_URI_PROPERTY if SOAPAction is
+                // already in PROTOCOL_HEADERS. It needs to be removed to reflect SOAPACTION_URI_PROPERTY specified here.
+                Map<String, List<String>> reqHeaders =
+                        CastUtils.cast((Map<?, ?>)_dispatcher.getRequestContext().get(org.apache.cxf.message.Message.PROTOCOL_HEADERS));
+                if (reqHeaders.containsKey(org.apache.cxf.binding.soap.SoapBindingConstants.SOAP_ACTION)) {
+                    reqHeaders.remove(org.apache.cxf.binding.soap.SoapBindingConstants.SOAP_ACTION);
+                }
                 _dispatcher.getRequestContext().put(BindingProvider.SOAPACTION_URI_PROPERTY, "\"" + action + "\"");
             }
 

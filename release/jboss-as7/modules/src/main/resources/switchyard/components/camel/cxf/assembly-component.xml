@@ -27,6 +27,7 @@
             <useTransitiveDependencies>false</useTransitiveDependencies>
             <includes>
                 <include>org.switchyard.components:switchyard-component-camel-cxf</include>
+		<include>org.apache.camel:camel-cxf-transport</include>
             </includes>
             <outputDirectory>/modules/system/layers/soa/org/switchyard/component/camel/cxf/main</outputDirectory>
             <outputFileNameMapping>${artifact.artifactId}-${project.version}.${artifact.extension}</outputFileNameMapping>

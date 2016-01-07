@@ -63,6 +63,7 @@
         <version.wildfly.maven>1.0.2.Final</version.wildfly.maven>
         <version.org.fusesource.mqtt-client>1.6</version.org.fusesource.mqtt-client>
         <version.org.fusesource.hawtdispatch>1.22</version.org.fusesource.hawtdispatch>
+        <version.surefire.plugin>2.18.1</version.surefire.plugin>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -135,6 +136,18 @@
     <build>
         <finalName>${project.artifactId}</finalName>
         <plugins>
+            <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-surefire-plugin</artifactId>
+               <version>${version.surefire.plugin}</version>
+               <dependencies>
+                  <dependency>
+                     <groupId>org.apache.maven.surefire</groupId>
+                     <artifactId>surefire-junit4</artifactId>
+                     <version>${version.surefire.plugin}</version>
+                  </dependency>
+               </dependencies>
+            </plugin>
             <plugin>
                 <groupId>org.switchyard</groupId>
                 <artifactId>switchyard-plugin</artifactId>

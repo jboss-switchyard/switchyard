@@ -21,6 +21,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
 
+import javax.xml.namespace.QName;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -57,7 +58,9 @@ public class HttpInvoker implements RemoteInvoker {
     public static final String AUTH_PASSWORD = "auth.password";
     /** Property name for Web Service Security header element. */
     public static final String WS_SECURITY = "webservice.security";
-
+    /** Property name represented by QName for Web Service Security header element. */
+    public static final QName WS_SECURITY_QNAME = new QName("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security");
+    
     private static Logger _log = Logger.getLogger(HttpInvoker.class);
     private Serializer _serializer = SerializerFactory.create(FormatType.JSON, null, true);
     private URL _endpoint;
@@ -133,8 +136,16 @@ public class HttpInvoker implements RemoteInvoker {
                     "Basic " + Base64.encodeFromString(_properties.getProperty(AUTH_USERNAME) + ":" + _properties.getProperty(AUTH_PASSWORD)));
         }
         
-        if (_properties.get(WS_SECURITY) != null) {
-            Object wsse = _properties.get(WS_SECURITY);
+        Object wsse = null;
+        if (_properties.get(WS_SECURITY_QNAME) != null) {
+            wsse = _properties.get(WS_SECURITY_QNAME);
+        } else if (_properties.get(WS_SECURITY_QNAME.toString()) != null) {
+            wsse = _properties.get(WS_SECURITY_QNAME.toString());
+        } else if (_properties.get(WS_SECURITY) != null) {
+            wsse = _properties.get(WS_SECURITY);
+        }
+        
+        if (wsse != null) {
             if (wsse instanceof Node) {
                 Node wsseNode = Node.class.cast(wsse);
                 StringWriter sw = new StringWriter();

@@ -195,7 +195,10 @@ public class ClientInvoker extends ClientInterceptorRepositoryImpl implements Me
         }
 
         _providerFactory = new ResteasyProviderFactory();
-
+        SSLSocketFactory sslFactory = getSSLSocketFactory(model.getSSLContextConfig());
+        if (sslFactory == null) {
+            sslFactory = SSLSocketFactory.getSocketFactory();
+        }
         boolean useBuiltins = true; // use builtin @Provider classes by default
         if (model.getContextParamsConfig() != null) {
             Map<String, String> contextParams = model.getContextParamsConfig().toMap();
@@ -238,10 +241,6 @@ public class ClientInvoker extends ClientInterceptorRepositoryImpl implements Me
         if (_baseUri.getScheme().startsWith("https")) {
             if (port == -1) {
                 port = 443;
-            }
-            SSLSocketFactory sslFactory = getSSLSocketFactory(model.getSSLContextConfig());
-            if (sslFactory == null) {
-                sslFactory = SSLSocketFactory.getSocketFactory();
             }
             schemeRegistry.register(new Scheme(_baseUri.getScheme(), port, sslFactory));
         } else {
@@ -301,6 +300,20 @@ public class ClientInvoker extends ClientInterceptorRepositoryImpl implements Me
                     ((ApacheHttpClient4Executor)_executor).setHttpContext(context);
                 }
                 httpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxyHost);
+                int portSchema=proxyHost.getPort();
+                if (proxyHost.getSchemeName().startsWith("https")) {
+                	
+                    if (portSchema == -1) {
+                    	portSchema = 443;
+                    }
+                    schemeRegistry.register(new Scheme(proxyHost.getSchemeName(), portSchema, sslFactory));
+                } else {
+                    if (portSchema == -1) {
+                    	portSchema = 80;
+                    }
+                    schemeRegistry.register(new Scheme(proxyHost.getSchemeName(), portSchema, PlainSocketFactory.getSocketFactory()));
+                }
+
             }
         }
         Integer timeout = model.getTimeout();

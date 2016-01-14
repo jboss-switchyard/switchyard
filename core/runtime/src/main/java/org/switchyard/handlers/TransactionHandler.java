@@ -371,7 +371,10 @@ public class TransactionHandler implements ExchangeHandler {
         Transaction currentTx = null;
         try {
             currentTx = getCurrentTransaction();
-        } catch (Exception e) { e.getMessage(); } // ignore
+        } catch (Exception e) {
+            e.getMessage();
+        } // ignore
+
         if (currentTx == null) {
             buf.append("N/A");
         } else {

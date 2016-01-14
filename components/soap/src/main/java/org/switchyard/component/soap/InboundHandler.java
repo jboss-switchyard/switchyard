@@ -144,6 +144,8 @@ public class InboundHandler extends BaseServiceHandler {
             _service = _domain.getServiceReference(_config.getServiceName());
             PortName portName = _config.getPort();
             Definition definition = WSDLUtil.readWSDL(_config.getWsdl());
+
+            WSDLUtil.filterWSDL(definition, _config.getModelConfiguration().getPropertyResolver());
             _targetNamespace = definition.getTargetNamespace();
             javax.wsdl.Service wsdlService = WSDLUtil.getService(definition, portName);
             _wsdlPort = WSDLUtil.getPort(wsdlService, portName);

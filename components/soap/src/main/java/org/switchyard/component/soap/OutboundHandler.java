@@ -85,6 +85,7 @@ public class OutboundHandler extends BaseServiceHandler {
 
     /**
      * Constructor.
+     * 
      * @param config the configuration settings
      */
     public OutboundHandler(final SOAPBindingModel config) {
@@ -102,6 +103,7 @@ public class OutboundHandler extends BaseServiceHandler {
         if (_dispatcher == null) {
             try {
                 Definition definition = WSDLUtil.readWSDL(_config.getWsdl());
+                WSDLUtil.filterWSDL(definition, _config.getModelConfiguration().getPropertyResolver());
                 PortName portName = _config.getPort();
                 javax.wsdl.Service wsdlService = WSDLUtil.getService(definition, portName);
                 _wsdlPort = WSDLUtil.getPort(wsdlService, portName);

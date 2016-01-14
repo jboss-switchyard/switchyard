@@ -56,16 +56,19 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.jboss.logging.Logger;
 import org.switchyard.ExchangePattern;
+import org.switchyard.common.lang.Strings;
+import org.switchyard.common.property.PropertyResolver;
 import org.switchyard.common.type.Classes;
 import org.switchyard.common.xml.XMLHelper;
-import org.switchyard.component.soap.SOAPMessages;
 import org.switchyard.component.soap.Feature;
 import org.switchyard.component.soap.PortName;
+import org.switchyard.component.soap.SOAPMessages;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+
 
 /**
  * Contains utility methods to examine/manipulate WSDLs.
@@ -162,6 +165,31 @@ public final class WSDLUtil {
             }
         }
     }
+
+    /**
+     * Filters the WSDL document.
+     *
+     * @param definition location pointing to a WSDL XML definition.
+     * @param propertyResolver the Property Resolver
+     */
+    public static void filterWSDL(Definition definition, PropertyResolver propertyResolver) {
+        for (Object serviceObject : definition.getServices().values()) {
+            Service service = (Service) serviceObject;
+            for (Object portObject : service.getPorts().values()) {
+                Port port = (Port) portObject;
+                for (Object extObject : port.getExtensibilityElements()) {
+                    if (extObject instanceof SOAPAddress) {
+                        SOAPAddress address = (SOAPAddress) extObject;
+                        String toReplace = Strings.replaceProperties(address.getLocationURI(), propertyResolver);
+                        if (!toReplace.isEmpty() && !toReplace.equals(address.getLocationURI())) {
+                            address.setLocationURI(toReplace);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 
     /**
      * Read the WSDL document accessible via the specified

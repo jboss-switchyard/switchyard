@@ -33,7 +33,6 @@ import org.junit.runner.RunWith;
 import org.switchyard.Message;
 import org.switchyard.ServiceDomain;
 import org.switchyard.common.net.SocketAddr;
-import org.switchyard.component.soap.PortName;
 import org.switchyard.component.soap.config.model.SOAPBindingModel;
 import org.switchyard.component.soap.config.model.SOAPNamespace;
 import org.switchyard.component.soap.config.model.v1.V1SOAPBindingModel;

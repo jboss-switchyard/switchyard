@@ -144,6 +144,16 @@
             <artifactId>bcpkix-jdk15on</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -223,6 +233,8 @@
                                 <feature version="${version.org.apache.camel}">camel-mina2</feature>
                                 <feature version="${version.org.apache.camel}">camel-jaxb</feature>
                                 <feature version="${version.org.apache.camel}">camel-saxon</feature>
+                                <feature version="${version.org.apache.camel}">camel-jackson</feature>
+                                <feature version="${version.org.apache.camel}">camel-dozer</feature>
                                 <feature version="${version.org.apache.activemq}">activemq-broker</feature>
                             </features>
                             <repository>target/dependencies/apache-karaf-${version.org.apache.karaf}/system</repository>

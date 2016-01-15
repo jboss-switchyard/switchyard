@@ -13,7 +13,6 @@
  */
 package org.switchyard.component.camel;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,15 +21,18 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.builder.xml.Namespaces;
 import org.apache.camel.model.Constants;
+import org.apache.camel.model.DataFormatDefinition;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.model.RoutesDefinition;
 import org.apache.camel.spi.NamespaceAware;
+import org.apache.camel.spring.CamelContextFactoryBean;
+import org.apache.camel.spring.CamelEndpointFactoryBean;
+import org.apache.camel.spring.SpringModelJAXBContextFactory;
+import org.switchyard.common.camel.SwitchYardCamelContext;
 import org.switchyard.common.type.Classes;
 import org.switchyard.component.camel.model.CamelComponentImplementationModel;
 import org.switchyard.SwitchYardException;
@@ -39,7 +41,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  * Creates RouteDefinition instances based off of a class containing @Route
@@ -54,7 +55,9 @@ public final class RouteFactory {
 
     static {
         try {
-            JAXB_CONTEXT = JAXBContext.newInstance(Constants.JAXB_CONTEXT_PACKAGES, CamelContext.class.getClassLoader());
+            JAXB_CONTEXT = JAXBContext.newInstance(Constants.JAXB_CONTEXT_PACKAGES
+                            + SpringModelJAXBContextFactory.ADDITIONAL_JAXB_CONTEXT_PACKAGES
+                            , SpringModelJAXBContextFactory.class.getClassLoader());
         } catch (JAXBException e) {
             throw new SwitchYardException(e);
         }
@@ -70,21 +73,23 @@ public final class RouteFactory {
     /**
      * Returns a list of route definitions referenced by a camel implementation.
      * @param model implementation config model
+     * @param camelContext CamelContext
      * @return list of route definitions
      */
-    public static List<RouteDefinition> getRoutes(CamelComponentImplementationModel model) {
+    public static List<RouteDefinition> getRoutes(CamelComponentImplementationModel model, SwitchYardCamelContext camelContext) {
         if (model.getJavaClass() != null) {
             return createRoute(model.getJavaClass(), model.getComponent().getTargetNamespace());
         }
-        return loadRoute(model.getXMLPath());
+        return loadRoute(model.getXMLPath(), camelContext);
     }
 
     /**
      * Loads a set of route definitions from an XML file.
      * @param xmlPath path to the file containing one or more route definitions
+     * @param camelContext CamelContext
      * @return list of route definitions
      */
-    public static List<RouteDefinition> loadRoute(String xmlPath) {
+    public static List<RouteDefinition> loadRoute(String xmlPath, SwitchYardCamelContext camelContext) {
         List<RouteDefinition> routes = null;
         
         try {
@@ -98,28 +103,33 @@ public final class RouteFactory {
             Object obj = binder.unmarshal(element);
             injectNamespaces(element, binder);
             
-            // Look for <routes> or <route> as top-level element
-            if (obj instanceof RoutesDefinition) {
+            // Look for top-level element - camelContext, routes or route
+            if (obj instanceof CamelContextFactoryBean) {
+                routes = processCamelContextElement((CamelContextFactoryBean)obj, camelContext);
+            } else if (obj instanceof RoutesDefinition) {
                 routes = ((RoutesDefinition)obj).getRoutes();
             } else if (obj instanceof RouteDefinition) {
                 routes = new ArrayList<RouteDefinition>(1);
                 routes.add((RouteDefinition)obj);
             }
             
-            // If we couldn't find a <route> or <routes> definition, throw an error
+            // If we couldn't find a route definition, throw an error
             if (routes == null) {
                 CamelComponentMessages.MESSAGES.noRoutesFoundInXMLFile(xmlPath);
             }
             return routes;
-        } catch (SAXException e) {
-            throw new SwitchYardException(e);
-        } catch (ParserConfigurationException e) {
-            throw new SwitchYardException(e);
-        } catch (JAXBException e) {
-            throw new SwitchYardException(e);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new SwitchYardException(e);
         }
+    }
+
+    /**
+     * Loads a set of route definitions from an XML file.
+     * @param xmlPath path to the file containing one or more route definitions
+     * @return list of route definitions
+     */
+    public static List<RouteDefinition> loadRoute(String xmlPath) {
+        return loadRoute(xmlPath, null);
     }
 
     private static void injectNamespaces(Element element, Binder<Node> binder) {
@@ -141,6 +151,21 @@ public final class RouteFactory {
                 injectNamespaces(childElement, binder);
             }
         }
+    }
+
+    private static List<RouteDefinition> processCamelContextElement(CamelContextFactoryBean camelContextFactoryBean, SwitchYardCamelContext camelContext) throws Exception {
+        if (camelContext != null) {
+            // processing camelContext/endpoint
+            for (CamelEndpointFactoryBean epBean : camelContextFactoryBean.getEndpoints()) {
+                epBean.setCamelContext(camelContext);
+                camelContext.getWritebleRegistry().put(epBean.getId(), epBean.getObject());
+            }
+            // processing camelContext/dataFormat
+            for (DataFormatDefinition dataFormatDef : camelContextFactoryBean.getDataFormats().getDataFormats()) {
+                camelContext.getDataFormats().put(dataFormatDef.getId(), dataFormatDef);
+            }
+        }
+        return camelContextFactoryBean.getRoutes();
     }
 
     /**

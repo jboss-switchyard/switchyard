@@ -19,8 +19,7 @@ import java.io.InputStreamReader;
 
 import javax.xml.namespace.QName;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.switchyard.Message;

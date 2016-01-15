@@ -18,6 +18,7 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
+import org.apache.camel.Endpoint;
 import org.apache.camel.component.properties.PropertiesComponent;
 import org.apache.camel.model.FromDefinition;
 import org.apache.camel.model.ProcessorDefinition;
@@ -90,7 +91,7 @@ public class CamelActivator extends BaseCamelActivator {
                 (CamelComponentImplementationModel)config.getComponent().getImplementation();
         try {
             final String endpointUri = ComponentNameComposer.composeComponentUri(serviceName);
-            final List<RouteDefinition> routeDefinitions = getRouteDefinition(ccim);
+            final List<RouteDefinition> routeDefinitions = getRouteDefinition(ccim, getCamelContext());
             verifyRouteDefinitions(routeDefinitions, ccim);
             getCamelContext().addRouteDefinitions(routeDefinitions);
             final SwitchYardEndpoint endpoint = getCamelContext().getEndpoint(endpointUri, SwitchYardEndpoint.class);
@@ -144,7 +145,14 @@ public class CamelActivator extends BaseCamelActivator {
             for (ProcessorDefinition<?> processorDefinition : outputs) {
                 if (processorDefinition instanceof ToDefinition) {
                     ToDefinition to = (ToDefinition) processorDefinition;
-                    final URI componentUri = URI.create(to.getUri());
+                    URI componentUri = null;
+                    if (to.getRef() != null) {
+                        componentUri = URI.create(getCamelContext().getRegistry().lookupByNameAndType(to.getRef(), Endpoint.class).getEndpointUri());
+                    } else if (to.getUri() != null) {
+                        componentUri = URI.create(to.getUri());
+                    } else {
+                        throw CamelComponentMessages.MESSAGES.couldNotResolveToEndpointUri(to.toString());
+                    }
                     if (componentUri.getScheme().equals(CamelConstants.SWITCHYARD_COMPONENT_NAME)) {
                         final String referenceName = componentUri.getAuthority();
                         final QName refServiceName = new QName(compositeNs, referenceName);
@@ -173,8 +181,8 @@ public class CamelActivator extends BaseCamelActivator {
      * This method figures out which one were dealing with and returns the
      * corresponding RouteDefinition.
      */
-    private List<RouteDefinition> getRouteDefinition(CamelComponentImplementationModel model) {
-        List<RouteDefinition> routes = RouteFactory.getRoutes(model);
+    private List<RouteDefinition> getRouteDefinition(CamelComponentImplementationModel model, SwitchYardCamelContext camelContext) {
+        List<RouteDefinition> routes = RouteFactory.getRoutes(model, camelContext);
         return routes;
     }
 

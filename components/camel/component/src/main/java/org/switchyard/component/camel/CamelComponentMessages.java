@@ -120,5 +120,13 @@ public interface CamelComponentMessages {
      */
     @Message(id = 33015, value = "No ServiceReference was found for uri [%s]")
     NullPointerException noServiceReferenceFoundForURI(String uri);
+
+    /**
+     * couldNotResolveToEndpointUri method definition.
+     * @param to to
+     * @return NullPointerException
+     */
+    @Message(id = 33016, value = "The endpoint '%s' could not be resolved")
+    NullPointerException couldNotResolveToEndpointUri(String to);
         
 }

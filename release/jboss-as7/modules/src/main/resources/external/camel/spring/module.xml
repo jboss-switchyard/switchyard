@@ -21,6 +21,7 @@
     <dependencies>
         <module name="javax.api"/>
         <module name="org.apache.camel.core"/>
+        <module name="org.apache.camel.core.xml"/>
         <module name="org.apache.commons.logging"/>
         <module name="javax.jms.api"/>
         <module name="org.springframework"/>

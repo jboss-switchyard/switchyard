@@ -96,6 +96,8 @@
                 <extension identifier="org.apache.camel.jaxb"/>
                 <extension identifier="org.apache.camel.saxon"/>
                 <extension identifier="org.apache.camel.soap"/>
+                <extension identifier="org.apache.camel.jackson"/>
+                <extension identifier="org.apache.camel.dozer"/>
             </extensions>
         </subsystem>
     </xsl:copy>
@@ -150,6 +152,8 @@
                 <extension identifier="org.apache.camel.jaxb"/>
                 <extension identifier="org.apache.camel.saxon"/>
                 <extension identifier="org.apache.camel.soap"/>
+                <extension identifier="org.apache.camel.jackson"/>
+                <extension identifier="org.apache.camel.dozer"/>
             </extensions>
         </subsystem>
     </xsl:copy>

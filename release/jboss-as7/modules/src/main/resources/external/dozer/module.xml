@@ -19,8 +19,10 @@
     </resources>
     <dependencies>
         <module name="javax.api"/>
+        <module name="javax.el.api"/>
         <module name="org.apache.commons.beanutils"/>
         <module name="org.apache.commons.lang3"/>
+        <module name="org.jboss.as.web" export="true"/>
         <module name="org.slf4j"/>
     </dependencies>
 </module>

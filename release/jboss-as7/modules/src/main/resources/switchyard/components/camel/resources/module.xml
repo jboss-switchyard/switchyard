@@ -38,6 +38,7 @@
                 <include path="META-INF/services/org/apache/camel/language/resolver"/>
             </exports>
         </module>
+        <module name="org.apache.camel.spring" />
         <module name="org.switchyard.component.camel.switchyard" export="true">
             <imports>
                 <include path="META-INF/services/org/apache/camel/component"/>

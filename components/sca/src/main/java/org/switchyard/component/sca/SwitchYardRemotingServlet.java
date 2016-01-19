@@ -101,7 +101,7 @@ public class SwitchYardRemotingServlet extends HttpServlet {
                     : service.createExchange(msg.getOperation(), replyHandler);
               
             Set<Credential> credentials = SecurityServices.getServletRequestCredentialExtractor().extract(request);
-            credentials.addAll(extractWebServiceSecurityCredentials(request));
+            credentials.addAll(extractWebServiceSecurityCredentials(request, msg));
             if (credentials != null && !credentials.isEmpty()) {
                 SecurityContextManager scm = new SecurityContextManager(domain);
                 scm.addCredentials(ex, credentials);
@@ -167,11 +167,16 @@ public class SwitchYardRemotingServlet extends HttpServlet {
         }
     }
     
-    private Set<Credential> extractWebServiceSecurityCredentials(HttpServletRequest request) {
+    private Set<Credential> extractWebServiceSecurityCredentials(HttpServletRequest request, RemoteMessage msg) {
         Set<Credential> credentials = new HashSet<Credential>();
         String wsseHeader = request.getHeader(HttpInvoker.WS_SECURITY_HEADER);
         if (wsseHeader != null) {
             wsseHeader = Base64.decodeToString(wsseHeader);
+        } else {
+            wsseHeader = msg.getContext().getPropertyValue(HttpInvoker.WS_SECURITY_QNAME.toString());
+        }
+        
+        if (wsseHeader != null) {
             if (_log.isDebugEnabled()) {
                 _log.debug("WebService Security header is found in request message: " + wsseHeader);
             }
@@ -181,10 +186,10 @@ public class SwitchYardRemotingServlet extends HttpServlet {
                 factory.setNamespaceAware(true);
                 Document doc = factory.newDocumentBuilder().parse(new InputSource(new StringReader(wsseHeader)));
                 
-                SOAPMessage msg = MessageFactory.newInstance().createMessage();
-                Node wsseNode = msg.getSOAPHeader().getOwnerDocument().importNode(doc.getDocumentElement(), true);
-                msg.getSOAPHeader().appendChild(wsseNode);
-                credentials.addAll(new SOAPMessageCredentialExtractor().extract(msg));
+                SOAPMessage soapmsg = MessageFactory.newInstance().createMessage();
+                Node wsseNode = soapmsg.getSOAPHeader().getOwnerDocument().importNode(doc.getDocumentElement(), true);
+                soapmsg.getSOAPHeader().appendChild(wsseNode);
+                credentials.addAll(new SOAPMessageCredentialExtractor().extract(soapmsg));
             } catch (Exception e) {
                 SCALogger.ROOT_LOGGER.ignoringReceivedWebServiceSecurityHeader(e.getMessage());
                 if (_log.isDebugEnabled()) {

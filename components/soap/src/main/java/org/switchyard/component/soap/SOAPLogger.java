@@ -130,5 +130,39 @@ public interface SOAPLogger {
     @LogMessage(level = Level.DEBUG)
     @Message(id = 35022, value = "Endpoint publisher service loaded: %s.")
     void endpointPublisherRegistered(String type);
+
+    /**
+     * searchingRecursively method definition.
+     * @param soapFaultExceptionName soapFault exception name
+     * @param exceptionClass exception class
+     */
+    @LogMessage(level = Level.DEBUG)
+    @Message(id = 35023, value = "Searching recursively for %s in %s")
+    void searchingRecursively(String soapFaultExceptionName, String exceptionClass);
+
+    /**
+     * instanceOfSoapFaultException method definition.
+     * @param exceptionClassName exception class
+     */
+    @LogMessage(level = Level.DEBUG)
+    @Message(id = 35024, value = "Found %s")
+    void instanceOfSoapFaultException(String exceptionClassName);
+
+    /**
+     * breakSearchingForClass method definition.
+     * @param className class name
+     */
+    @LogMessage(level = Level.DEBUG)
+    @Message(id = 35025, value = "Break searching for %s due to recursive exception cause")
+    void breakSearchingForClass(String className);
+
+    /**
+     * reachedEndOfExceptionCause method definition.
+     * @param className class name
+     */
+    @LogMessage(level = Level.DEBUG)
+    @Message(id = 35026, value = "Reached end of exception cause in search for %s, will return null")
+    void reachedEndOfExceptionCause(String className);
+
 }
 

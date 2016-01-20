@@ -52,6 +52,13 @@ import com.arjuna.mwlabs.wst11.at.context.TxContextImple;
  */
 public class SCAInvoker extends BaseServiceHandler {
     
+    /** prefix for the context property. */
+    public static final String CONTEXT_PROPERTY_PREFIX = "org.switchyard.component.sca.";
+    /** key for endpoint service name. */
+    public static final String KEY_TARGET_SERVICE = "targetService";
+    /** key for namespace of the endpoint service. */
+    public static final String KEY_TARGET_NAMESPACE = "targetNamespace";
+    
     private static Logger _log = Logger.getLogger(SCAInvoker.class);
     
     private final String _bindingName;
@@ -224,10 +231,18 @@ public class SCAInvoker extends BaseServiceHandler {
     }
     
     private QName getTargetServiceName(Exchange exchange) {
-        // Figure out the QName for the service were invoking
+        // Figure out the QName for the service were invoking.
         QName service = exchange.getProvider().getName();
-        String targetName = _targetService != null ? _targetService : service.getLocalPart();
-        String targetNS = _targetNamespace != null ? _targetNamespace : service.getNamespaceURI();
+        
+        // Overriding target service name if it's specified in context property.
+        String targetName = exchange.getContext().getPropertyValue(CONTEXT_PROPERTY_PREFIX + KEY_TARGET_SERVICE);
+        if (targetName == null) {
+            targetName = _targetService != null ? _targetService : service.getLocalPart();
+        }
+        String targetNS = exchange.getContext().getPropertyValue(CONTEXT_PROPERTY_PREFIX + KEY_TARGET_NAMESPACE);
+        if (targetNS == null) {
+            targetNS = _targetNamespace != null ? _targetNamespace : service.getNamespaceURI();
+        }
         return new QName(targetNS, targetName);
     }
     

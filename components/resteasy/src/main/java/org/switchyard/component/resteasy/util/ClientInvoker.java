@@ -37,7 +37,6 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.ext.Providers;
 
 import org.jboss.logging.Logger;
-
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.ChallengeState;
@@ -87,6 +86,8 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.jboss.resteasy.util.MediaTypeHelper;
 import org.jboss.resteasy.util.IsHttpMethod;
 import org.jboss.resteasy.util.Types;
+import org.switchyard.Exchange;
+import org.switchyard.SwitchYardException;
 import org.switchyard.component.resteasy.RestEasyLogger;
 import org.switchyard.component.resteasy.RestEasyMessages;
 import org.switchyard.component.resteasy.composer.RESTEasyBindingData;
@@ -102,6 +103,11 @@ import org.switchyard.component.resteasy.config.model.SSLContextModel;
  */
 public class ClientInvoker extends ClientInterceptorRepositoryImpl implements MethodInvoker {
 
+    /** prefix for the context property. */
+    public static final String CONTEXT_PROPERTY_PREFIX = "org.switchyard.component.resteasy.";
+    /** key for endpoint service name. */
+    public static final String KEY_ADDRESS = "address";
+
     private static final Logger LOGGER = Logger.getLogger(ClientInvoker.class);
 
     private static final String AS7_URIBUILDER = "org.jboss.resteasy.specimpl.UriBuilderImpl";
@@ -115,7 +121,7 @@ public class ClientInvoker extends ClientInterceptorRepositoryImpl implements Me
     private Class<?> _resourceClass;
     private Method _method;
     private String _httpMethod;
-    private UriBuilder _uri;
+    private UriBuilder _defaultUriBuilder;
     private MediaType _accepts;
     private Marshaller[] _marshallers;
     private ClientExecutor _executor;
@@ -179,20 +185,7 @@ public class ClientInvoker extends ClientInterceptorRepositoryImpl implements Me
         _httpMethod = httpMethods.iterator().next();
         _resourceClass = resourceClass;
         _method = method;
-        try {
-            _uri = (UriBuilder)URIBUILDER_CLASS.newInstance();
-        } catch (InstantiationException ie) {
-            throw new RuntimeException(ie);
-        } catch (IllegalAccessException iae) {
-            throw new RuntimeException(iae);
-        }
-        _uri.uri(_baseUri);
-        if (_resourceClass.isAnnotationPresent(Path.class)) {
-            _uri.path(_resourceClass);
-        }
-        if (_method.isAnnotationPresent(Path.class)) {
-            _uri.path(_method);
-        }
+        _defaultUriBuilder = createUriBuilder(_baseUri, _resourceClass, _method);
 
         _providerFactory = new ResteasyProviderFactory();
         SSLSocketFactory sslFactory = getSSLSocketFactory(model.getSSLContextConfig());
@@ -302,14 +295,14 @@ public class ClientInvoker extends ClientInterceptorRepositoryImpl implements Me
                 httpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxyHost);
                 int portSchema=proxyHost.getPort();
                 if (proxyHost.getSchemeName().startsWith("https")) {
-                	
+                    
                     if (portSchema == -1) {
-                    	portSchema = 443;
+                        portSchema = 443;
                     }
                     schemeRegistry.register(new Scheme(proxyHost.getSchemeName(), portSchema, sslFactory));
                 } else {
                     if (portSchema == -1) {
-                    	portSchema = 80;
+                        portSchema = 80;
                     }
                     schemeRegistry.register(new Scheme(proxyHost.getSchemeName(), portSchema, PlainSocketFactory.getSocketFactory()));
                 }
@@ -323,7 +316,30 @@ public class ClientInvoker extends ClientInterceptorRepositoryImpl implements Me
             HttpConnectionParams.setSoTimeout(httpParams, timeout);
         }
     }
-
+    
+    private UriBuilder createUriBuilder(URI baseUri, Class<?> resourceClass, Method method) {
+        UriBuilder builder = null;
+        try {
+            builder = (UriBuilder)URIBUILDER_CLASS.newInstance();
+        } catch (Exception ie) {
+            throw new SwitchYardException(ie);
+        }
+        builder.uri(baseUri);
+        if (resourceClass.isAnnotationPresent(Path.class)) {
+            builder.path(resourceClass);
+        }
+        if (_method.isAnnotationPresent(Path.class)) {
+            builder.path(method);
+        }
+        return builder;
+    }
+    
+    // This method exists for test purposes and should not be used at runtime.  Initialization
+    // of the executor instance occurs in the constructor for ClientInvoker.
+    void setClientExecutor(ClientExecutor executor) {
+        _executor = executor;
+    }
+    
     /**
      * Gets a ResteasyProviderFactory instance.
      * @return ResteasyProviderFactory
@@ -447,14 +463,14 @@ public class ClientInvoker extends ClientInterceptorRepositoryImpl implements Me
     }*/
 
     @Override
-    public RESTEasyBindingData invoke(Object[] args, MultivaluedMap<String, String> headers) {
+    public RESTEasyBindingData invoke(Exchange exchange, Object[] args, MultivaluedMap<String, String> headers) {
         boolean isProvidersSet = ResteasyProviderFactory.getContextData(Providers.class) != null;
         if (!isProvidersSet) {
             ResteasyProviderFactory.pushContext(Providers.class, _providerFactory);
         }
 
         try {
-            if (_uri == null) {
+            if (_defaultUriBuilder == null) {
                 throw RestEasyMessages.MESSAGES.youHaveNotSetABaseURIForTheClientProxy();
             }
 
@@ -462,7 +478,7 @@ public class ClientInvoker extends ClientInterceptorRepositoryImpl implements Me
 
             BaseClientResponse clientResponse = null;
             try {
-                request = createRequest(args, headers);
+                request = createRequest(exchange, args, headers);
                 clientResponse = (BaseClientResponse) request.httpMethod(_httpMethod);
             } catch (ClientResponseFailure crf) {
                 clientResponse = (BaseClientResponse) crf.getResponse();
@@ -499,8 +515,17 @@ public class ClientInvoker extends ClientInterceptorRepositoryImpl implements Me
         }
     }
 
-    private ClientRequest createRequest(Object[] args, MultivaluedMap<String, String> headers) {
-        UriBuilder uriBuilder = _uri;
+    private ClientRequest createRequest(Exchange exchange, Object[] args, MultivaluedMap<String, String> headers) {
+        UriBuilder uriBuilder = _defaultUriBuilder;
+        String address = exchange.getContext().getPropertyValue(CONTEXT_PROPERTY_PREFIX + KEY_ADDRESS);
+        // Overriding endpoint address if it's specified in context property
+        if (address != null) {
+            if (_subResourcePath != null) {
+                uriBuilder = UriBuilder.fromUri(String.format(createSubResourcePath(address, _method), args));
+            } else {
+                uriBuilder = createUriBuilder(createUri(address), _resourceClass, _method);
+            }
+        }
         if (_subResourcePath != null) {
             uriBuilder = UriBuilder.fromUri(String.format(_subResourcePath, args));
         }

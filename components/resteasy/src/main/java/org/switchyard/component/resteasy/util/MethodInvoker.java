@@ -16,6 +16,7 @@ package org.switchyard.component.resteasy.util;
 
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.switchyard.Exchange;
 import org.switchyard.component.resteasy.composer.RESTEasyBindingData;
 
 /**
@@ -28,9 +29,10 @@ public interface MethodInvoker {
     /**
      * Invokes the JAX-RS method.
      *
+     * @param exchange SwitchYard exchange
      * @param args the method arguments
      * @param headers the HTTP headers to be set on the request
      * @return the method's response entity and headers wrapped in RESTEasyBindingData
      */
-    RESTEasyBindingData invoke(Object[] args, MultivaluedMap<String, String> headers);
+    RESTEasyBindingData invoke(Exchange exchange, Object[] args, MultivaluedMap<String, String> headers);
 }

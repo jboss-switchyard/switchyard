@@ -18,8 +18,7 @@ import java.util.LinkedList;
 
 import javax.xml.namespace.QName;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -324,6 +323,10 @@ public class SCAInvokerTest {
             public String getTarget() {
                 return "test-target";
             }
+            @Override
+            public String getTargetNamespace() {
+                return "test-namespace";
+            }
             public CompositeReferenceModel getReference() {
                 return new V1CompositeReferenceModel();
             };
@@ -348,12 +351,26 @@ public class SCAInvokerTest {
         Mockito.when(mockEx.getContract().getConsumerOperation().getName()).thenReturn("test-operation");
         Mockito.when(mockEx.getProvider().getDomain().getName()).thenReturn(new QName("test-domain"));
         Mockito.when(mockEx.getMessage().getContent()).thenReturn("test-content");
+        Mockito.when(mockEx.getContext().getPropertyValue(SCAInvoker.CONTEXT_PROPERTY_PREFIX + SCAInvoker.KEY_TARGET_SERVICE)).thenReturn(null);
+        Mockito.when(mockEx.getContext().getPropertyValue(SCAInvoker.CONTEXT_PROPERTY_PREFIX + SCAInvoker.KEY_TARGET_NAMESPACE)).thenReturn(null);
         scaInvoker.handleMessage(mockEx);
         
         RemoteMessage remoteMsg = msgs.pop();
         Assert.assertEquals(new QName("test-domain"), remoteMsg.getDomain());
         Assert.assertEquals("test-operation", remoteMsg.getOperation());
         Assert.assertEquals("test-content", remoteMsg.getContent());
+        Assert.assertEquals(new QName("test-namespace", "test-target"), remoteMsg.getService());
+        
+        Mockito.when(mockEx.getContext().getPropertyValue(SCAInvoker.CONTEXT_PROPERTY_PREFIX + SCAInvoker.KEY_TARGET_SERVICE)).thenReturn("modified-test-target");
+        scaInvoker.handleMessage(mockEx);
+        remoteMsg = msgs.pop();
+        Assert.assertEquals(new QName("test-namespace", "modified-test-target"), remoteMsg.getService());
+        
+        Mockito.when(mockEx.getContext().getPropertyValue(SCAInvoker.CONTEXT_PROPERTY_PREFIX + SCAInvoker.KEY_TARGET_NAMESPACE)).thenReturn("modified-test-namespace");
+        scaInvoker.handleMessage(mockEx);
+        remoteMsg = msgs.pop();
+        Assert.assertEquals(new QName("modified-test-namespace", "modified-test-target"), remoteMsg.getService());
+        
     }
 }
 

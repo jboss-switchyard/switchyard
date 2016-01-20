@@ -148,7 +148,7 @@ public class OutboundHandler extends BaseServiceHandler {
         }
 
         try {
-            RESTEasyBindingData restResponse = methodInvoker.invoke(restRequest.getParameters(), restRequest.getHeaders());
+            RESTEasyBindingData restResponse = methodInvoker.invoke(exchange, restRequest.getParameters(), restRequest.getHeaders());
             restResponse.setOperationName(opName);
             Message out = _messageComposer.compose(restResponse, exchange);
             // Our transformer magic transforms the entity appropriately here :)

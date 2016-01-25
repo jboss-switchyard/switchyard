@@ -58,6 +58,24 @@ import org.switchyard.validate.ValidatorRegistry;
  * @author <a href="mailto:tom.fennelly@gmail.com">tom.fennelly@gmail.com</a>
  */
 public class ServiceDomainManager {
+	/**
+	 * Array of Strings that are disallowed in an Objectname value
+	 * @see javax.management.ObjectName
+	 */
+    public static final String[] MBeanDisallowedStrings = new String[]{
+    		// colon is not allowed due to separation of domain and attribute
+    		":", 
+    		
+    		// These are reserved to separate key-value pairs
+    		",",
+    		
+    		"=",
+    		
+    		//Avoid the creation of an ObjectName pattern
+    		"?",
+    		
+    		"*"
+    	};
 
     /**
      * Root domain property.
@@ -84,6 +102,20 @@ public class ServiceDomainManager {
     public ServiceDomainManager(SystemSecurity systemSecurity) {
         _systemSecurity = systemSecurity;
     }
+    
+    public static String sanitizeServiceQNameForMBean(QName qname) {
+    	if(qname == null) {
+    		return null;
+    	}
+    	
+    	String sanitizedString = qname.toString();
+    	
+    	for(String disallowedString : MBeanDisallowedStrings) {
+    		sanitizedString = sanitizedString.replace(disallowedString, "");
+    	}
+    	
+    	return sanitizedString;
+    }
 
     /**
      * Create a ServiceDomain instance.
@@ -106,6 +138,9 @@ public class ServiceDomainManager {
         ValidatorRegistry validatorRegistry = new BaseValidatorRegistry();
 
         SwitchYardCamelContextImpl camelContext = new SwitchYardCamelContextImpl();
+        if(null != domainName) {
+        	camelContext.setName(sanitizeServiceQNameForMBean(domainName));
+        }
         CamelExchangeBus bus = new CamelExchangeBus(camelContext);
 
         ServiceDomainSecurity serviceDomainSecurity = getServiceDomainSecurity(switchyardConfig);

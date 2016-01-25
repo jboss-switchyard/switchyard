@@ -14,6 +14,11 @@
 
 package org.switchyard.deploy;
 
+import java.lang.management.ManagementFactory;
+
+import javax.management.MBeanInfo;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 import javax.xml.namespace.QName;
 
 import org.junit.Assert;
@@ -26,6 +31,8 @@ import org.switchyard.config.model.switchyard.SwitchYardModel;
  * @author <a href="mailto:tom.fennelly@gmail.com">tom.fennelly@gmail.com</a>
  */
 public class ServiceDomainManagerTest {
+	public static final String MBEAN_PREFIX ="org.apache.camel:context=";
+	public static final String MBEAN_INTERMEDIATE = ",type=context,name=";
 
     @Test
     public void testHandlerRegistration() throws Exception {
@@ -37,6 +44,31 @@ public class ServiceDomainManagerTest {
         
         Assert.assertEquals("abc-value", domain.getProperty("abc"));
         Assert.assertEquals("xyz-value", domain.getProperty("xyz"));
+        Assert.assertNull(domain.getProperty("nothing"));
+    }
+    
+    @Test
+    public void testJMXName() throws Exception {
+        SwitchYardModel switchyard = new ModelPuller<SwitchYardModel>().pull(
+                "/switchyard-config-properties-01.xml", getClass());
+        
+        String contextNamespace = "http//switchyard.jboss.org";
+        String contextName = "test";
+        
+        QName serviceDomain = new QName(contextNamespace, contextName);
+        
+        ServiceDomain domain = new ServiceDomainManager().createDomain(serviceDomain, switchyard);
+        
+        MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
+        
+        String mBeanContextName = ServiceDomainManager.sanitizeServiceQNameForMBean(serviceDomain);
+        
+        String objectNameString = MBEAN_PREFIX + mBeanContextName + MBEAN_INTERMEDIATE + '"' + mBeanContextName + '"';
+        
+        // Throws InstanceNotFoundException when MBean is not found
+        MBeanInfo mBeanInfo = mBeanServer.getMBeanInfo(new ObjectName(objectNameString));
+        Assert.assertNotNull(mBeanInfo);
+        
         Assert.assertNull(domain.getProperty("nothing"));
     }
 }

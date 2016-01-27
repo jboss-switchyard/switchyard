@@ -29,15 +29,15 @@ import org.switchyard.SwitchYardException;
 import org.switchyard.common.camel.SwitchYardCamelContext;
 import org.switchyard.common.property.PropertyResolver;
 import org.switchyard.component.camel.CamelComponentMessages;
-import org.switchyard.component.camel.switchyard.ComponentNameComposer;
 import org.switchyard.component.camel.RouteFactory;
-import org.switchyard.component.camel.switchyard.SwitchYardConsumer;
-import org.switchyard.component.camel.switchyard.SwitchYardEndpoint;
-import org.switchyard.component.camel.switchyard.SwitchYardPropertiesParser;
 import org.switchyard.component.camel.common.CamelConstants;
 import org.switchyard.component.camel.common.composer.CamelComposition;
 import org.switchyard.component.camel.common.deploy.BaseCamelActivator;
 import org.switchyard.component.camel.model.CamelComponentImplementationModel;
+import org.switchyard.component.camel.switchyard.ComponentNameComposer;
+import org.switchyard.component.camel.switchyard.SwitchYardConsumer;
+import org.switchyard.component.camel.switchyard.SwitchYardEndpoint;
+import org.switchyard.component.camel.switchyard.SwitchYardPropertiesParser;
 import org.switchyard.config.model.composite.ComponentModel;
 import org.switchyard.config.model.composite.ComponentReferenceModel;
 import org.switchyard.config.model.composite.ComponentServiceModel;
@@ -119,7 +119,6 @@ public class CamelActivator extends BaseCamelActivator {
         // TODO what happens when we have multiple services?
         String serviceName = ccim.getComponent().getServices().get(0).getName();
         String compositeNs = ccim.getComponent().getComposite().getTargetNamespace();
-
         // number of switchyard:// consumers/from statements
         int serviceConsumer = 0;
         for (RouteDefinition routeDefinition : routeDefinitions) {
@@ -127,7 +126,8 @@ public class CamelActivator extends BaseCamelActivator {
                 throw CamelComponentMessages.MESSAGES.mustHaveAtLeastOneInput();
             }
             for (FromDefinition fromDefinition : routeDefinition.getInputs()) {
-                URI from = URI.create(fromDefinition.getUri());
+
+                URI from = URI.create(this.getCamelContext().resolvePropertyPlaceholders(fromDefinition.getUri()));
                 if (from.getScheme().equals(CamelConstants.SWITCHYARD_COMPONENT_NAME)) {
                     if (serviceConsumer > 0) {
                         throw CamelComponentMessages.MESSAGES.onlyOneSwitchYardInputPerImpl();
@@ -149,7 +149,7 @@ public class CamelActivator extends BaseCamelActivator {
                     if (to.getRef() != null) {
                         componentUri = URI.create(getCamelContext().getRegistry().lookupByNameAndType(to.getRef(), Endpoint.class).getEndpointUri());
                     } else if (to.getUri() != null) {
-                        componentUri = URI.create(to.getUri());
+                        componentUri = URI.create(this.getCamelContext().resolvePropertyPlaceholders(to.getUri()));
                     } else {
                         throw CamelComponentMessages.MESSAGES.couldNotResolveToEndpointUri(to.toString());
                     }

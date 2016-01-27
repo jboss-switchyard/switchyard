@@ -32,10 +32,11 @@ import org.apache.camel.spi.NamespaceAware;
 import org.apache.camel.spring.CamelContextFactoryBean;
 import org.apache.camel.spring.CamelEndpointFactoryBean;
 import org.apache.camel.spring.SpringModelJAXBContextFactory;
+import org.switchyard.SwitchYardException;
 import org.switchyard.common.camel.SwitchYardCamelContext;
+import org.switchyard.common.property.PropertyResolver;
 import org.switchyard.common.type.Classes;
 import org.switchyard.component.camel.model.CamelComponentImplementationModel;
-import org.switchyard.SwitchYardException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -80,16 +81,23 @@ public final class RouteFactory {
         if (model.getJavaClass() != null) {
             return createRoute(model.getJavaClass(), model.getComponent().getTargetNamespace());
         }
-        return loadRoute(model.getXMLPath(), camelContext);
+
+        return loadRoute(model.getXMLPath(), camelContext, model.getModelConfiguration().getPropertyResolver());
     }
 
     /**
      * Loads a set of route definitions from an XML file.
-     * @param xmlPath path to the file containing one or more route definitions
-     * @param camelContext CamelContext
+     * 
+     * @param xmlPath
+     *            path to the file containing one or more route definitions
+     * @param camelContext
+     *            CamelContext
+     * @param propertyResolver
+     *            The property Resolver
      * @return list of route definitions
      */
-    public static List<RouteDefinition> loadRoute(String xmlPath, SwitchYardCamelContext camelContext) {
+    public static List<RouteDefinition> loadRoute(String xmlPath, SwitchYardCamelContext camelContext,
+            PropertyResolver propertyResolver) {
         List<RouteDefinition> routes = null;
         
         try {
@@ -117,6 +125,8 @@ public final class RouteFactory {
             if (routes == null) {
                 CamelComponentMessages.MESSAGES.noRoutesFoundInXMLFile(xmlPath);
             }
+
+
             return routes;
         } catch (Exception e) {
             throw new SwitchYardException(e);
@@ -129,7 +139,7 @@ public final class RouteFactory {
      * @return list of route definitions
      */
     public static List<RouteDefinition> loadRoute(String xmlPath) {
-        return loadRoute(xmlPath, null);
+        return loadRoute(xmlPath, null, null);
     }
 
     private static void injectNamespaces(Element element, Binder<Node> binder) {

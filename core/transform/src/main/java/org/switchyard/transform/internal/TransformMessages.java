@@ -559,4 +559,14 @@ public interface TransformMessages {
      */
     @Message(id=16862, value = "null 'domain' argument")
     IllegalArgumentException nullServiceDomainArgument();
+
+    /**
+     * failedToUnmarshallForType method definition.
+     * @param type type
+     * @param e e
+     * @return SwitchYardException
+     * @see #failedToMarshallForType(String, JAXBException)
+     */
+    @Message(id=16863, value = "Failed to marshal for type '%s'.")
+    SwitchYardException failedToMarshalForType(String type, @Cause Exception e);
 }

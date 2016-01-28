@@ -16,7 +16,11 @@ package org.switchyard.transform.jaxb.internal;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
 import javax.xml.transform.stream.StreamSource;
 
@@ -38,27 +42,48 @@ import org.xml.sax.SAXException;
  */
 public class JAXBTransformerTest extends AbstractTransformerTestCase {
 
+	
+	
     @Test
     public void test_createFromClass() throws IOException, SAXException {
         JAXBUnmarshalTransformer unmarshalTransformer = new JAXBUnmarshalTransformer(
                 new QName("purchaseOrder"), JavaTypes.toMessageType(POType.class), null);
-        
+
         JAXBMarshalTransformer marshalTransformer = new JAXBMarshalTransformer(
                 JavaTypes.toMessageType(POType.class), new QName("purchaseOrder"), null);
-
+                
         DefaultMessage message = new DefaultMessage();
         message.setContent(new StreamSource(new StringReader(PO_XML)));
 
         // Transform XML to Java POType and back to XML...
         unmarshalTransformer.transform(message);
         marshalTransformer.transform(message);
-
+        
         // Check the round trip...
         String resultXML = message.getContent(String.class);
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.compareXML(PO_XML, resultXML);
     }
 
+    @Test 
+    public void testOrderMarshal() throws Exception {
+        QName FROM_TYPE =
+                new QName("urn:switchyard-quickstart:transform-jaxb:1.0", "order");
+    	
+    	Order order = new Order();
+    	order.setItemId("BUTTER");
+    	order.setOrderId("PO-19838-XYZ");
+    	order.setQuantity(200);
+    	
+    	JAXBContext jaxbContext = JAXBContext.newInstance(new Class[] { Order.class });
+    	StringWriter resultWriter = new StringWriter();
+    	Marshaller marshaller = jaxbContext.createMarshaller();
+        JAXBElement<Order> jaxbOrder = new JAXBElement<Order>(FROM_TYPE, Order.class, order);
+
+        marshaller.marshal(jaxbOrder, resultWriter);
+//        _testKit.compareXMLToResource(resultWriter.toString(), ORDER_XML);
+    }
+    
     @Test
     public void test_configRead() throws IOException {
         Transformer unmarshalingTransformer = getTransformer("switchyard-config-01.xml");
@@ -88,6 +113,14 @@ public class JAXBTransformerTest extends AbstractTransformerTestCase {
         Assert.assertTrue(messageContains);
     }
 
+    private static final String ORDER_XML = "<?xml version=\"1.0\"?>\n" +
+            "<order>\n" +
+            "<orderId>PO-19838-XYZ</orderId>\n" +
+            "<itemId>BUTTER</itemId>\n" +
+            "<quantity>200</quantity>\n" +
+            "</order>";
+    
+    
     private static final String PO_XML = "<?xml version=\"1.0\"?>\n" +
             "<purchaseOrder orderDate=\"1999-10-20\">\n" +
             "    <shipTo country=\"US\">\n" +

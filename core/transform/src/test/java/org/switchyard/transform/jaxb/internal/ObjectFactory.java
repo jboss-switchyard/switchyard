@@ -45,6 +45,7 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
+    private final static QName _Order_QNAME = new QName("urn:switchyard-quickstart:transform-jaxb:1.0", "order");
     private final static QName _PurchaseOrder_QNAME = new QName("", "purchaseOrder");
     private final static QName _Comment_QNAME = new QName("", "comment");
 
@@ -71,6 +72,10 @@ public class ObjectFactory {
         return new POType();
     }
 
+    public Order createOrder() {
+        return new Order();
+    }
+
     /**
      * Create an instance of {@link USAddress }
      * 
@@ -95,6 +100,16 @@ public class ObjectFactory {
     public JAXBElement<POType> createPurchaseOrder(POType value) {
         return new JAXBElement<POType>(_PurchaseOrder_QNAME, POType.class, null, value);
     }
+
+    /**
+     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link Order }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "", name = "order")
+    public JAXBElement<Order> createOrder(Order value) {
+        return new JAXBElement<Order>(_Order_QNAME, Order.class, null, value);
+    }
+
 
     /**
      * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link String }{@code >}}

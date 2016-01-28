@@ -15,18 +15,25 @@
 package org.switchyard.transform.jaxb.internal;
 
 import java.io.StringWriter;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.MarshalException;
+import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 
 import org.switchyard.Message;
 import org.switchyard.SwitchYardException;
+import org.switchyard.common.type.Classes;
 import org.switchyard.common.xml.QNameUtil;
 import org.switchyard.config.model.Scannable;
 import org.switchyard.transform.BaseTransformer;
 import org.switchyard.transform.internal.TransformMessages;
+
 
 /**
  * JAXB Marshalling transformer.
@@ -74,16 +81,60 @@ public class JAXBMarshalTransformer<F, T> extends BaseTransformer<Message, Messa
         try {
             StringWriter resultWriter = new StringWriter();
             Object javaObject = message.getContent();
-            //JAXBElement jaxbElement = new JAXBElement(getTo(), QNameUtil.toJavaMessageType(getFrom()), javaObject);
 
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-            marshaller.marshal(javaObject, resultWriter);
+            try {
+                marshaller.marshal(javaObject, resultWriter);
+                message.setContent(resultWriter.toString());
+                
+            // SWITCHYARD-2852 : if the class does not have an XMLRootElement annotation, we can
+            // attempt to use the ObjectFactory to create it and wrap it in an JAXBElement and
+            // marshal the JAXBElement.
+            } catch (MarshalException ife) {
+                resultWriter = new StringWriter();
+                Class<?> objectFactory = getObjectFactory(javaObject.getClass());
+                Method[] methods = objectFactory.getMethods();
+                Method method = null;
+                for (int i = 0; i < methods.length; i++) {
+                    Class<?>[] parameterTypes = methods[i].getParameterTypes();
+                    if ((parameterTypes.length == 1) && (parameterTypes[0] == javaObject.getClass())) {
+                        method = methods[i];
+                    }
+                }
 
-            message.setContent(resultWriter.toString());
+                JAXBElement jaxbElement = null;
+                try {
+                    Object of = objectFactory.newInstance();
+                    jaxbElement = (JAXBElement) method.invoke(of, javaObject);
+                } catch (IllegalAccessException iae) {
+                    throw TransformMessages.MESSAGES.failedToMarshalForType(getFrom().toString(), iae);
+                } catch (InvocationTargetException ite) {
+                    throw TransformMessages.MESSAGES.failedToMarshalForType(getFrom().toString(), ite);
+                } catch (InstantiationException e) {
+                    throw TransformMessages.MESSAGES.failedToMarshalForType(getFrom().toString(), e);
+                }
+
+                marshaller.marshal(jaxbElement, resultWriter);
+                message.setContent(resultWriter.toString());
+           }
         } catch (JAXBException e) {
             throw TransformMessages.MESSAGES.failedToMarshallForType(getFrom().toString(), e);
         }
 
         return message;
     }
+
+    private static Class getObjectFactory(Class<?> type) {
+        if (type.getAnnotation(XmlType.class) != null) {
+            // Get the ObjectFactory, if it exists...
+            String objectFactoryName = type.getPackage().getName() + "." + "ObjectFactory";
+
+            return Classes.forName(objectFactoryName, JAXBTransformerFactory.class);
+        }
+
+        return null;
+    }
+
+
+
 }

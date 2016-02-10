@@ -62,6 +62,8 @@ public class CamelContextMapper extends BaseRegexContextMapper<CamelBindingData>
      */
     @Override
     public void mapFrom(CamelBindingData source, Context context) throws Exception {
+        super.mapFrom(source, context);
+
         Message message = source.getMessage();
         Exchange exchange = message.getExchange();
 
@@ -92,6 +94,8 @@ public class CamelContextMapper extends BaseRegexContextMapper<CamelBindingData>
      */
     @Override
     public void mapTo(Context context, CamelBindingData target) throws Exception {
+        super.mapTo(context, target);
+
         Message message = target.getMessage();
         Exchange exchange = message.getExchange();
 

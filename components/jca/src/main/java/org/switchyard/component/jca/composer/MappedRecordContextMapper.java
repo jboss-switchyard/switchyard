@@ -13,10 +13,14 @@
  */
 package org.switchyard.component.jca.composer;
 
+import java.util.ArrayList;
+import java.util.regex.Pattern;
+
 import javax.resource.cci.MappedRecord;
 
 import org.switchyard.Context;
 import org.switchyard.Property;
+import org.switchyard.Scope;
 import org.switchyard.component.common.composer.BaseRegexContextMapper;
 import org.switchyard.component.common.label.ComponentLabel;
 import org.switchyard.component.common.label.EndpointLabel;
@@ -37,6 +41,8 @@ public class MappedRecordContextMapper extends BaseRegexContextMapper<MappedReco
      */
     @Override
     public void mapFrom(MappedRecordBindingData source, Context context) throws Exception {
+        super.mapFrom(source, context);
+
         MappedRecord record = source.getRecord();
         String recordName = record.getRecordName();
         if (recordName != null) {
@@ -46,6 +52,15 @@ public class MappedRecordContextMapper extends BaseRegexContextMapper<MappedReco
         if (recordDescription != null) {
             context.setProperty(JCAConstants.CCI_RECORD_SHORT_DESC_KEY, recordDescription).addLabels(MAPPED_RECORD_LABELS);
         }
+
+        for (Object obj : record.keySet()) {
+            if (obj instanceof String) {
+                String key = (String) obj;
+                if (matches(key, _includeRegexes, new ArrayList<Pattern>())) {
+                    context.setProperty(key, record.get(key), Scope.EXCHANGE);
+                }
+            }
+        }
     }
 
     /**
@@ -54,6 +69,8 @@ public class MappedRecordContextMapper extends BaseRegexContextMapper<MappedReco
     @SuppressWarnings("unchecked")
     @Override
     public void mapTo(Context context, MappedRecordBindingData target) throws Exception {
+        super.mapTo(context, target);
+
         MappedRecord record = target.getRecord();
         for (Property property : context.getProperties()) {
             String name = property.getName();
@@ -66,6 +83,8 @@ public class MappedRecordContextMapper extends BaseRegexContextMapper<MappedReco
             } else if (name.equals(JCAConstants.CCI_RECORD_SHORT_DESC_KEY)) {
                 record.setRecordShortDescription(value.toString());
             } else if (matches(name)) {
+                record.put(name, value);
+            } else if (matches(name, _includeRegexes, new ArrayList<Pattern>())) {
                 record.put(name, value);
             }
         }

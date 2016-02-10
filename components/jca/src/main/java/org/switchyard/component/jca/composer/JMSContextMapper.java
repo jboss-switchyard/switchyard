@@ -13,7 +13,9 @@
  */
 package org.switchyard.component.jca.composer;
 
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.regex.Pattern;
 
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -63,6 +65,8 @@ public class JMSContextMapper extends BaseRegexContextMapper<JMSBindingData> {
      */
     @Override
     public void mapFrom(JMSBindingData source, Context context) throws Exception {
+        super.mapFrom(source, context);
+
         Message message = source.getMessage();
         
         // process JMS headers
@@ -112,6 +116,17 @@ public class JMSContextMapper extends BaseRegexContextMapper<JMSBindingData> {
                 if (value != null) {
                     context.setProperty(key, value).addLabels(JMS_PROPERTY_LABELS);
                 }
+            } else if (matches(key, _includeRegexes, new ArrayList<Pattern>())) {
+                Object value = null;
+                try {
+                    value = message.getObjectProperty(key);
+                } catch (JMSException pce) {
+                    // ignore and keep going (here just to keep checkstyle happy)
+                    pce.getMessage();
+                }
+                if (value != null) {
+                    context.setProperty(key, value).addLabels(JMS_PROPERTY_LABELS);
+                }
             }
         }
     }
@@ -121,6 +136,8 @@ public class JMSContextMapper extends BaseRegexContextMapper<JMSBindingData> {
      */
     @Override
     public void mapTo(Context context, JMSBindingData target) throws Exception {
+        super.mapTo(context, target);
+
         Message message = target.getMessage();
         for (Property property : context.getProperties()) {
             String name = property.getName();
@@ -161,6 +178,12 @@ public class JMSContextMapper extends BaseRegexContextMapper<JMSBindingData> {
                 } catch (Throwable t) {
                     continue;
                 }
+            } else if (matches(name, _includeRegexes, new ArrayList<Pattern>())) {
+                Object value = property.getValue();
+                if (value == null) {
+                    continue;
+                }
+                message.setObjectProperty(name, value);
             }
         }
         

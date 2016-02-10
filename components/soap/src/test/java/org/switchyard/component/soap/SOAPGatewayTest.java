@@ -435,6 +435,7 @@ public class SOAPGatewayTest {
         Assert.assertEquals(faultStr, faultInfoProperty.getValue().toString());
     }
 
+    @Ignore
     @Test
     public void invokeMultiThreaded() throws Exception {
         String output = null;

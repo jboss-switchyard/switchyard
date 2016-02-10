@@ -15,9 +15,13 @@ package org.switchyard.common.property;
 /** 
  * Common properties.
  *
- * @author <a href="mailto:david.virgil.naranjo@gmail.com">david.virgil.naranjo@gmail.com</a> 
+ * @author <a href="mailto:david.virgil.naranjo@gmail.com">david.virgil.naranjo@gmail.com</a>
  */
 public interface PropertyConstants {
+	/** The RTGOV resubmission header ID. **/
+	public static final String RTGOV_HEADER_RESUBMITTED_ID = "_rtgov_.*";
+    public static final String RTGOV_HEADER_RESUBMITTED_ID_PATTERN = "^" + RTGOV_HEADER_RESUBMITTED_ID + "$";
+
     /** The domain property propagate prefix constant. */
-    public static final String DOMAIN_PROPERTY_PROPAGATE_PREFIX = "org.switchyard.propagate.prefix";
+    public static final String DOMAIN_PROPERTY_PROPAGATE_REGEX = "org.switchyard.propagate.regex";
 }

@@ -21,8 +21,12 @@ import java.util.regex.PatternSyntaxException;
 
 import javax.xml.namespace.QName;
 
+import org.switchyard.Context;
+import org.switchyard.ServiceDomain;
+import org.switchyard.ServiceReference;
 import org.switchyard.component.common.CommonCommonMessages;
 import org.switchyard.common.lang.Strings;
+import org.switchyard.common.property.PropertyConstants;
 import org.switchyard.common.xml.XMLHelper;
 
 /**
@@ -38,6 +42,12 @@ public class BaseRegexContextMapper<D extends BindingData> extends BaseContextMa
     private final List<Pattern> _excludes = new ArrayList<Pattern>();
     private final List<Pattern> _includeNamespaces = new ArrayList<Pattern>();
     private final List<Pattern> _excludeNamespaces = new ArrayList<Pattern>();
+
+
+    // RTGOV Resubmission ID / property propagation
+    private boolean _prefixPropagationSet = false;
+    private static final String SERVICE_REFERENCE_PROPERTY = "org.switchyard.bus.camel.consumer";
+    protected final List<Pattern> _includeRegexes = new ArrayList<Pattern>();
 
     private void setPatternList(String regexs, List<Pattern> patternList) {
         Set<String> regexSet = Strings.uniqueSplitTrimToNull(regexs, ",");
@@ -108,7 +118,7 @@ public class BaseRegexContextMapper<D extends BindingData> extends BaseContextMa
         return qname != null && matches(qname.getLocalPart(), _includes, _excludes) && matches(qname.getNamespaceURI(), _includeNamespaces, _excludeNamespaces);
     }
 
-    private boolean matches(String test, List<Pattern> includes, List<Pattern> excludes) {
+    public boolean matches(String test, List<Pattern> includes, List<Pattern> excludes) {
         boolean green = false;
         boolean red = false;
         for (Pattern include : includes) {
@@ -136,4 +146,42 @@ public class BaseRegexContextMapper<D extends BindingData> extends BaseContextMa
         return matches;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void mapFrom(D source, Context context) throws Exception {
+        setRegexPropagationList(context);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void mapTo(Context context, D target) throws Exception {
+        setRegexPropagationList(context);
+    }
+
+    /**
+     * Set the list of regexes of properties that need to be propagated.
+     *
+     * @param context context
+     */
+    protected void setRegexPropagationList(Context context) {
+        _includeRegexes.clear();
+
+        if (!_prefixPropagationSet) {
+            if (context.getProperty(SERVICE_REFERENCE_PROPERTY) != null) {
+                ServiceDomain domain = ((ServiceReference)context.getProperty(SERVICE_REFERENCE_PROPERTY).getValue()).getDomain();
+
+                if (domain.getProperty(PropertyConstants.DOMAIN_PROPERTY_PROPAGATE_REGEX) != null) {
+                    String regexList = (String) domain.getProperty(PropertyConstants.DOMAIN_PROPERTY_PROPAGATE_REGEX);
+                    setPatternList(regexList, _includeRegexes);
+                }
+            }
+            _prefixPropagationSet = true;
+        }
+        Pattern rtGovResubmissionPattern = Pattern.compile(PropertyConstants.RTGOV_HEADER_RESUBMITTED_ID_PATTERN);
+        _includeRegexes.add(rtGovResubmissionPattern);
+    }
 }

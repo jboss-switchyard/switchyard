@@ -17,9 +17,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.switchyard.Context;
 import org.switchyard.Property;
+import org.switchyard.Scope;
 import org.switchyard.component.common.composer.BaseRegexContextMapper;
 import org.switchyard.component.common.label.ComponentLabel;
 import org.switchyard.component.common.label.EndpointLabel;
@@ -44,6 +46,8 @@ public class HttpContextMapper extends BaseRegexContextMapper<HttpBindingData> {
      */
     @Override
     public void mapFrom(HttpBindingData source, Context context) throws Exception {
+        super.mapFrom(source, context);
+
         if (source instanceof HttpResponseBindingData) {
             HttpResponseBindingData response = (HttpResponseBindingData) source;
             context.setProperty(HTTP_RESPONSE_STATUS, response.getStatus()).addLabels(HTTP_LABELS);
@@ -64,6 +68,13 @@ public class HttpContextMapper extends BaseRegexContextMapper<HttpBindingData> {
                 } else if ((values != null) && (values.size() > 1)) {
                     context.setProperty(name, values).addLabels(HTTP_LABELS);
                 }
+            } else if (matches(name, _includeRegexes, new ArrayList<Pattern>())) {
+                 List<String> values = entry.getValue();
+                 if ((values != null) && (values.size() == 1)) {
+                     context.setProperty(name, values.get(0), Scope.EXCHANGE).addLabels(HTTP_LABELS);
+                 } else if ((values != null) && (values.size() > 1)) {
+                     context.setProperty(name, values, Scope.EXCHANGE).addLabels(HTTP_LABELS);
+                 }
             }
         }
     }
@@ -74,6 +85,8 @@ public class HttpContextMapper extends BaseRegexContextMapper<HttpBindingData> {
     @Override
     @SuppressWarnings("unchecked")
     public void mapTo(Context context, HttpBindingData target) throws Exception {
+        super.mapTo(context, target);
+
         Map<String, List<String>> httpHeaders = target.getHeaders();
         for (Property property : context.getProperties()) {
             String name = property.getName();
@@ -106,6 +119,26 @@ public class HttpContextMapper extends BaseRegexContextMapper<HttpBindingData> {
                         list.add(String.valueOf(value));
                         httpHeaders.put(name, list);
                     }
+                }
+            } else if ((value != null) && matches(name, _includeRegexes, new ArrayList<Pattern>())) {
+                if (value instanceof List) {
+                    // We need to check through the list for non-string values and map .toString()
+                    // values to those entries
+                    List<String> vals = new ArrayList<String>();
+                    List valueList = (List)value;
+                    for (Object obj : valueList) {
+                        if (obj instanceof String) {
+                            vals.add((String) obj);
+                        } else {
+                            vals.add(obj.toString());
+                        }
+                    }
+
+                    httpHeaders.put(name, vals);
+                } else if (value instanceof String) {
+                    List<String> list = new ArrayList<String>();
+                    list.add(String.valueOf(value));
+                    httpHeaders.put(name, list);
                 }
             }
         }

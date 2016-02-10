@@ -21,9 +21,13 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.spi.CreationalContext;
@@ -39,7 +43,10 @@ import org.switchyard.ExchangeHandler;
 import org.switchyard.ExchangeState;
 import org.switchyard.Property;
 import org.switchyard.Scope;
+import org.switchyard.ServiceDomain;
 import org.switchyard.ServiceReference;
+import org.switchyard.common.property.PropertyConstants;
+import org.switchyard.common.lang.Strings;
 import org.switchyard.component.bean.deploy.BeanDeploymentMetaData;
 import org.switchyard.component.bean.internal.context.ContextProxy;
 import org.switchyard.component.common.SynchronousInOutHandler;
@@ -293,7 +300,7 @@ public class ClientProxyBean implements Bean {
                 
                 Exchange exchangeIn = createExchange(_service, method, inOutHandler);
                 //copy the properties from the current exchange to the new exchange that will be invoked
-                copyProperties(exchangeIn);
+                //copyProperties(exchangeIn);
                 // Don't set the message content as an array unless there are multiple arguments
                 if (args != null && args.length == 1) {
                     exchangeIn.send(exchangeIn.createMessage().setContent(args[0]));
@@ -310,7 +317,7 @@ public class ClientProxyBean implements Bean {
             } else {
                 Exchange exchange = createExchange(_service, method, null);
                 //copy the properties from the current exchange to the new exchange that will be invoked
-                copyProperties(exchange);
+                //copyProperties(exchange);
                 // Don't set the message content as an array unless there are multiple arguments
                 if (args == null) {
                     exchange.send(exchange.createMessage());
@@ -368,19 +375,34 @@ public class ClientProxyBean implements Bean {
             ContextProxy context = new ContextProxy();
             Context contextNew = newExchange.getContext();
 
-            for (org.switchyard.Property p : context
-                    .getProperties(Scope.EXCHANGE)) {
-                if (contextNew.getProperty(p.getName(), Scope.EXCHANGE) == null
-                        && !p.getName().startsWith("org.switchyard.bus.camel")) {
-                    Property newProp = newExchange.getContext().setProperty(
-                            p.getName(), p.getValue(), Scope.EXCHANGE);
-                    if (p.getLabels() != null && !p.getLabels().isEmpty()) {
-                        newProp.addLabels(p.getLabels());
+            List<Pattern> _includeRegexes = new ArrayList<Pattern>();
+            if (_service.getDomain().getProperty(PropertyConstants.DOMAIN_PROPERTY_PROPAGATE_REGEX) != null) {
+                String regexList = (String) _service.getDomain().getProperty(PropertyConstants.DOMAIN_PROPERTY_PROPAGATE_REGEX);
+                Set<String> regexSet = Strings.uniqueSplitTrimToNull(regexList, ",");
+                for (String regex : regexSet) {
+                    try {
+                        Pattern pattern = Pattern.compile(regex);
+                        _includeRegexes.add(pattern);
+                    } catch (PatternSyntaxException pse) {
                     }
                 }
             }
 
+            Pattern rtGovResubmissionPattern = Pattern.compile(PropertyConstants.RTGOV_HEADER_RESUBMITTED_ID_PATTERN);
+            _includeRegexes.add(rtGovResubmissionPattern);
+
+            for (org.switchyard.Property p : context.getProperties(Scope.EXCHANGE)) {
+                if (contextNew.getProperty(p.getName(), Scope.EXCHANGE) == null) {
+                    for (Pattern include : _includeRegexes) {
+                        if (include.matcher(p.getName()).matches()) {
+                            Property newProp = newExchange.getContext().setProperty(p.getName(), p.getValue(), Scope.EXCHANGE);
+                            if (p.getLabels() != null && !p.getLabels().isEmpty()) {
+                                newProp.addLabels(p.getLabels());
+                            }
+                        }
+                    }
+                }
+            }
         }
-        
     }
 }

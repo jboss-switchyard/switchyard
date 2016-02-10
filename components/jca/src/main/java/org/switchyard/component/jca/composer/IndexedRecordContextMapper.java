@@ -13,10 +13,14 @@
  */
 package org.switchyard.component.jca.composer;
 
+import java.util.ArrayList;
+import java.util.regex.Pattern;
+
 import javax.resource.cci.IndexedRecord;
 
 import org.switchyard.Context;
 import org.switchyard.Property;
+import org.switchyard.Scope;
 import org.switchyard.component.common.composer.BaseRegexContextMapper;
 import org.switchyard.component.common.label.ComponentLabel;
 import org.switchyard.component.common.label.EndpointLabel;
@@ -37,6 +41,8 @@ public class IndexedRecordContextMapper extends BaseRegexContextMapper<IndexedRe
      */
     @Override
     public void mapFrom(IndexedRecordBindingData source, Context context) throws Exception {
+        super.mapFrom(source, context);
+
         IndexedRecord record = source.getRecord();
         String recordName = record.getRecordName();
         if (recordName != null) {
@@ -46,6 +52,24 @@ public class IndexedRecordContextMapper extends BaseRegexContextMapper<IndexedRe
         if (recordDescription != null) {
             context.setProperty(JCAConstants.CCI_RECORD_SHORT_DESC_KEY, recordDescription).addLabels(INDEXED_RECORD_LABELS);
         }
+
+        for (int i = 0; i < record.size(); i++) {
+            Object o = record.get(i);
+            if (o instanceof String) {
+                String element = (String) o;
+                if (element.contains("=")) {
+                    String[] strings = element.split("=");
+
+                    if (strings.length >= 2) {
+                        String key = strings[0];
+                        String value = strings[1];
+                        if (matches(key, _includeRegexes, new ArrayList<Pattern>())) {
+                            context.setProperty(key, value, Scope.EXCHANGE);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -54,6 +78,8 @@ public class IndexedRecordContextMapper extends BaseRegexContextMapper<IndexedRe
     @SuppressWarnings("unchecked")
     @Override
     public void mapTo(Context context, IndexedRecordBindingData target) throws Exception {
+        super.mapTo(context, target);
+
         IndexedRecord record = target.getRecord();
         for (Property property : context.getProperties()) {
             String name = property.getName();
@@ -66,6 +92,8 @@ public class IndexedRecordContextMapper extends BaseRegexContextMapper<IndexedRe
             } else if (name.equals(JCAConstants.CCI_RECORD_SHORT_DESC_KEY)) {
                 record.setRecordShortDescription(value.toString());
             } else if (matches(name)) {
+                record.add(name + "=" + value);
+            }  else if (matches(name, _includeRegexes, new ArrayList<Pattern>())) {
                 record.add(name + "=" + value);
             }
         }

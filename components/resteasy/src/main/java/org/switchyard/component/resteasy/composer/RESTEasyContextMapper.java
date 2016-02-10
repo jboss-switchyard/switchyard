@@ -44,6 +44,8 @@ public class RESTEasyContextMapper extends BaseRegexContextMapper<RESTEasyBindin
      */
     @Override
     public void mapFrom(RESTEasyBindingData source, Context context) throws Exception {
+        super.mapFrom(source, context);
+
         Iterator<Map.Entry<String, List<String>>> entries = source.getHeaders().entrySet().iterator();
         while (entries.hasNext()) {
             Map.Entry<String, List<String>> entry = entries.next();
@@ -68,6 +70,8 @@ public class RESTEasyContextMapper extends BaseRegexContextMapper<RESTEasyBindin
     @Override
     @SuppressWarnings("unchecked")
     public void mapTo(Context context, RESTEasyBindingData target) throws Exception {
+        super.mapTo(context, target);
+
         Map<String, List<String>> httpHeaders = target.getHeaders();
         for (Property property : context.getProperties()) {
             String name = property.getName();

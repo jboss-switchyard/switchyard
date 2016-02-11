@@ -57,12 +57,12 @@ public interface RuntimeMessages {
     HandlerException invalidTransactionPolicyCombo(String policyOne, String policyTwo, String policyThree);
 
     /**
-     * invalidTransactionStatus method definition.
+     * noTransactionPropagated method definition.
      * @param policy policy
      * @return HandlerException
      */
     @Message(id = 14004, value = "Invalid transaction status : %s is required but the transaction doesn't exist")
-    HandlerException invalidTransactionStatus(String policy);
+    HandlerException noTransactionPropagated(String policy);
 
     /**
      * failedCreateNewTransaction method definition.
@@ -324,6 +324,21 @@ public interface RuntimeMessages {
      * @return IllegalStateException
      */
     @Message(id = 14037, value = "Scope %s is different than expected %s")
-    IllegalArgumentException scopeDifferent(String scope, String source);    
+    IllegalArgumentException scopeDifferent(String scope, String source);
+
+    /**
+     * propagatedTransactionHasInvalidStatus method definition.
+     * @param txStatus Transaction status code
+     * @return HandlerException
+     */
+    @Message(id = 14038, value = "Transaction has invalid status '%s' - it must be '0' (STATUS_ACTIVE) on propagation")
+    HandlerException propagatedTransactionHasInvalidStatus(int txStatus);
+
+    /**
+     * transactionAlreadyRolledBack method definition.
+     * @return HandlerException
+     */
+    @Message(id = 14039, value = "Transaction was already rolled back somehow. It may be caused by the transaction timeout, or application did it before SwitchYard handled it.")
+    HandlerException transactionAlreadyRolledBack();
     
 }

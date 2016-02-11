@@ -65,4 +65,12 @@ public interface RuntimeLogger {
     @Message(id = 13804, value = "Handler '%s' failed to handle fault.")
     void handlerFailedHandleFault(String refName, @Cause Exception e);
 
+    /**
+     * failedToRollbackOnStatusRolledback method definition.
+     * @param e SystemException
+     */
+    @LogMessage(level = ERROR)
+    @Message(id = 13805, value = "Failed to rollback the transaction which is in STATUS_ROLLEDBACK - this was required to clean up the transaction which is aborted by Narayana transaction reaper thread. See WFLY-4327.")
+    void failedToRollbackOnStatusRolledback(@Cause SystemException e);
+
 }

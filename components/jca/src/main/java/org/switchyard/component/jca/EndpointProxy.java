@@ -321,7 +321,7 @@ public class EndpointProxy implements InvocationHandler, MessageEndpoint {
                     if (_useBatchCommit) {
                         helper.cancelScheduledReaperThread();
                     }
-                } else {
+                } else if (_startedTx.getStatus() == Status.STATUS_ACTIVE) {
                     if (_useBatchCommit) {
                         if (helper.getCounter() + 1 < _batchSize) {
                             // keep the transaction active for next message
@@ -334,6 +334,31 @@ public class EndpointProxy implements InvocationHandler, MessageEndpoint {
                         return;
                     } else {
                         _transactionManager.commit();
+                    }
+                } else if (_startedTx.getStatus() == Status.STATUS_ROLLEDBACK) {
+                    // WFLY-1346 : if transaction timeout occurs, we need to disassociate
+                    // the transaction from the thread manually for Narayana Tx manager.
+                    // WFLY-4327 : In addition to above, tm.rollback() is required to clean up
+                    // Narayana internal static stuff rather than only disassociating the tx from
+                    // the thread by tm.suspend().
+                    //_transactionManager.suspend();
+                    _transactionManager.rollback();
+                    if (_useBatchCommit) {
+                        helper.cancelScheduledReaperThread();
+                    }
+                } else if (_startedTx.getStatus() == Status.STATUS_UNKNOWN) {
+                    // According to the WFLY-1346 fix, there is a case that has UNKNOWN status,
+                    // and the transaction should be rolled back in this case.
+                    _transactionManager.rollback();
+                    if (_useBatchCommit) {
+                        helper.cancelScheduledReaperThread();
+                    }
+                } else {
+                    // WFLY-1346 : In any status other than we handled above, it needs to disassociate
+                    // the transaction from the thread by tm.suspend() manually for Narayana Tx manager.
+                    _transactionManager.suspend();
+                    if (_useBatchCommit) {
+                        helper.cancelScheduledReaperThread();
                     }
                 }
                 _startedTx = null;

@@ -133,14 +133,40 @@ public class TransactionHandler implements ExchangeHandler {
         }
         
         evaluatePolicyCombination(exchange);
-        evaluateTransactionStatus(exchange);
         
-        if (isEligibleToSuspendTransaction(exchange)) {
-            suspendTransaction(exchange);
+        int txStatus = getCurrentTransactionStatus();
+        
+        // Check if propagated transaction is in valid state
+        if (propagatesRequired(exchange)) {
+            if (txStatus == Status.STATUS_NO_TRANSACTION) {
+                // Start new transaction on managedGlobal later even if propagatesRequired
+                if (!managedGlobalRequired(exchange)) {
+                    throw RuntimeMessages.MESSAGES.noTransactionPropagated(TransactionPolicy.PROPAGATES_TRANSACTION.toString());
+                }
+            } else if (txStatus != Status.STATUS_ACTIVE) {
+                throw RuntimeMessages.MESSAGES.propagatedTransactionHasInvalidStatus(txStatus);
+            }
+        } else if (managedGlobalRequired(exchange) && !suspendsRequired(exchange)) {
+            // SwitchYard managed transaction must be in Status.STATUS_ACTIVE
+            if (txStatus != Status.STATUS_NO_TRANSACTION && txStatus != Status.STATUS_ACTIVE) {
+                throw RuntimeMessages.MESSAGES.propagatedTransactionHasInvalidStatus(txStatus);
+            }
         }
         
-        if (isEligibleToStartTransaction(exchange)) {
+        // Suspend existing transaction if required. We don't care about the transaction status on suspend
+        if ((managedLocalRequired(exchange) || noManagedRequired(exchange) || suspendsRequired(exchange))
+                && txStatus != Status.STATUS_NO_TRANSACTION) {
+            suspendTransaction(exchange);
+            txStatus = getCurrentTransactionStatus();
+        }
+        
+        // Start new transaction if required
+        if (managedLocalRequired(exchange)) {
             startTransaction(exchange);
+            txStatus = getCurrentTransactionStatus();
+        } else if (managedGlobalRequired(exchange) && txStatus == Status.STATUS_NO_TRANSACTION) {
+            startTransaction(exchange);
+            txStatus = getCurrentTransactionStatus();
         }
         
         provideRequiredPolicies(exchange);
@@ -163,40 +189,6 @@ public class TransactionHandler implements ExchangeHandler {
             throw RuntimeMessages.MESSAGES.invalidTransactionPolicyCombo(TransactionPolicy.PROPAGATES_TRANSACTION.toString(), 
                     TransactionPolicy.MANAGED_TRANSACTION_LOCAL.toString(), TransactionPolicy.NO_MANAGED_TRANSACTION.toString());
         }
-    }
-    
-    private void evaluateTransactionStatus(Exchange exchange) throws HandlerException {
-        Transaction transaction = getCurrentTransaction();
-
-        if (transaction == null && propagatesRequired(exchange) && !managedGlobalRequired(exchange)) {
-            throw RuntimeMessages.MESSAGES.invalidTransactionStatus(TransactionPolicy.PROPAGATES_TRANSACTION.toString());
-        }
-    }
-    
-    private boolean isEligibleToSuspendTransaction(Exchange exchange) throws HandlerException {
-        Transaction transaction = getCurrentTransaction();
-        if (transaction == null) {
-           return false;
-       }
-
-        if (managedLocalRequired(exchange) || noManagedRequired(exchange) || suspendsRequired(exchange)) {
-            return true;
-        }
-
-       return false;
-    }
-    
-    private boolean isEligibleToStartTransaction(Exchange exchange) throws HandlerException {
-        Transaction transaction = getCurrentTransaction();
-        
-        if (managedLocalRequired(exchange)) {
-            return true;
-        } else if (managedGlobalRequired(exchange)) {
-            if (transaction == null) {
-                return true;
-            }
-        }
-        return false;
     }
     
     private void provideRequiredPolicies(Exchange exchange) {
@@ -307,7 +299,38 @@ public class TransactionHandler implements ExchangeHandler {
             } catch (Exception e) {
                 throw RuntimeMessages.MESSAGES.failedToCommitTransaction(e);
             }
+        } else if (txStatus == Status.STATUS_ROLLEDBACK) {
+            // WFLY-1346 : if transaction timeout occurs, we need to disassociate
+            // the transaction from the thread manually for Narayana Tx manager.
+            // WFLY-4327 : In addition to above, tm.rollback() is required to clean up
+            // Narayana internal static stuff rather than only disassociating the tx from
+            // the thread by tm.suspend().
+            try {
+                //_transactionManager.suspend();
+                _transactionManager.rollback();
+            } catch (SystemException e) {
+                RuntimeLogger.ROOT_LOGGER.failedToRollbackOnStatusRolledback(e);
+            }
+            throw RuntimeMessages.MESSAGES.transactionAlreadyRolledBack();
+        } else if (txStatus == Status.STATUS_UNKNOWN) {
+            // According to the WFLY-1346 fix, there is a case that has UNKNOWN status,
+            // and the transaction should be rolled back in this case.
+            try {
+                _transactionManager.rollback();
+                if (_log.isDebugEnabled()) {
+                    printDebugInfo("Transaction has been rolled back due to its UNKNOWN status");
+                }
+            } catch (Exception e) {
+                throw RuntimeMessages.MESSAGES.failedToRollbackTransaction(e);
+            }
         } else {
+            // WFLY-1346 : In any status other than we handled above, it needs to disassociate
+            // the transaction from the thread by tm.suspend() manually for Narayana Tx manager.
+            try {
+                _transactionManager.suspend();
+            } catch (SystemException e) {
+                RuntimeLogger.ROOT_LOGGER.failedToSuspendTransactionOnExchange(e);
+            }
             throw RuntimeMessages.MESSAGES.failedToCompleteWithStatus(txStatus);
         }
     }

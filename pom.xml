@@ -1640,6 +1640,11 @@
                 <artifactId>switchyard-demo-security-propagation-basic</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.switchyard.quickstarts.demos</groupId>
+                <artifactId>switchyard-demo-security-propagation-jms</artifactId>
+                <version>${project.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <distributionManagement>

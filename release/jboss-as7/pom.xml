@@ -638,6 +638,17 @@
         </dependency>
         <dependency>
             <groupId>org.switchyard.quickstarts.demos</groupId>
+            <artifactId>switchyard-demo-security-propagation-jms</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.switchyard.quickstarts.demos</groupId>
             <artifactId>switchyard-demo-policy-security-cert</artifactId>
             <scope>test</scope>
             <exclusions>

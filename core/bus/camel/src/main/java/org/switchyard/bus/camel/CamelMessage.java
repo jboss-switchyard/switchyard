@@ -6,7 +6,7 @@
  * You may obtain a copy of the License at
  * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,  
+ * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
@@ -35,7 +35,7 @@ import org.switchyard.transform.Transformer;
 import org.switchyard.transform.TransformerRegistry;
 
 /**
- * Message implementation which adapt SwitchYard {@link Message} interface to 
+ * Message implementation which adapt SwitchYard {@link Message} interface to
  * {@link org.apache.camel.Message}.
  */
 public class CamelMessage extends SwitchYardMessage implements Message {
@@ -44,7 +44,7 @@ public class CamelMessage extends SwitchYardMessage implements Message {
 
     /**
      * Creates new Camel message with specified exchange.
-     * 
+     *
      * @param exchange The camel exchange.
      */
     public CamelMessage(Exchange exchange) {
@@ -135,7 +135,7 @@ public class CamelMessage extends SwitchYardMessage implements Message {
     public void removeAttachment(String name) {
         HandlerDataSource attachment = getAttachment(name);
         if (attachment != null) {
-            removeAttachment(name);
+            super.removeAttachment(name);
         }
     }
 
@@ -175,7 +175,7 @@ public class CamelMessage extends SwitchYardMessage implements Message {
 
     /**
      * Verify if message was sent or not.
-     * 
+     *
      * @return True if message was sent.
      */
     public boolean isSent() {

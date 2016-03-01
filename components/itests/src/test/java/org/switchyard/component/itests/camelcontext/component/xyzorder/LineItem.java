@@ -1,5 +1,5 @@
 
-package org.switchyard.component.itests.camelcontext.xyzorder;
+package org.switchyard.component.itests.camelcontext.component.xyzorder;
 
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonInclude;

@@ -16,53 +16,24 @@ package org.switchyard.component.camel;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.Binder;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.builder.xml.Namespaces;
-import org.apache.camel.model.Constants;
 import org.apache.camel.model.DataFormatDefinition;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.model.RoutesDefinition;
-import org.apache.camel.spi.NamespaceAware;
 import org.apache.camel.spring.CamelContextFactoryBean;
 import org.apache.camel.spring.CamelEndpointFactoryBean;
-import org.apache.camel.spring.SpringModelJAXBContextFactory;
 import org.switchyard.SwitchYardException;
+import org.switchyard.common.camel.CamelModelFactory;
 import org.switchyard.common.camel.SwitchYardCamelContext;
 import org.switchyard.common.property.PropertyResolver;
 import org.switchyard.common.type.Classes;
 import org.switchyard.component.camel.model.CamelComponentImplementationModel;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 
 /**
  * Creates RouteDefinition instances based off of a class containing @Route
  * methods and Java DSL route definitions.
  */
 public final class RouteFactory {
-
-    /**
-     * JAXB context for reading XML definitions.
-     */
-    private static JAXBContext JAXB_CONTEXT;
-
-    static {
-        try {
-            JAXB_CONTEXT = JAXBContext.newInstance(Constants.JAXB_CONTEXT_PACKAGES
-                            + SpringModelJAXBContextFactory.ADDITIONAL_JAXB_CONTEXT_PACKAGES
-                            , SpringModelJAXBContextFactory.class.getClassLoader());
-        } catch (JAXBException e) {
-            throw new SwitchYardException(e);
-        }
-    }
 
     /** 
      * Utility class - so no need to directly instantiate.
@@ -101,15 +72,7 @@ public final class RouteFactory {
         List<RouteDefinition> routes = null;
         
         try {
-            InputSource source =  new InputSource(Classes.getResourceAsStream(xmlPath));
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setNamespaceAware(true);
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document document = builder.parse(source);
-            Element element = document.getDocumentElement();
-            Binder<Node> binder = JAXB_CONTEXT.createBinder();
-            Object obj = binder.unmarshal(element);
-            injectNamespaces(element, binder);
+            Object obj = CamelModelFactory.createCamelModelObjectFromXML(xmlPath);
             
             // Look for top-level element - camelContext, routes or route
             if (obj instanceof CamelContextFactoryBean) {
@@ -140,27 +103,6 @@ public final class RouteFactory {
      */
     public static List<RouteDefinition> loadRoute(String xmlPath) {
         return loadRoute(xmlPath, null, null);
-    }
-
-    private static void injectNamespaces(Element element, Binder<Node> binder) {
-        NodeList list = element.getChildNodes();
-        Namespaces namespaces = null;
-        int size = list.getLength();
-        for (int i = 0; i < size; i++) {
-            Node child = list.item(i);
-            if (child instanceof Element) {
-                Element childElement = (Element) child;
-                Object object = binder.getJAXBNode(child);
-                if (object instanceof NamespaceAware) {
-                    NamespaceAware namespaceAware = (NamespaceAware) object;
-                    if (namespaces == null) {
-                        namespaces = new Namespaces(element);
-                    }
-                    namespaces.configure(namespaceAware);
-                }
-                injectNamespaces(childElement, binder);
-            }
-        }
     }
 
     private static List<RouteDefinition> processCamelContextElement(CamelContextFactoryBean camelContextFactoryBean, SwitchYardCamelContext camelContext) throws Exception {

@@ -1,4 +1,4 @@
-package org.switchyard.component.itests.camelcontext;
+package org.switchyard.component.itests.camelcontext.component;
 
 public class MyMapping {
 

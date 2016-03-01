@@ -1,0 +1,29 @@
+<camelContext xmlns="http://camel.apache.org/schema/spring"
+                id="foobar-camel-context"
+                allowUseOriginalMessage="false"
+                streamCache="true"
+                useMDCLogging="true">
+    
+    <properties>
+        <property key="abc" value="xyz"/>
+    </properties>
+    
+    <jmxAgent id="foobar-jmx-agent" statisticsLevel="RoutesOnly"/>
+    
+    <endpoint id="foobar-endpoint" uri="direct:foobar"/>
+    
+    <dataFormats>
+        <json id="transform-json" library="Jackson"/>
+    </dataFormats>
+    
+    <route id="foobar-consumer">
+        <from uri="direct:input"/>
+        <to ref="foobar-endpoint"/>
+    </route>
+    <route id="foobar-provider">
+        <from uri="direct:foobar"/>
+        <log message="##### received a message! - [${body}] #####"/>
+        <to uri="mock:output"/>
+    </route>
+    
+</camelContext>

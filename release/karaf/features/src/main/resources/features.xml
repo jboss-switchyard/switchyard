@@ -11,6 +11,7 @@
         <feature>http</feature>
         <feature version="${version.org.apache.camel.features}">camel-core</feature>
         <feature version="${version.org.apache.camel.features}">camel-spring</feature>
+        <bundle>wrap:mvn:org.apache.camel/camel-core-xml/${version.org.apache.camel}</bundle>
         <feature>switchyard-internal-core</feature>
         <bundle>mvn:org.switchyard.karaf/switchyard-karaf-deploy/${project.version}</bundle>
         <bundle>mvn:org.switchyard.karaf/switchyard-karaf-commands/${project.version}</bundle>

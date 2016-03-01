@@ -19,6 +19,9 @@ import java.util.Map.Entry;
 import org.apache.camel.CamelContext;
 import org.apache.camel.CamelContextAware;
 import org.apache.camel.ManagementStatisticsLevel;
+import org.apache.camel.core.xml.AbstractCamelContextFactoryBean;
+import org.apache.camel.spring.CamelContextFactoryBean;
+import org.jboss.logging.Logger;
 import org.switchyard.ServiceDomain;
 import org.switchyard.common.type.Classes;
 
@@ -29,6 +32,8 @@ import org.switchyard.common.type.Classes;
  * of SwitchYardCamelContextImpl.
  */
 public final class CamelContextConfigurator {
+    
+    private static final Logger LOG = Logger.getLogger(CamelContextConfigurator.class);
     
     /**
      * Domain property used to configure the timeout value for ShutdownStrategy.
@@ -54,6 +59,13 @@ public final class CamelContextConfigurator {
      */
     public static final String CAMEL_CONTEXT_CONFIG = 
             "org.switchyard.camel.CamelContextConfiguration";
+    
+    /**
+     * Property which contains the location of camel context configuration XML file
+     * to configure the SwitchYard global CamelContext.
+     */
+    public static final String CAMEL_CONTEXT_CONFIG_XML = 
+            "org.switchyard.camel.CamelContextConfigurationXML";
     
     private CamelContextConfigurator() {
         // prevent direct instantiation
@@ -97,9 +109,14 @@ public final class CamelContextConfigurator {
                 configureCamelContextAware(context, value);
             } else if (name.equals(MDC_LOGGING_ENABLED)) {
                 configureMDCLogging(context, value);
+            } else if (name.equals(CAMEL_CONTEXT_CONFIG_XML)) {
+                configureCamelContextXML(context, value);
             }
         } catch (Exception ex) {
             CommonCamelLogger.ROOT_LOGGER.camelContextConfigurationError(name, value, ex);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(null, ex);
+            }
         }
     }
 
@@ -122,5 +139,12 @@ public final class CamelContextConfigurator {
         Class<?> contextAwareClass = Classes.forName(value.toString());
         CamelContextAware contextAware = (CamelContextAware)contextAwareClass.newInstance();
         contextAware.setCamelContext(context);
+    }
+    
+    private static void configureCamelContextXML(CamelContext context, Object value) throws Exception {
+        Object object = CamelModelFactory.createCamelModelObjectFromXML(value.toString());
+        if (object instanceof CamelContextFactoryBean) {
+            CamelModelFactory.importCamelContextFactoryBean((SwitchYardCamelContext)context, (CamelContextFactoryBean)object);
+        }
     }
 }

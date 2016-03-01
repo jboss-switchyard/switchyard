@@ -1,5 +1,5 @@
 
-package org.switchyard.component.itests.camelcontext.abcorder;
+package org.switchyard.component.itests.camelcontext.component.abcorder;
 
 import java.util.ArrayList;
 import java.util.List;

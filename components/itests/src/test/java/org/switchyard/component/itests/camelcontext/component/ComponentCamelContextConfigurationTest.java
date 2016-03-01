@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.switchyard.component.itests.camelcontext;
+package org.switchyard.component.itests.camelcontext.component;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -39,8 +39,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * 
  */
 @RunWith(SwitchYardRunner.class)
-@SwitchYardTestCaseConfig(config = "switchyard-camel-context-configuration-test.xml")
-public class CamelContextConfigurationTest  {
+@SwitchYardTestCaseConfig(config = "switchyard-camel-context-configuration-component-test.xml")
+public class ComponentCamelContextConfigurationTest  {
 
     private SwitchYardTestKit _testKit;
     private CamelContext _camelContext;
@@ -48,8 +48,8 @@ public class CamelContextConfigurationTest  {
     @ServiceOperation("OrderService.order")
     private Invoker _order;
     
-    private static final String INPUT_FILEPATH = "src/test/resources/org/switchyard/component/itests/camelcontext/abc-order.xml";
-    private static final String OUTPUT_FILEPATH = "src/test/resources/org/switchyard/component/itests/camelcontext/xyz-order.json";
+    private static final String INPUT_FILEPATH = "src/test/resources/org/switchyard/component/itests/camelcontext/component/abc-order.xml";
+    private static final String OUTPUT_FILEPATH = "src/test/resources/org/switchyard/component/itests/camelcontext/component/xyz-order.json";
 
     @Test
     public void testOrder() throws Exception {

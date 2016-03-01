@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.switchyard.component.itests.camelcontext;
+package org.switchyard.component.itests.camelcontext.component;
 
 /**
  * Simple interface for a Store Service.

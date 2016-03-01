@@ -6,9 +6,9 @@
         </variables>
     </configuration>
     <mapping>
-        <class-a>org.switchyard.component.itests.camelcontext.abcorder.ABCOrder</class-a>
-        <class-b>org.switchyard.component.itests.camelcontext.xyzorder.XyzOrder</class-b>
-        <field custom-converter-id="_customMapping" custom-converter-param="org.switchyard.component.itests.camelcontext.MyMapping,map">
+        <class-a>org.switchyard.component.itests.camelcontext.component.abcorder.ABCOrder</class-a>
+        <class-b>org.switchyard.component.itests.camelcontext.component.xyzorder.XyzOrder</class-b>
+        <field custom-converter-id="_customMapping" custom-converter-param="org.switchyard.component.itests.camelcontext.component.MyMapping,map">
             <a>header.customerNum</a>
             <b>custId</b>
         </field>
@@ -26,8 +26,8 @@
         </field>
     </mapping>
     <mapping>
-        <class-a>org.switchyard.component.itests.camelcontext.abcorder.ABCOrder$OrderItems$Item</class-a>
-        <class-b>org.switchyard.component.itests.camelcontext.xyzorder.LineItem</class-b>
+        <class-a>org.switchyard.component.itests.camelcontext.component.abcorder.ABCOrder$OrderItems$Item</class-a>
+        <class-b>org.switchyard.component.itests.camelcontext.component.xyzorder.LineItem</class-b>
         <field>
             <a>price</a>
             <b>cost</b>
@@ -43,7 +43,7 @@
     </mapping>
     <mapping>
         <class-a>org.apache.camel.component.dozer.VariableMapper</class-a>
-        <class-b>org.switchyard.component.itests.camelcontext.xyzorder.XyzOrder</class-b>
+        <class-b>org.switchyard.component.itests.camelcontext.component.xyzorder.XyzOrder</class-b>
         <field custom-converter-id="_variableMapping" custom-converter-param="${ORIGIN}">
             <a>literal</a>
             <b>origin</b>
@@ -51,7 +51,7 @@
     </mapping>
     <mapping>
         <class-a>org.apache.camel.component.dozer.ExpressionMapper</class-a>
-        <class-b>org.switchyard.component.itests.camelcontext.xyzorder.XyzOrder</class-b>
+        <class-b>org.switchyard.component.itests.camelcontext.component.xyzorder.XyzOrder</class-b>
         <field custom-converter-id="_expressionMapping" custom-converter-param="header:approval">
             <a>expression</a>
             <b>approvalCode</b>

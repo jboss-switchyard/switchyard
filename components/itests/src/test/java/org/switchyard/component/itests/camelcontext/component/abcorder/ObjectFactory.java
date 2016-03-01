@@ -1,5 +1,5 @@
 
-package org.switchyard.component.itests.camelcontext.abcorder;
+package org.switchyard.component.itests.camelcontext.component.abcorder;
 
 import javax.xml.bind.annotation.XmlRegistry;
 

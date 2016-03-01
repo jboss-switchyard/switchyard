@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<switchyard xmlns="urn:switchyard-config:switchyard:1.0"
+        xmlns:camel="urn:switchyard-component-camel:config:1.0"
+        xmlns:file="urn:switchyard-component-camel-file:config:1.0"
+        xmlns:sca="http://docs.oasis-open.org/ns/opencsa/sca/200912">
+  <domain>
+      <properties>
+        <property name="org.switchyard.camel.CamelContextConfigurationXML"
+                value="org/switchyard/component/itests/camelcontext/domain/camel-context.xml"/>
+      </properties>
+  </domain>
+</switchyard>

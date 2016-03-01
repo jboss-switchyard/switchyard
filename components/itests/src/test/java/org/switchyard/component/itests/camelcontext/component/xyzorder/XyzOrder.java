@@ -1,5 +1,5 @@
 
-package org.switchyard.component.itests.camelcontext.xyzorder;
+package org.switchyard.component.itests.camelcontext.component.xyzorder;
 
 import java.util.ArrayList;
 import java.util.List;

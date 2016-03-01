@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<switchyard xmlns="urn:switchyard-config:switchyard:1.0" xmlns:camel="urn:switchyard-component-camel:config:1.0" xmlns:file="urn:switchyard-component-camel-file:config:1.0" xmlns:sca="http://docs.oasis-open.org/ns/opencsa/sca/200912">
-  <sca:composite name="camel-context-configuration" targetNamespace="urn:example:camel-context-configuration:0.1.0">
+<switchyard xmlns="urn:switchyard-config:switchyard:1.0"
+        xmlns:camel="urn:switchyard-component-camel:config:1.0"
+        xmlns:file="urn:switchyard-component-camel-file:config:1.0"
+        xmlns:sca="http://docs.oasis-open.org/ns/opencsa/sca/200912">
+  <sca:composite name="camel-context-configuration-component" targetNamespace="urn:example:camel-context-configuration-component:0.1.0">
     <sca:service name="OrderService" promote="OrderService/OrderService">
       <file:binding.file name="file1">
         <file:directory>target/input</file:directory>
@@ -14,17 +17,17 @@
     </sca:service>
     <sca:component name="OrderService">
       <camel:implementation.camel>
-        <camel:xml path="org/switchyard/component/itests/camelcontext/camelcontext.xml"/>
+        <camel:xml path="org/switchyard/component/itests/camelcontext/component/camelcontext.xml"/>
       </camel:implementation.camel>
       <sca:service name="OrderService">
-        <sca:interface.java interface="org.switchyard.component.itests.camelcontext.OrderService"/>
+        <sca:interface.java interface="org.switchyard.component.itests.camelcontext.component.OrderService"/>
       </sca:service>
       <sca:reference name="StoreService">
-        <sca:interface.java interface="org.switchyard.component.itests.camelcontext.StoreService"/>
+        <sca:interface.java interface="org.switchyard.component.itests.camelcontext.component.StoreService"/>
       </sca:reference>
     </sca:component>
     <sca:reference name="StoreService" multiplicity="0..1" promote="OrderService/StoreService">
-      <sca:interface.java interface="org.switchyard.component.itests.camelcontext.StoreService"/>
+      <sca:interface.java interface="org.switchyard.component.itests.camelcontext.component.StoreService"/>
       <file:binding.file name="file2">
         <file:directory>target/output</file:directory>
         <file:fileName>xyz-order.json</file:fileName>

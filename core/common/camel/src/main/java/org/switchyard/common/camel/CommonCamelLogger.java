@@ -37,4 +37,12 @@ public interface CommonCamelLogger {
     @Message(id = 13201, value="Unable to set camel context configuration [name = %s, value = %s] : %s")
     void camelContextConfigurationError(String propertyName, Object propertyValue, Exception error);
 
+    /**
+     * unableToRegisterBean method definition.
+     * @param id id
+     * @param error error
+     */
+    @LogMessage(level = WARN)
+    @Message(id = 13202, value="Unable to register bean '%s' due to '%s' - Ignoring")
+    void unableToRegisterBean(String id, Exception error);
 }

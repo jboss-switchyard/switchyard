@@ -63,10 +63,12 @@ import org.switchyard.common.xml.XMLHelper;
 import org.switchyard.component.soap.Feature;
 import org.switchyard.component.soap.PortName;
 import org.switchyard.component.soap.SOAPMessages;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
 import org.xml.sax.InputSource;
 
 
@@ -265,8 +267,26 @@ public final class WSDLUtil {
     public static Service getService(final Definition definition, final PortName portName) throws WSDLException {
         Service service = null;
         if (portName.getServiceQName().equals(new QName(""))) {
-            service = (Service) definition.getAllServices().values().iterator().next();
-            portName.setServiceQName(service.getQName());
+
+            boolean found = false;
+            Iterator it_services = definition.getAllServices().values().iterator();
+            if (it_services != null) {
+                while (it_services.hasNext() && !found) {
+                    service = (Service)it_services.next();
+                    if (portName.getName() != null) {
+                        if (service.getPort(portName.getName()) != null) {
+                            portName.setServiceQName(service.getQName());
+                            found = true;
+                        } else {
+                            service = null;
+                        }
+                    } else {
+                        portName.setServiceQName(service.getQName());
+                        found = true;
+                    }
+
+                }
+            }
         } else {
             String namespace = portName.getNamespaceURI();
             Boolean namespaceSet = false;

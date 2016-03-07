@@ -112,6 +112,18 @@ public class WSDLUtilTest {
     }
 
     @Test
+    public void multipleServices() throws Exception {
+        PortName portName = new PortName();
+        portName.setName("GoodbyeWebServicePort");
+        Service service = WSDLUtil.getService("TwoServicesGoodbyeService.wsdl", portName);
+        Assert.assertNotNull(service);
+        portName = new PortName();
+        portName.setName("GoodbyeWebServiceResponsePort");
+        Service service2 = WSDLUtil.getService("TwoServicesGoodbyeService.wsdl", portName);
+        Assert.assertNotNull(service2);
+    }
+
+    @Test
     public void soap12Action() throws Exception {
         Service service = WSDLUtil.getService("HelloWebService1.2.wsdl", new PortName("HelloSOAP12Service:"));
         Assert.assertNotNull(service);

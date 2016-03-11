@@ -25,10 +25,15 @@ import org.switchyard.Exchange;
 import org.switchyard.ExchangeState;
 import org.switchyard.Message;
 import org.switchyard.Property;
+import org.switchyard.ServiceDomain;
+import org.switchyard.ServiceReference;
 import org.switchyard.common.xml.QNameUtil;
 import org.switchyard.component.common.composer.BaseMessageComposer;
 import org.switchyard.component.common.label.EndpointLabel;
 import org.switchyard.config.model.composer.MessageComposerModel;
+import org.switchyard.metadata.JavaTypes;
+import org.switchyard.transform.Transformer;
+import org.switchyard.transform.TransformerRegistry;
 
 /**
  * The HTTP implementation of MessageComposer simply copies the HTTP body into
@@ -44,6 +49,7 @@ public class HttpMessageComposer extends BaseMessageComposer<HttpBindingData> {
      * Camel HTTP Header.
      */
     public static final String CAMEL_HTTP_HEADER = "CamelHttp";
+    private static final String SERVICE_REFERENCE_PROPERTY = "org.switchyard.bus.camel.consumer";
 
     /**
      * {@inheritDoc}
@@ -87,7 +93,20 @@ public class HttpMessageComposer extends BaseMessageComposer<HttpBindingData> {
                                 || (content instanceof InputStream) || (content instanceof Reader)) {
                         status = HttpServletResponse.SC_OK;
                     } else {
-                        status = HttpServletResponse.SC_BAD_GATEWAY;
+                        if (exchange.getContext().getProperty(SERVICE_REFERENCE_PROPERTY) != null) {
+                            ServiceDomain domain = ((ServiceReference)exchange.getContext().getProperty(SERVICE_REFERENCE_PROPERTY).getValue()).getDomain();
+                            TransformerRegistry registry = domain.getTransformerRegistry();
+                            QName from = JavaTypes.toMessageType(content.getClass());
+                            QName to = JavaTypes.toMessageType(String.class);
+                            org.switchyard.transform.Transformer transformer = registry.getTransformer(from, to);
+                            if (transformer != null) {
+                                Object stringForm = transformer.transform(content);
+                                content = (String) stringForm;
+                                status = HttpServletResponse.SC_OK;
+                            }
+                        } else {
+                            status = HttpServletResponse.SC_BAD_GATEWAY;
+                        }
                     }
                     HttpResponseBindingData response = (HttpResponseBindingData) target;
                     response.setStatus(status);

@@ -68,7 +68,7 @@ public class HttpContextMapper extends BaseRegexContextMapper<HttpBindingData> {
                 } else if ((values != null) && (values.size() > 1)) {
                     context.setProperty(name, values).addLabels(HTTP_LABELS);
                 }
-            } else if (matches(name, _includeRegexes, new ArrayList<Pattern>())) {
+            } else if (matches(name, getIncludeRegexes(), new ArrayList<Pattern>())) {
                  List<String> values = entry.getValue();
                  if ((values != null) && (values.size() == 1)) {
                      context.setProperty(name, values.get(0), Scope.EXCHANGE).addLabels(HTTP_LABELS);
@@ -120,7 +120,7 @@ public class HttpContextMapper extends BaseRegexContextMapper<HttpBindingData> {
                         httpHeaders.put(name, list);
                     }
                 }
-            } else if ((value != null) && matches(name, _includeRegexes, new ArrayList<Pattern>())) {
+            } else if ((value != null) && matches(name, getIncludeRegexes(), new ArrayList<Pattern>())) {
                 if (value instanceof List) {
                     // We need to check through the list for non-string values and map .toString()
                     // values to those entries

@@ -569,4 +569,30 @@ public interface TransformMessages {
      */
     @Message(id=16863, value = "Failed to marshal for type '%s'.")
     SwitchYardException failedToMarshalForType(String type, @Cause Exception e);
+
+    /**
+     * camelEndpointNotFound method definition.
+     * @param uri URI
+     * @return SwitchYardException
+     */
+    @Message(id=16864, value = "The endpoint '%s' is not found in CamelContext.")
+    SwitchYardException camelEndpointNotFound(String uri);
+
+    /**
+     * failedToTransformViaCamelEndpoint method definition.
+     * @param endpointUri endpoint URI
+     * @param e cause
+     * @return SwitchYardException
+     */
+    @Message(id=18865, value = "Failed to transform via camel endpoint '%s'.")
+    SwitchYardException failedToTransformViaCamelEndpoint(String endpointUri, @Cause Exception e);
+    
+    /**
+     * failedToTransformViaCamelEndpoint method definition.
+     * @param endpointUri endpoint URI
+     * @param cause cause
+     * @return SwitchYardException
+     */
+    @Message(id=18866, value = "Failed to transform via camel endpoint '%s': %s")
+    SwitchYardException failedToTransformViaCamelEndpoint(String endpointUri, String cause);
 }

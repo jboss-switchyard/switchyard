@@ -43,7 +43,6 @@ import org.switchyard.ExchangeHandler;
 import org.switchyard.ExchangeState;
 import org.switchyard.Property;
 import org.switchyard.Scope;
-import org.switchyard.ServiceDomain;
 import org.switchyard.ServiceReference;
 import org.switchyard.common.property.PropertyConstants;
 import org.switchyard.common.lang.Strings;

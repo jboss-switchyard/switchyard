@@ -89,6 +89,11 @@
         </dependency>
         <dependency>
             <groupId>org.switchyard.quickstarts</groupId>
+            <artifactId>switchyard-transform-datamapper</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.switchyard.quickstarts</groupId>
             <artifactId>switchyard-transform-dozer</artifactId>
             <scope>test</scope>
         </dependency>

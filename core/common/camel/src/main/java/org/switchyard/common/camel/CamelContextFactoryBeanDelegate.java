@@ -21,9 +21,6 @@ import org.apache.camel.ShutdownRoute;
 import org.apache.camel.ShutdownRunningTask;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.core.xml.AbstractCamelContextFactoryBean;
-import org.apache.camel.core.xml.AbstractCamelEndpointFactoryBean;
-import org.apache.camel.core.xml.AbstractCamelFactoryBean;
-import org.apache.camel.core.xml.AbstractCamelRedeliveryPolicyFactoryBean;
 import org.apache.camel.core.xml.CamelJMXAgentDefinition;
 import org.apache.camel.core.xml.CamelPropertyPlaceholderDefinition;
 import org.apache.camel.core.xml.CamelStreamCachingStrategyDefinition;
@@ -46,6 +43,8 @@ import org.apache.camel.model.rest.RestConfigurationDefinition;
 import org.apache.camel.model.rest.RestDefinition;
 import org.apache.camel.spi.PackageScanFilter;
 import org.apache.camel.spring.CamelContextFactoryBean;
+import org.apache.camel.spring.CamelEndpointFactoryBean;
+import org.apache.camel.spring.CamelRedeliveryPolicyFactoryBean;
 import org.jboss.logging.Logger;
 
 /**
@@ -82,29 +81,30 @@ public class CamelContextFactoryBeanDelegate extends AbstractCamelContextFactory
      */
     public void importConfiguration() throws Exception {
         afterPropertiesSet();
-        registerBeans(getEndpoints());
-        registerBeans(getRedeliveryPolicies());
-        setupRoutes();
-    }
-
-    private void registerBeans(List<? extends AbstractCamelFactoryBean<?>> beans) {
-        if (beans == null || beans.isEmpty()) {
-            return;
-        }
-        
-        for (AbstractCamelFactoryBean<?> bean : beans) {
-            try {
-                bean.setCamelContext(_camelContext);
-                bean.afterPropertiesSet();
-                Object created = bean.getObject();
-                _camelContext.getWritebleRegistry().put(bean.getId(), created);
-            } catch (Exception e) {
-                CommonCamelLogger.ROOT_LOGGER.unableToRegisterBean(bean.getId(), e);
+        // Keep using concrete factory bean classes to prevent CCE due to module loader difference
+        if (_factoryBean.getEndpoints() != null) {
+            for (CamelEndpointFactoryBean endpoint : _factoryBean.getEndpoints()) {
+                endpoint.setCamelContext(_camelContext);
+                endpoint.afterPropertiesSet();
+                Object created = endpoint.getObject();
+                _camelContext.getWritebleRegistry().put(endpoint.getId(), created);
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug(null, e);
+                    LOG.debug("Registered camel endpoint '" + endpoint.getId() + "'");
                 }
             }
         }
+        if (_factoryBean.getRedeliveryPolicies() != null) {
+            for (CamelRedeliveryPolicyFactoryBean policy : _factoryBean.getRedeliveryPolicies()) {
+                policy.setCamelContext(_camelContext);
+                policy.afterPropertiesSet();
+                Object created = policy.getObject();
+                _camelContext.getWritebleRegistry().put(policy.getId(), created);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Registered camel RedeliveryPolicy '" + policy.getId() + "'");
+                }
+            }
+        }
+        setupRoutes();
     }
 
     @Override
@@ -151,12 +151,12 @@ public class CamelContextFactoryBeanDelegate extends AbstractCamelContextFactory
     }
 
     @Override
-    public List<? extends AbstractCamelEndpointFactoryBean> getEndpoints() {
+    public List<CamelEndpointFactoryBean> getEndpoints() {
         return _factoryBean.getEndpoints();
     }
 
     @Override
-    public List<? extends AbstractCamelRedeliveryPolicyFactoryBean> getRedeliveryPolicies() {
+    public List<CamelRedeliveryPolicyFactoryBean> getRedeliveryPolicies() {
         return _factoryBean.getRedeliveryPolicies();
     }
 

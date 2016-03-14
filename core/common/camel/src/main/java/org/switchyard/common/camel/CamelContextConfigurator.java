@@ -19,7 +19,6 @@ import java.util.Map.Entry;
 import org.apache.camel.CamelContext;
 import org.apache.camel.CamelContextAware;
 import org.apache.camel.ManagementStatisticsLevel;
-import org.apache.camel.core.xml.AbstractCamelContextFactoryBean;
 import org.apache.camel.spring.CamelContextFactoryBean;
 import org.jboss.logging.Logger;
 import org.switchyard.ServiceDomain;

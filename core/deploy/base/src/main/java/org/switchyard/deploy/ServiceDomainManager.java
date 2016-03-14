@@ -58,24 +58,24 @@ import org.switchyard.validate.ValidatorRegistry;
  * @author <a href="mailto:tom.fennelly@gmail.com">tom.fennelly@gmail.com</a>
  */
 public class ServiceDomainManager {
-	/**
-	 * Array of Strings that are disallowed in an Objectname value
-	 * @see javax.management.ObjectName
-	 */
-    public static final String[] MBeanDisallowedStrings = new String[]{
-    		// colon is not allowed due to separation of domain and attribute
-    		":", 
-    		
-    		// These are reserved to separate key-value pairs
-    		",",
-    		
-    		"=",
-    		
-    		//Avoid the creation of an ObjectName pattern
-    		"?",
-    		
-    		"*"
-    	};
+    /**
+     * Array of Strings that are disallowed in an Objectname value.
+     * @see javax.management.ObjectName
+     */
+    public static final String[] MBEAN_DISALLOWED_STRINGS = new String[]{
+        // colon is not allowed due to separation of domain and attribute
+        ":", 
+
+        // These are reserved to separate key-value pairs
+        ",",
+
+        "=",
+
+        //Avoid the creation of an ObjectName pattern
+        "?",
+
+        "*"
+    };
 
     /**
      * Root domain property.
@@ -102,19 +102,19 @@ public class ServiceDomainManager {
     public ServiceDomainManager(SystemSecurity systemSecurity) {
         _systemSecurity = systemSecurity;
     }
-    
-    public static String sanitizeServiceQNameForMBean(QName qname) {
-    	if(qname == null) {
-    		return null;
-    	}
-    	
-    	String sanitizedString = qname.toString();
-    	
-    	for(String disallowedString : MBeanDisallowedStrings) {
-    		sanitizedString = sanitizedString.replace(disallowedString, "");
-    	}
-    	
-    	return sanitizedString;
+
+    private String sanitizeServiceQNameForMBean(QName qname) {
+        if (qname == null) {
+            return null;
+        }
+
+        String sanitizedString = qname.toString();
+
+        for (String disallowedString : MBEAN_DISALLOWED_STRINGS) {
+            sanitizedString = sanitizedString.replace(disallowedString, "");
+        }
+
+        return sanitizedString;
     }
 
     /**
@@ -138,15 +138,15 @@ public class ServiceDomainManager {
         ValidatorRegistry validatorRegistry = new BaseValidatorRegistry();
 
         SwitchYardCamelContextImpl camelContext = new SwitchYardCamelContextImpl();
-        if(null != domainName) {
-        	camelContext.setName(sanitizeServiceQNameForMBean(domainName));
+        if (null != domainName) {
+            camelContext.setName(sanitizeServiceQNameForMBean(domainName));
         }
         CamelExchangeBus bus = new CamelExchangeBus(camelContext);
 
         ServiceDomainSecurity serviceDomainSecurity = getServiceDomainSecurity(switchyardConfig);
 
         DomainImpl domain = new DomainImpl(
-            domainName, _registry, bus, transformerRegistry, validatorRegistry, new DomainEventManager(), serviceDomainSecurity);
+                domainName, _registry, bus, transformerRegistry, validatorRegistry, new DomainEventManager(), serviceDomainSecurity);
         camelContext.setServiceDomain(domain);
 
         // set properties on the domain
@@ -158,7 +158,7 @@ public class ServiceDomainManager {
         // now that all resources and properties are set, init the domain
         domain.init();
         return domain;
-    
+
     }
     /**
      * Return the shared EventManager used for all ServiceDomain instances.
@@ -167,7 +167,7 @@ public class ServiceDomainManager {
     public EventManager getEventManager() {
         return _eventManager;
     }
-    
+
     /**
      * Return the shared ServiceRegistry used for all ServiceDomain instance.
      * @return ServiceRegistry instance
@@ -187,12 +187,12 @@ public class ServiceDomainManager {
                         if (security != null) {
                             PropertiesModel properties = security.getProperties();
                             ServiceSecurity value = new DefaultServiceSecurity()
-                                .setName(security.getName())
-                                .setCallbackHandler(security.getCallbackHandler(getClass().getClassLoader()))
-                                .setProperties(properties != null ? properties.toMap() : null)
-                                .setRolesAllowed(security.getRolesAllowed())
-                                .setRunAs(security.getRunAs())
-                                .setSecurityDomain(security.getSecurityDomain());
+                            .setName(security.getName())
+                            .setCallbackHandler(security.getCallbackHandler(getClass().getClassLoader()))
+                            .setProperties(properties != null ? properties.toMap() : null)
+                            .setRolesAllowed(security.getRolesAllowed())
+                            .setRunAs(security.getRunAs())
+                            .setSecurityDomain(security.getSecurityDomain());
                             String key = value.getName();
                             if (!serviceSecurities.containsKey(key)) {
                                 serviceSecurities.put(key, value);
@@ -206,7 +206,7 @@ public class ServiceDomainManager {
         }
         return new DefaultServiceDomainSecurity(serviceSecurities, _systemSecurity);
     }
-    
+
     protected Map<String, String> getDomainProperties(SwitchYardModel config) {
         if (config != null) {
             DomainModel domain = config.getDomain();
@@ -219,7 +219,7 @@ public class ServiceDomainManager {
         }
         return Collections.<String, String>emptyMap();
     }
-    
+
     private final class DomainEventManager extends EventManager {
         @Override
         public void publish(EventObject event) {

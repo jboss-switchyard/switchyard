@@ -27,6 +27,7 @@
     <url>http://switchyard.org</url>
     <properties>
         <switchyard.osgi.export.pkg>
+            org.switchyard.transform.camel.*;
             org.switchyard.transform.config.*;
             org.switchyard.transform.dozer.*;
             org.switchyard.transform.internal.*;
@@ -52,6 +53,10 @@
         <dependency>
             <groupId>org.switchyard</groupId>
             <artifactId>switchyard-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.switchyard</groupId>
+            <artifactId>switchyard-common-camel</artifactId>
         </dependency>
         <dependency>
             <groupId>org.switchyard</groupId>
@@ -98,8 +103,13 @@
             <artifactId>dozer</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-core</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.switchyard</groupId>
             <artifactId>switchyard-runtime</artifactId>
+            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>

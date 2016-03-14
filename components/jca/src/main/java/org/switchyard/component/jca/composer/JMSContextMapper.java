@@ -116,7 +116,7 @@ public class JMSContextMapper extends BaseRegexContextMapper<JMSBindingData> {
                 if (value != null) {
                     context.setProperty(key, value).addLabels(JMS_PROPERTY_LABELS);
                 }
-            } else if (matches(key, _includeRegexes, new ArrayList<Pattern>())) {
+            } else if (matches(key, getIncludeRegexes(), new ArrayList<Pattern>())) {
                 Object value = null;
                 try {
                     value = message.getObjectProperty(key);
@@ -178,7 +178,7 @@ public class JMSContextMapper extends BaseRegexContextMapper<JMSBindingData> {
                 } catch (Throwable t) {
                     continue;
                 }
-            } else if (matches(name, _includeRegexes, new ArrayList<Pattern>())) {
+            } else if (matches(name, getIncludeRegexes(), new ArrayList<Pattern>())) {
                 Object value = property.getValue();
                 if (value == null) {
                     continue;

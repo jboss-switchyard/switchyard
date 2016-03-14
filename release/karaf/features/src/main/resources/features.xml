@@ -637,6 +637,16 @@
         <bundle>mvn:org.switchyard.quickstarts/switchyard-rest-binding/${project.version}</bundle>
     </feature>
 
+    <feature name="switchyard-quickstart-transform-datamapper" version="${project.version}" resolver="(obr)">
+        <feature version="${project.version}">switchyard-bean</feature>
+        <feature version="${project.version}">switchyard-file</feature>
+        <feature version="${project.version}">switchyard-camel</feature>
+        <feature version="${version.org.apache.camel.features}">camel-dozer</feature>
+        <feature version="${version.org.apache.camel.features}">camel-jackson</feature>
+        <feature version="${version.org.apache.camel.features}">camel-jaxb</feature>
+        <bundle>mvn:org.switchyard.quickstarts/switchyard-transform-datamapper/${project.version}</bundle>
+    </feature>
+
     <feature name="switchyard-quickstart-transform-dozer" version="${project.version}" resolver="(obr)">
         <feature version="${project.version}">switchyard-bean</feature>
         <feature version="${project.version}">switchyard-sca</feature>

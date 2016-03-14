@@ -47,7 +47,7 @@ public class BaseRegexContextMapper<D extends BindingData> extends BaseContextMa
     // RTGOV Resubmission ID / property propagation
     private boolean _prefixPropagationSet = false;
     private static final String SERVICE_REFERENCE_PROPERTY = "org.switchyard.bus.camel.consumer";
-    protected final List<Pattern> _includeRegexes = new ArrayList<Pattern>();
+    private final List<Pattern> _includeRegexes = new ArrayList<Pattern>();
 
     private void setPatternList(String regexs, List<Pattern> patternList) {
         Set<String> regexSet = Strings.uniqueSplitTrimToNull(regexs, ",");
@@ -118,6 +118,13 @@ public class BaseRegexContextMapper<D extends BindingData> extends BaseContextMa
         return qname != null && matches(qname.getLocalPart(), _includes, _excludes) && matches(qname.getNamespaceURI(), _includeNamespaces, _excludeNamespaces);
     }
 
+    /**
+     * Check if the property name matches specified condition.
+     * @param test test
+     * @param includes includes
+     * @param excludes excludes
+     * @return true if it matches
+     */
     public boolean matches(String test, List<Pattern> includes, List<Pattern> excludes) {
         boolean green = false;
         boolean red = false;
@@ -183,5 +190,9 @@ public class BaseRegexContextMapper<D extends BindingData> extends BaseContextMa
         }
         Pattern rtGovResubmissionPattern = Pattern.compile(PropertyConstants.RTGOV_HEADER_RESUBMITTED_ID_PATTERN);
         _includeRegexes.add(rtGovResubmissionPattern);
+    }
+    
+    protected List<Pattern> getIncludeRegexes() {
+        return _includeRegexes;
     }
 }

@@ -32,7 +32,6 @@ import org.switchyard.component.common.composer.BaseMessageComposer;
 import org.switchyard.component.common.label.EndpointLabel;
 import org.switchyard.config.model.composer.MessageComposerModel;
 import org.switchyard.metadata.JavaTypes;
-import org.switchyard.transform.Transformer;
 import org.switchyard.transform.TransformerRegistry;
 
 /**

@@ -18,6 +18,7 @@ import org.switchyard.config.Configuration;
 import org.switchyard.config.model.Descriptor;
 import org.switchyard.config.model.Model;
 import org.switchyard.config.model.transform.TransformModel;
+import org.switchyard.transform.config.model.CamelTransformModel;
 import org.switchyard.transform.config.model.DozerFileEntryModel;
 import org.switchyard.transform.config.model.DozerMappingFilesModel;
 import org.switchyard.transform.config.model.DozerTransformModel;
@@ -31,7 +32,8 @@ import org.switchyard.transform.config.model.v1.V1TransformMarshaller;
 public class V2TransformMarshaller extends V1TransformMarshaller {
 
     private static final String TRANSFORM_DOZER = TransformModel.TRANSFORM + "." + DozerTransformModel.DOZER;
-
+    private static final String TRANSFORM_CAMEL = TransformModel.TRANSFORM + "." + CamelTransformModel.CAMEL;
+    
     /**
      * Constructs a new V2TransformMarshaller with the specified Descriptor.
      * @param desc the Descriptor
@@ -58,6 +60,8 @@ public class V2TransformMarshaller extends V1TransformMarshaller {
             return new V2DozerMappingFilesModel(config, desc);
         } else if (name.equals(DozerFileEntryModel.ENTRY)) {
             return new V2DozerFileEntryModel(config, desc);
+        } else if (name.equals(TRANSFORM_CAMEL)) {
+            return new V2CamelTransformModel(config, desc);
         }
 
         return null;

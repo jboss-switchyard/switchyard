@@ -107,14 +107,18 @@ public final class RouteFactory {
 
     private static List<RouteDefinition> processCamelContextElement(CamelContextFactoryBean camelContextFactoryBean, SwitchYardCamelContext camelContext) throws Exception {
         if (camelContext != null) {
-            // processing camelContext/endpoint
-            for (CamelEndpointFactoryBean epBean : camelContextFactoryBean.getEndpoints()) {
-                epBean.setCamelContext(camelContext);
-                camelContext.getWritebleRegistry().put(epBean.getId(), epBean.getObject());
+            if (camelContextFactoryBean.getEndpoints() != null) {
+                // processing camelContext/endpoint
+                for (CamelEndpointFactoryBean epBean : camelContextFactoryBean.getEndpoints()) {
+                    epBean.setCamelContext(camelContext);
+                    camelContext.getWritebleRegistry().put(epBean.getId(), epBean.getObject());
+                }
             }
-            // processing camelContext/dataFormat
-            for (DataFormatDefinition dataFormatDef : camelContextFactoryBean.getDataFormats().getDataFormats()) {
-                camelContext.getDataFormats().put(dataFormatDef.getId(), dataFormatDef);
+            if (camelContextFactoryBean.getDataFormats() != null) {
+                // processing camelContext/dataFormat
+                for (DataFormatDefinition dataFormatDef : camelContextFactoryBean.getDataFormats().getDataFormats()) {
+                    camelContext.getDataFormats().put(dataFormatDef.getId(), dataFormatDef);
+                }
             }
         }
         return camelContextFactoryBean.getRoutes();

@@ -56,7 +56,7 @@ public class MappedRecordContextMapper extends BaseRegexContextMapper<MappedReco
         for (Object obj : record.keySet()) {
             if (obj instanceof String) {
                 String key = (String) obj;
-                if (matches(key, _includeRegexes, new ArrayList<Pattern>())) {
+                if (matches(key, getIncludeRegexes(), new ArrayList<Pattern>())) {
                     context.setProperty(key, record.get(key), Scope.EXCHANGE);
                 }
             }
@@ -84,7 +84,7 @@ public class MappedRecordContextMapper extends BaseRegexContextMapper<MappedReco
                 record.setRecordShortDescription(value.toString());
             } else if (matches(name)) {
                 record.put(name, value);
-            } else if (matches(name, _includeRegexes, new ArrayList<Pattern>())) {
+            } else if (matches(name, getIncludeRegexes(), new ArrayList<Pattern>())) {
                 record.put(name, value);
             }
         }

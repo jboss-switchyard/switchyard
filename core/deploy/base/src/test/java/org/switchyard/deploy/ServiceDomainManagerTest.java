@@ -15,6 +15,7 @@
 package org.switchyard.deploy;
 
 import java.lang.management.ManagementFactory;
+import java.lang.reflect.Method;
 
 import javax.management.MBeanInfo;
 import javax.management.MBeanServer;
@@ -57,11 +58,14 @@ public class ServiceDomainManagerTest {
         
         QName serviceDomain = new QName(contextNamespace, contextName);
         
-        ServiceDomain domain = new ServiceDomainManager().createDomain(serviceDomain, switchyard);
+        ServiceDomainManager domainManager = new ServiceDomainManager();
+        ServiceDomain domain = domainManager.createDomain(serviceDomain, switchyard);
         
         MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
         
-        String mBeanContextName = ServiceDomainManager.sanitizeServiceQNameForMBean(serviceDomain);
+        Method method = ServiceDomainManager.class.getDeclaredMethod("sanitizeServiceQNameForMBean", QName.class);
+        method.setAccessible(true);
+        String mBeanContextName = (String) method.invoke(domainManager, serviceDomain);
         
         String objectNameString = MBEAN_PREFIX + mBeanContextName + MBEAN_INTERMEDIATE + '"' + mBeanContextName + '"';
         

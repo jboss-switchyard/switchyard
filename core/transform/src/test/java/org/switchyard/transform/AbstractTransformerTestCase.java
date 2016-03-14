@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.junit.Assert;
+import org.switchyard.ServiceDomain;
 import org.switchyard.common.type.Classes;
 import org.switchyard.config.model.ModelPuller;
 import org.switchyard.config.model.switchyard.SwitchYardModel;
@@ -31,7 +32,7 @@ import org.switchyard.transform.internal.TransformerRegistryLoader;
  */
 public abstract class AbstractTransformerTestCase {
 
-    protected Transformer getTransformer(String config) throws IOException {
+    protected Transformer<?,?> getTransformer(String config, ServiceDomain domain) throws IOException {
         InputStream swConfigStream = Classes.getResourceAsStream(config, getClass());
 
         if (swConfigStream == null) {
@@ -50,10 +51,18 @@ public abstract class AbstractTransformerTestCase {
         TransformModel transformModel = transforms.getTransforms().get(0);
 
         if (transformModel == null) {
-            Assert.fail("No smooks config.");
+            Assert.fail("No transformer config.");
         }
-        TransformerRegistryLoader trl = new TransformerRegistryLoader(new BaseTransformerRegistry());
+        TransformerRegistryLoader trl;
+        if (domain != null) {
+            trl = new TransformerRegistryLoader(domain);
+        } else {
+            trl = new TransformerRegistryLoader(new BaseTransformerRegistry());
+        }
         return trl.newTransformer(transformModel);
     }
 
+    protected Transformer<?,?> getTransformer(String config) throws IOException {
+        return getTransformer(config, null);
+    }
 }

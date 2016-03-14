@@ -18,8 +18,9 @@ package org.switchyard.common.property;
  * @author <a href="mailto:david.virgil.naranjo@gmail.com">david.virgil.naranjo@gmail.com</a>
  */
 public interface PropertyConstants {
-	/** The RTGOV resubmission header ID. **/
-	public static final String RTGOV_HEADER_RESUBMITTED_ID = "_rtgov_.*";
+    /** The RTGOV resubmission header ID. **/
+    public static final String RTGOV_HEADER_RESUBMITTED_ID = "_rtgov_.*";
+    /** The RTGOV resubmission header ID pattern. **/
     public static final String RTGOV_HEADER_RESUBMITTED_ID_PATTERN = "^" + RTGOV_HEADER_RESUBMITTED_ID + "$";
 
     /** The domain property propagate prefix constant. */

@@ -1,0 +1,9 @@
+<camelContext xmlns="http://camel.apache.org/schema/spring">
+    <endpoint id="transform" uri="direct:transform"/>
+    <route>
+        <from uri="direct:transform"/>
+        <setBody>
+            <simple>${body}-transformed</simple>
+        </setBody>
+    </route>
+</camelContext>

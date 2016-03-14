@@ -63,7 +63,7 @@ public class IndexedRecordContextMapper extends BaseRegexContextMapper<IndexedRe
                     if (strings.length >= 2) {
                         String key = strings[0];
                         String value = strings[1];
-                        if (matches(key, _includeRegexes, new ArrayList<Pattern>())) {
+                        if (matches(key, getIncludeRegexes(), new ArrayList<Pattern>())) {
                             context.setProperty(key, value, Scope.EXCHANGE);
                         }
                     }
@@ -93,7 +93,7 @@ public class IndexedRecordContextMapper extends BaseRegexContextMapper<IndexedRe
                 record.setRecordShortDescription(value.toString());
             } else if (matches(name)) {
                 record.add(name + "=" + value);
-            }  else if (matches(name, _includeRegexes, new ArrayList<Pattern>())) {
+            }  else if (matches(name, getIncludeRegexes(), new ArrayList<Pattern>())) {
                 record.add(name + "=" + value);
             }
         }

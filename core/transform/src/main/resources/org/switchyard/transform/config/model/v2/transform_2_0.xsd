@@ -229,4 +229,18 @@
     <complexType name="dozerFileEntryType">
         <attribute name="file" type="string" use="required"/>
     </complexType>
+
+    <element name="transform.camel" type="trfm:CamelTransformType" substitutionGroup="swyd:transform" />
+    <complexType name="CamelTransformType">
+        <annotation>
+            <documentation xml:lang="en">
+                Camel Transformer Configuration.
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="swyd:TransformType">
+                <attribute name="endpointUri" type="string" use="required"/>
+            </extension>
+        </complexContent>
+    </complexType>
 </schema>

@@ -31,11 +31,8 @@ import javax.xml.soap.SOAPMessage;
 import org.switchyard.Context;
 import org.switchyard.Property;
 import org.switchyard.Scope;
-import org.switchyard.ServiceDomain;
-import org.switchyard.ServiceReference;
 import org.switchyard.common.io.pull.ElementPuller;
 import org.switchyard.common.lang.Strings;
-import org.switchyard.common.property.PropertyConstants;
 import org.switchyard.common.xml.XMLHelper;
 import org.switchyard.component.common.composer.BaseRegexContextMapper;
 import org.switchyard.component.common.label.ComponentLabel;
@@ -57,9 +54,6 @@ public class SOAPContextMapper extends BaseRegexContextMapper<SOAPBindingData> {
      * The HTTP responce code.
      */
     public static final String HTTP_RESPONSE_STATUS = "http_response_status";
-
-    // Property used to get the Service Domain from the CompositeContext
-    private static final String SERVICE_REFERENCE_PROPERTY = "org.switchyard.bus.camel.consumer";
 
     /**
     * Headers to be excluded.
@@ -230,13 +224,13 @@ public class SOAPContextMapper extends BaseRegexContextMapper<SOAPBindingData> {
     }
 
     private void copySOAPHeadersToContext(Context context, String name, Object value) {
-        if (matches(name, _includeRegexes, new ArrayList<Pattern>())) {
+        if (matches(name, getIncludeRegexes(), new ArrayList<Pattern>())) {
             context.setProperty(name, value, Scope.EXCHANGE).addLabels(SOAP_HEADER_LABELS);
         }
     }
 
     private void copyToSOAPHeader(SOAPHeader soapHeader, Property property) throws IOException, SOAPException {
-        if ((property != null) && (matches(property.getName(), _includeRegexes, new ArrayList<Pattern>()))) {
+        if ((property != null) && (matches(property.getName(), getIncludeRegexes(), new ArrayList<Pattern>()))) {
             String v = property.getValue().toString();
             QName qname = new QName(HEADER_NAMESPACE_PROPAGATION, property.getName());
             if (SOAPHeadersType.XML.equals(_soapHeadersType)) {

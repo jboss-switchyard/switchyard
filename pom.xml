@@ -1343,6 +1343,11 @@
             </dependency>
             <dependency>
                 <groupId>org.switchyard.quickstarts</groupId>
+                <artifactId>switchyard-transform-datamapper</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.switchyard.quickstarts</groupId>
                 <artifactId>switchyard-transform-dozer</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -1394,6 +1399,11 @@
             <dependency>
                 <groupId>org.switchyard.quickstarts</groupId>
                 <artifactId>switchyard-camel-cxf-binding</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.switchyard.quickstarts</groupId>
+                <artifactId>switchyard-camel-dozer</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

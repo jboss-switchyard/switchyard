@@ -18,11 +18,13 @@ import java.util.List;
 
 import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.plugins.RuntimeGroup;
-import org.jboss.as.console.client.shared.state.ServerSelectionChanged;
 import org.jboss.as.console.client.shared.subsys.RevealStrategy;
+import org.jboss.as.console.client.v3.stores.domain.ServerStore;
 import org.jboss.as.console.spi.AccessControl;
 import org.jboss.as.console.spi.RuntimeExtension;
 import org.jboss.ballroom.client.layout.LHSHighlightEvent;
+import org.jboss.gwt.circuit.Action;
+import org.jboss.gwt.circuit.PropagatesChange;
 import org.switchyard.console.client.NameTokens;
 import org.switchyard.console.client.Singleton;
 import org.switchyard.console.client.model.MessageMetrics;
@@ -38,7 +40,6 @@ import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyCodeSplit;
 import com.gwtplatform.mvp.client.proxy.Place;
-import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.Proxy;
 import com.gwtplatform.mvp.client.proxy.ResetPresentersEvent;
 
@@ -49,8 +50,7 @@ import com.gwtplatform.mvp.client.proxy.ResetPresentersEvent;
  * 
  * @author Rob Cernich
  */
-public class MetricsPresenter extends Presenter<MetricsPresenter.MyView, MetricsPresenter.MyProxy> implements
-        ServerSelectionChanged.ChangeListener {
+public class MetricsPresenter extends Presenter<MetricsPresenter.MyView, MetricsPresenter.MyProxy> {
 
     /**
      * MyProxy
@@ -98,7 +98,7 @@ public class MetricsPresenter extends Presenter<MetricsPresenter.MyView, Metrics
         void clearMetrics();
     }
 
-    private final PlaceManager _placeManager;
+    private final ServerStore _serverStore;
     private final RevealStrategy _revealStrategy;
     private final SwitchYardStore _switchYardStore;
 
@@ -108,16 +108,16 @@ public class MetricsPresenter extends Presenter<MetricsPresenter.MyView, Metrics
      * @param eventBus the injected EventBus.
      * @param view the injected MyView.
      * @param proxy the injected MyProxy.
-     * @param placeManager the injected PlaceManager.
+     * @param serverStore the injected ServerStore.
      * @param revealStrategy the RevealStrategy
      * @param switchYardStore the injected SwitchYardStore.
      */
     @Inject
-    public MetricsPresenter(EventBus eventBus, MyView view, MyProxy proxy, PlaceManager placeManager,
+    public MetricsPresenter(EventBus eventBus, MyView view, MyProxy proxy, ServerStore serverStore,
             RevealStrategy revealStrategy, SwitchYardStore switchYardStore) {
         super(eventBus, view, proxy);
 
-        _placeManager = placeManager;
+        _serverStore = serverStore;
         _revealStrategy = revealStrategy;
         _switchYardStore = switchYardStore;
     }
@@ -159,24 +159,24 @@ public class MetricsPresenter extends Presenter<MetricsPresenter.MyView, Metrics
     }
 
     @Override
-    public void onServerSelectionChanged(boolean isRunning) {
-        getView().clearMetrics();
-
-        Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
-            @Override
-            public void execute() {
-                if (isVisible()) {
-                    loadMetrics();
-                }
-            }
-        });
-    }
-
-    @Override
     protected void onBind() {
         super.onBind();
         getView().setPresenter(this);
-        getEventBus().addHandler(ServerSelectionChanged.TYPE, this);
+        
+        _serverStore.addChangeHandler(new PropagatesChange.Handler() {
+            @Override
+            public void onChange(Action action) {
+                Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
+                    
+                    @Override
+                    public void execute() {
+                        if (isVisible()) {
+                            loadMetrics();
+                        }
+                    }
+                });
+            }
+        });
     }
 
     @Override

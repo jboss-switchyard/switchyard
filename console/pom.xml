@@ -31,8 +31,8 @@
         <url>http://github.com/jboss-switchyard/console</url>
     </scm>
     <properties>
-        <version.com.google.gwt>2.5.1</version.com.google.gwt>
-        <version.jbossas.console>2.2.8.Final</version.jbossas.console>
+        <version.com.google.gwt>2.6.1</version.com.google.gwt>
+        <version.com.gwtplatform>1.2.1</version.com.gwtplatform>
     </properties>
     <modules>
         <module>component</module>
@@ -42,17 +42,16 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.jboss.as</groupId>
-                <artifactId>jboss-as-console-bom</artifactId>
-                <version>${version.jbossas.console}</version>
-                <type>pom</type>
-                <scope>import</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.bsc.maven</groupId>
-                        <artifactId>maven-processor-plugin</artifactId>
-                    </exclusion>
-                </exclusions>
+                <groupId>com.gwtplatform</groupId>
+                <artifactId>gwtp-mvp-shared</artifactId>
+                <version>${version.com.gwtplatform}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.google.gwt</groupId>
+                <artifactId>gwt-user</artifactId>
+                <version>${version.com.google.gwt}</version>
+                <scope>provided</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -79,7 +78,7 @@
                         <configuration>
                             <rules>
                                 <requireJavaVersion>
-                                    <version>1.7</version>
+                                    <version>[1.7,)</version>
                                 </requireJavaVersion>
                                 <requireMavenVersion>
                                     <!-- Required by HAL build (app module) -->

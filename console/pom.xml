@@ -30,11 +30,6 @@
         <developerConnection>scm:git:ssh://git@github.com:jboss-switchyard/console.git</developerConnection>
         <url>http://github.com/jboss-switchyard/console</url>
     </scm>
-    <modules>
-        <module>component</module>
-        <module>gwt</module>
-        <module>app</module>
-    </modules>
     <build>
         <plugins>
             <plugin>
@@ -78,4 +73,26 @@
             </snapshots>
         </repository>
     </repositories>
+    <profiles>
+        <profile>
+            <id>wildfly</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <modules>
+                <module>wildfly</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>eap</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>component</module>
+                <module>gwt</module>
+                <module>app</module>
+            </modules>
+        </profile>
+    </profiles>
 </project>

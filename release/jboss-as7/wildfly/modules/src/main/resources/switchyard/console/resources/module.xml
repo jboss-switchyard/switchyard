@@ -17,7 +17,7 @@
 <module xmlns="urn:jboss:module:1.1" name="org.jboss.as.console" slot="main">
 
     <resources>
-        <resource-root path="switchyard-console-application-resources.jar"/>
+        <resource-root path="switchyard-console-wildfly-application-resources.jar"/>
         <!-- Insert resources here -->
     </resources>
 

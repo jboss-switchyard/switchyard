@@ -53,6 +53,7 @@
           resources, i.e. build is platform dependent! -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.org.jboss.as.console>2.5.11.Final</version.org.jboss.as.console>
+        <version.org.jboss.as.console.wildfly>2.8.18.Final</version.org.jboss.as.console.wildfly>
         <version.redhat.eap6.bom>6.4.4.GA</version.redhat.eap6.bom>
         <version.ip.bom>6.0.1.Final</version.ip.bom>
         <!-- This version is only used as a prefix for a jar included in release modules -->
@@ -1001,6 +1002,62 @@
                 <groupId>org.switchyard.console</groupId>
                 <artifactId>switchyard-console-extension</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.switchyard.console.wildfly</groupId>
+                <artifactId>switchyard-console-wildfly-application</artifactId>
+                <version>${version.org.jboss.as.console.wildfly}</version>
+                <classifier>resources</classifier>
+            </dependency>
+            <dependency>
+                <groupId>org.switchyard.console.wildfly</groupId>
+                <artifactId>switchyard-console-wildfly-component-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.switchyard.console.wildfly</groupId>
+                <artifactId>switchyard-console-wildfly-component-bean</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.switchyard.console.wildfly</groupId>
+                <artifactId>switchyard-console-wildfly-component-bpel</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.switchyard.console.wildfly</groupId>
+                <artifactId>switchyard-console-wildfly-component-bpm</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.switchyard.console.wildfly</groupId>
+                <artifactId>switchyard-console-wildfly-component-camel</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.switchyard.console.wildfly</groupId>
+                <artifactId>switchyard-console-wildfly-component-clojure</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.switchyard.console.wildfly</groupId>
+                <artifactId>switchyard-console-wildfly-component-hornetq</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.switchyard.console.wildfly</groupId>
+                <artifactId>switchyard-console-wildfly-component-rules</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.switchyard.console.wildfly</groupId>
+                <artifactId>switchyard-console-wildfly-component-soap</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.switchyard.console.wildfly</groupId>
+                <artifactId>switchyard-console-wildfly-extension</artifactId>
+                <version>${version.org.jboss.as.console.wildfly}</version>
             </dependency>
             <dependency>
                 <groupId>org.switchyard</groupId>

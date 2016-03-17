@@ -26,7 +26,7 @@
         <dependencySet>
             <useTransitiveDependencies>false</useTransitiveDependencies>
             <includes>
-                <include>org.switchyard.console:switchyard-console-application:jar:resources</include>
+                <include>org.switchyard.console.wildfly:switchyard-console-wildfly-application:jar:resources</include>
             </includes>
             <outputDirectory>/modules/system/layers/soa/org/jboss/as/console/main</outputDirectory>
             <outputFileNameMapping>${artifact.artifactId}-${artifact.classifier}.${artifact.extension}

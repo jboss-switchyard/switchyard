@@ -95,8 +95,8 @@
             <artifactId>switchyard-deploy-wildfly</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.switchyard.console</groupId>
-            <artifactId>switchyard-console-application</artifactId>
+            <groupId>org.switchyard.console.wildfly</groupId>
+            <artifactId>switchyard-console-wildfly-application</artifactId>
             <classifier>resources</classifier>
         </dependency>
         <dependency>

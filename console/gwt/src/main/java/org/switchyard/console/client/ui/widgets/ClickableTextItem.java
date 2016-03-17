@@ -36,6 +36,8 @@ public class ClickableTextItem<T> extends FormItem<T> {
      * Provides services for retrieving the display text and link token for the
      * current field value.
      * 
+     * @param <T> the value type managed by this object.
+     * 
      * @author Rob Cernich
      */
     public interface ValueAdapter<T> {

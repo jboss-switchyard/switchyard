@@ -18,6 +18,7 @@
     </resources>
     <dependencies>
         <module name="javax.api"/>
+        <module name="javax.activation.api"/>
         <module name="javax.ws.rs.api"/>
         <module name="org.jboss.logging"/>
 

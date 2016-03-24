@@ -13,12 +13,12 @@
  */
 package org.switchyard.common.camel;
 
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 import javax.xml.bind.Binder;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -40,6 +40,9 @@ import org.xml.sax.InputSource;
  */
 public final class CamelModelFactory {
 
+    private static final String NS_SPRING = "http://www.springframework.org/schema/beans";
+    private static final String NS_CAMEL_SPRING = "http://camel.apache.org/schema/spring";
+    
     /**
      * JAXB context for reading XML definitions.
      */
@@ -47,9 +50,9 @@ public final class CamelModelFactory {
 
     static {
         try {
-            JAXB_CONTEXT = JAXBContext.newInstance(Constants.JAXB_CONTEXT_PACKAGES
-                            + SpringModelJAXBContextFactory.ADDITIONAL_JAXB_CONTEXT_PACKAGES
-                            , SpringModelJAXBContextFactory.class.getClassLoader());
+            JAXB_CONTEXT = JAXBContext.newInstance(
+                    Constants.JAXB_CONTEXT_PACKAGES + SpringModelJAXBContextFactory.ADDITIONAL_JAXB_CONTEXT_PACKAGES,
+                    SpringModelJAXBContextFactory.class.getClassLoader());
         } catch (JAXBException e) {
             throw new SwitchYardException(e);
         }
@@ -73,7 +76,7 @@ public final class CamelModelFactory {
     public static Object createCamelModelObjectFromXML(String xmlPath) throws Exception {
         InputStream input = Classes.getResourceAsStream(xmlPath);
         if (input == null) {
-            throw new FileNotFoundException(xmlPath);
+            throw CommonCamelMessages.MESSAGES.specifiedCamelContextFileIsNotFound(xmlPath);
         }
         
         InputSource source =  new InputSource(input);
@@ -82,10 +85,43 @@ public final class CamelModelFactory {
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document document = builder.parse(source);
         Element element = document.getDocumentElement();
+        Element camelModelElement = findCamelModelElement(element, xmlPath);
+        if (camelModelElement == null) {
+            throw CommonCamelMessages.MESSAGES.noCamelContextElementFound(xmlPath);
+        }
+        
         Binder<Node> binder = JAXB_CONTEXT.createBinder();
-        Object obj = binder.unmarshal(element);
-        injectNamespaces(element, binder);
+        Object obj = binder.unmarshal(camelModelElement);
+        injectNamespaces(camelModelElement, binder);
         return obj;
+    }
+    
+    private static Element findCamelModelElement(Element top, String xmlPath) {
+        if (top.getNamespaceURI().equals(NS_SPRING) && top.getNodeName().equals("beans")) {
+            Element camelContext = null;
+            NodeList list = top.getChildNodes();
+            for (int i=0; i<list.getLength(); i++) {
+                Node node = list.item(i);
+                if (node.getNodeType() != Node.ELEMENT_NODE) {
+                    continue;
+                }
+                
+                Element element = (Element)node;
+                if (element.getNamespaceURI().equals(NS_CAMEL_SPRING)
+                        && element.getNodeName().equals("camelContext")) {
+                    if (camelContext == null) {
+                        camelContext = element;
+                    } else {
+                        CommonCamelLogger.ROOT_LOGGER.ignoringMultipleCamelContextElement(xmlPath);
+                    }
+                } else {
+                    CommonCamelLogger.ROOT_LOGGER.ignoringUnsupportedElement(xmlPath, new QName(element.getNamespaceURI(), element.getNodeName()));
+                }
+            }
+            return camelContext != null ? camelContext : null;
+        }
+        // Assuming anything other than spring <beans> is a camel model object
+        return top;
     }
     
     private static void injectNamespaces(Element element, Binder<Node> binder) {

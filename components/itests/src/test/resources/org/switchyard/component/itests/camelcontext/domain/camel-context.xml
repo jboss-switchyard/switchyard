@@ -1,32 +1,40 @@
-<camelContext xmlns="http://camel.apache.org/schema/spring"
-                id="foobar-camel-context"
-                allowUseOriginalMessage="false"
-                streamCache="true"
-                trace="true"
-                errorHandlerRef="foobarErrorHandler"
-                useMDCLogging="true">
-    
-    <properties>
-        <property key="abc" value="xyz"/>
-    </properties>
-    
-    <jmxAgent id="foobar-jmx-agent" statisticsLevel="RoutesOnly"/>
-    
-    <endpoint id="foobar-endpoint" uri="direct:foobar"/>
-    
-    <dataFormats>
-        <json id="transform-json" library="Jackson"/>
-    </dataFormats>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+             http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+             http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
 
-    <route id="foobar-consumer">
-        <from uri="direct:input"/>
-        <to ref="foobar-endpoint"/>
-    </route>
-    
-    <route id="foobar-provider">
-        <from uri="direct:foobar"/>
-        <log message="##### received a message! - [${body}] #####"/>
-        <to uri="mock:output"/>
-    </route>
-    
-</camelContext>
+    <camelContext xmlns="http://camel.apache.org/schema/spring"
+                    id="foobar-camel-context"
+                    allowUseOriginalMessage="false"
+                    streamCache="true"
+                    trace="true"
+                    errorHandlerRef="foobarErrorHandler"
+                    useMDCLogging="true">
+        
+        <properties>
+            <property key="abc" value="xyz"/>
+        </properties>
+        
+        <jmxAgent id="foobar-jmx-agent" statisticsLevel="RoutesOnly"/>
+        
+        <endpoint id="foobar-endpoint" uri="direct:foobar"/>
+        
+        <dataFormats>
+            <json id="transform-json" library="Jackson"/>
+        </dataFormats>
+        
+        <route id="foobar-consumer">
+            <from uri="direct:input"/>
+            <to ref="foobar-endpoint"/>
+        </route>
+        
+        <route id="foobar-provider">
+            <from uri="direct:foobar"/>
+            <log message="##### received a message! - [${body}] #####"/>
+            <to uri="mock:output"/>
+        </route>
+        
+    </camelContext>
+</beans>

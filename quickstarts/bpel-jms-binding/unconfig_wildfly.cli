@@ -1,0 +1,6 @@
+if (outcome == success) of /subsystem=messaging-activemq/server=default/jms-queue=HelloRequestQueue:read-resource
+    /subsystem=messaging-activemq/server=default/jms-queue=HelloRequestQueue:remove
+end-if
+if (outcome == success) of /subsystem=messaging-activemq/server=default/jms-queue=HelloReplyQueue:read-resource
+    /subsystem=messaging-activemq/server=default/jms-queue=HelloReplyQueue:remove
+end-if

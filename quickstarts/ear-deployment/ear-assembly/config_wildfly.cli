@@ -1,0 +1,4 @@
+if (outcome != success) of /subsystem=messaging-activemq/server=default/jms-queue=EAROrderRequestQueue:read-resource
+    /subsystem=messaging-activemq/server=default/jms-queue=EAROrderRequestQueue:add(entries=[EAROrderRequestQueue])
+    /subsystem=messaging-activemq/server=default/jms-queue=EAROrderReplyQueue:add(entries=[EAROrderReplyQueue])
+end-if

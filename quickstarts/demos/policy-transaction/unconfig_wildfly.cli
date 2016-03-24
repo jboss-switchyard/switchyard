@@ -1,0 +1,27 @@
+if (outcome == success) of /subsystem=messaging-activemq/server=default/jms-queue=policyQSTransacted:read-resource
+    /subsystem=messaging-activemq/server=default/jms-queue=policyQSTransacted:remove
+end-if
+if (outcome == success) of /subsystem=messaging-activemq/server=default/jms-queue=policyQSNonTransacted:read-resource
+    /subsystem=messaging-activemq/server=default/jms-queue=policyQSNonTransacted:remove
+end-if
+if (outcome == success) of /subsystem=messaging-activemq/server=default/jms-queue=queueA:read-resource
+    /subsystem=messaging-activemq/server=default/jms-queue=queueA:remove
+end-if
+if (outcome == success) of /subsystem=messaging-activemq/server=default/jms-queue=queueB:read-resource
+    /subsystem=messaging-activemq/server=default/jms-queue=queueB:remove
+end-if
+if (outcome == success) of /subsystem=messaging-activemq/server=default/jms-queue=queueC:read-resource
+    /subsystem=messaging-activemq/server=default/jms-queue=queueC:remove
+end-if
+if (outcome == success) of /subsystem=messaging-activemq/server=default/pooled-connection-factory=hornetq-ra-in:read-resource
+    /subsystem=messaging-activemq/server=default/pooled-connection-factory=hornetq-ra-in:remove
+end-if
+if (outcome == success) of /subsystem=messaging-activemq/server=default/pooled-connection-factory=hornetq-ra-out-a:read-resource
+    /subsystem=messaging-activemq/server=default/pooled-connection-factory=hornetq-ra-out-a:remove
+end-if
+if (outcome == success) of /subsystem=messaging-activemq/server=default/pooled-connection-factory=hornetq-ra-out-b:read-resource
+    /subsystem=messaging-activemq/server=default/pooled-connection-factory=hornetq-ra-out-b:remove
+end-if
+if (outcome == success) of /subsystem=messaging-activemq/server=default/pooled-connection-factory=hornetq-ra-out-c:read-resource
+    /subsystem=messaging-activemq/server=default/pooled-connection-factory=hornetq-ra-out-c:remove
+end-if

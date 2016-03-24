@@ -23,7 +23,7 @@ sh% mvn -Deap.home=<PATH-TO-EAP-HOME> -Peap clean install
 ## What versions of the containers are supported currently?
 
 EAP : 6.4.x
-WildFly : 10.0.0.CR4
+WildFly : 10.0.0.Final
 Karaf : 2.4.0.Final
 
 ## How do I install my build of SwitchYard into a container?

@@ -41,9 +41,9 @@ EAP
 
 Wildfly
 ----------
-1. Start Wildfly in standalone-full mode:
+1. Start Wildfly in standalone-full mode - don't forget to add resource adapter name via system property:
 
-        ${AS}/bin/standalone.sh -server-config standalone-full.xml
+        ${AS}/bin/standalone.sh -server-config standalone-full.xml -Dorg.switchyard.quickstarts.jca.resourceAdapterName=activemq-ra.rar
 
 2. Create an application user:
 

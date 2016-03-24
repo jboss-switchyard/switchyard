@@ -77,9 +77,12 @@ public class HornetQMixIn extends AbstractTestMixIn {
     private static final String HOST_PROP_NAME = "hornetqmixin.host";
     private static final String PORT_PROP_NAME = "hornetqmixin.port";
     private static final String HTTP_UPGRADE_ENABLED_PROP_NAME = "hornetqmixin.http.upgrade.enabled";
+    private static final String HTTP_UPGRADE_ENDPOINT_PROP_NAME = "hornetqmixin.http.upgrade.endpoint";
     // TODO Use TransportConstants.HTTP_UPGRADE_ENABLED_PROP_NAME instead once we upgrade to HornetQ 2.4.x
     private static final String HORNETQ_HTTP_UPGRADE_ENABLED_PROP_NAME = "http-upgrade-enabled";
-
+    private static final String HORNETQ_HTTP_UPGRADE_ENDPOINT_PROP_NAME = "http-upgrade-endpoint";
+    private static final String HORNETQ_DEFAULT_HTTP_UPGRADE_ENDPOINT = "http-acceptor";
+    
     private Logger _logger = Logger.getLogger(HornetQMixIn.class);
     private boolean _startEmbedded;
     private Map<String,Object> _transportParams;
@@ -122,6 +125,9 @@ public class HornetQMixIn extends AbstractTestMixIn {
         String upgrade = System.getProperty(HTTP_UPGRADE_ENABLED_PROP_NAME);
         if (upgrade != null) {
             _transportParams.put(HORNETQ_HTTP_UPGRADE_ENABLED_PROP_NAME, upgrade);
+            String endpoint = System.getProperty(HTTP_UPGRADE_ENDPOINT_PROP_NAME);
+            _transportParams.put(HORNETQ_HTTP_UPGRADE_ENDPOINT_PROP_NAME,
+                    endpoint != null ? endpoint : HORNETQ_DEFAULT_HTTP_UPGRADE_ENDPOINT);
         }
     }
     
@@ -168,6 +174,19 @@ public class HornetQMixIn extends AbstractTestMixIn {
      */
     public HornetQMixIn setHttpUpgradeEnabled(boolean upgrade) {
         _transportParams.put(HORNETQ_HTTP_UPGRADE_ENABLED_PROP_NAME, upgrade);
+        if (_transportParams.get(HORNETQ_HTTP_UPGRADE_ENDPOINT_PROP_NAME) == null) {
+            setHttpUpgradeEndpoint(HORNETQ_DEFAULT_HTTP_UPGRADE_ENDPOINT);
+        }
+        return this;
+    }
+
+    /**
+     * Set http-upgrade-endpoint.
+     * @param endpoint http-upgrade-endpoint
+     * @return this instance
+     */
+    public HornetQMixIn setHttpUpgradeEndpoint(String endpoint) {
+        _transportParams.put(HORNETQ_HTTP_UPGRADE_ENDPOINT_PROP_NAME, endpoint);
         return this;
     }
 

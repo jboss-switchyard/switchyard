@@ -2,10 +2,10 @@ if (outcome == success) of /subsystem=undertow/server=default-server/https-liste
     /subsystem=undertow/server=default-server/https-listener=https/:remove
     /core-service=management/security-realm=https/:remove
 end-if
-if (outcome == success) of /subsystem=messaging/hornetq-server=default/jms-queue=WorkStoreQueue:read-resource
-    jms-queue remove --queue-address=WorkStoreQueue
+if (outcome == success) of /subsystem=messaging-activemq/server=default/jms-queue=WorkStoreQueue:read-resource
+    /subsystem=messaging-activemq/server=default/jms-queue=WorkStoreQueue:remove
 end-if
-if (outcome == success) of /subsystem=messaging/hornetq-server=default/jms-queue=WorkAckStoreQueue:read-resource
-    jms-queue remove --queue-address=WorkAckStoreQueue
+if (outcome == success) of /subsystem=messaging-activemq/server=default/jms-queue=WorkAckStoreQueue:read-resource
+    /subsystem=messaging-activemq/server=default/jms-queue=WorkAckStoreQueue:remove
 end-if
 :reload

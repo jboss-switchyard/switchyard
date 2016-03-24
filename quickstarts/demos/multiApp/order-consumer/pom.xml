@@ -31,7 +31,9 @@
         </license>
     </licenses>
     <properties>
-        <version.wildfly.hornetq>2.4.1.Final</version.wildfly.hornetq>
+        <config.file>config.cli</config.file>
+        <unconfig.file>unconfig.cli</unconfig.file>
+        <version.wildfly.hornetq>2.4.7.Final</version.wildfly.hornetq>
     </properties>
     <dependencies>
         <dependency>
@@ -132,7 +134,7 @@
                         <configuration>
                             <beforeDeployment>
                                 <scripts>
-                                    <script>config.cli</script>
+                                    <script>${config.file}</script>
                                 </scripts>
                             </beforeDeployment>
                             <filename>${project.build.finalName}.jar</filename>
@@ -148,7 +150,7 @@
                         <configuration>
                             <afterDeployment>
                                 <scripts>
-                                    <script>unconfig.cli</script>
+                                    <script>${unconfig.file}</script>
                                 </scripts>
                             </afterDeployment>
                             <filename>${project.build.finalName}.jar</filename>
@@ -177,6 +179,8 @@
             <properties>
                 <hornetqmixin.http.upgrade.enabled>true</hornetqmixin.http.upgrade.enabled>
                 <hornetqmixin.port>8080</hornetqmixin.port>
+                <config.file>config_wildfly.cli</config.file>
+                <unconfig.file>unconfig_wildfly.cli</unconfig.file>
             </properties>
             <dependencies>
                 <dependency>

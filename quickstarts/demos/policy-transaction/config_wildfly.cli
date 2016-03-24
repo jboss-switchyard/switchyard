@@ -1,0 +1,27 @@
+if (outcome != success) of /subsystem=messaging-activemq/server=default/jms-queue=policyQSTransacted:read-resource
+    /subsystem=messaging-activemq/server=default/jms-queue=policyQSTransacted:add(entries=[policyQSTransacted],durable=false)
+end-if
+if (outcome != success) of /subsystem=messaging-activemq/server=default/jms-queue=policyQSNonTransacted:read-resource
+    /subsystem=messaging-activemq/server=default/jms-queue=policyQSNonTransacted:add(entries=[policyQSNonTransacted],durable=false)
+end-if
+if (outcome != success) of /subsystem=messaging-activemq/server=default/jms-queue=queueA:read-resource
+    /subsystem=messaging-activemq/server=default/jms-queue=queueA:add(entries=[queueA],durable=false)
+end-if
+if (outcome != success) of /subsystem=messaging-activemq/server=default/jms-queue=queueB:read-resource
+    /subsystem=messaging-activemq/server=default/jms-queue=queueB:add(entries=[queueB],durable=false)
+end-if
+if (outcome != success) of /subsystem=messaging-activemq/server=default/jms-queue=queueC:read-resource
+    /subsystem=messaging-activemq/server=default/jms-queue=queueC:add(entries=[queueC],durable=false)
+end-if
+if (outcome != success) of /subsystem=messaging-activemq/server=default/pooled-connection-factory=hornetq-ra-in:read-resource
+    /subsystem=messaging-activemq/server=default/pooled-connection-factory=hornetq-ra-in:add(transaction=xa,connectors=["in-vm"],entries=["java:/JmsXAIn"])
+end-if
+if (outcome != success) of /subsystem=messaging-activemq/server=default/pooled-connection-factory=hornetq-ra-out-a:read-resource
+    /subsystem=messaging-activemq/server=default/pooled-connection-factory=hornetq-ra-out-a:add(transaction=xa,connectors=["in-vm"],entries=["java:/JmsXAOutA"])
+end-if
+if (outcome != success) of /subsystem=messaging-activemq/server=default/pooled-connection-factory=hornetq-ra-out-b:read-resource
+    /subsystem=messaging-activemq/server=default/pooled-connection-factory=hornetq-ra-out-b:add(transaction=xa,connectors=["in-vm"],entries=["java:/JmsXAOutB"])
+end-if
+if (outcome != success) of /subsystem=messaging-activemq/server=default/pooled-connection-factory=hornetq-ra-out-c:read-resource
+    /subsystem=messaging-activemq/server=default/pooled-connection-factory=hornetq-ra-out-c:add(transaction=xa,connectors=["in-vm"],entries=["java:/JmsXAOutC"])
+end-if

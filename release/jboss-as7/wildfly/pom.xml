@@ -25,7 +25,9 @@
     <name>SwitchYard: Wildfly Standalone Parent</name>
     <description>SwitchYard Wildfly Standalone Parent</description>
     <properties>
-        <version.wildfly>10.0.0.CR4</version.wildfly>
+        <version.wildfly>10.0.0.Final</version.wildfly>
+        <version.wildfly.hornetq>2.4.7.Final</version.wildfly.hornetq>
+        <version.wildfly.hornetq.client.netty>4.0.13.Final</version.wildfly.hornetq.client.netty>
         <!-- Required for the module.xml file generation. -->
         <version.io.netty>3.6.10.Final</version.io.netty>
         <!-- Overridden version settings. -->
@@ -67,6 +69,35 @@
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpcore</artifactId>
                 <version>${version.org.apache.httpcomponents.httpcore}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.switchyard.components</groupId>
+                <artifactId>switchyard-component-test-mixin-hornetq</artifactId>
+                <scope>test</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.jboss.as</groupId>
+                        <artifactId>jboss-as-naming</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.hornetq</groupId>
+                <artifactId>hornetq-server</artifactId>
+                <version>${version.wildfly.hornetq}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.hornetq</groupId>
+                <artifactId>hornetq-jms-server</artifactId>
+                <version>${version.wildfly.hornetq}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-all</artifactId>
+                <version>${version.wildfly.hornetq.client.netty}</version>
+                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -1,0 +1,4 @@
+if (outcome == success) of /subsystem=messaging-activemq/server=default/jms-queue=EAROrderRequestQueue:read-resource
+    /subsystem=messaging-activemq/server=default/jms-queue=EAROrderRequestQueue:remove
+    /subsystem=messaging-activemq/server=default/jms-queue=EAROrderReplyQueue:remove
+end-if

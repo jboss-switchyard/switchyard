@@ -1,0 +1,6 @@
+if (outcome != success) of /subsystem=messaging-activemq/server=default/jms-queue=OrderRequestQueue:read-resource
+    /subsystem=messaging-activemq/server=default/jms-queue=OrderRequestQueue:add(entries=[OrderRequestQueue])
+end-if
+if (outcome != success) of /subsystem=messaging-activemq/server=default/jms-queue=OrderReplyQueue:read-resource
+    /subsystem=messaging-activemq/server=default/jms-queue=OrderReplyQueue:add(entries=[OrderReplyQueue])
+end-if

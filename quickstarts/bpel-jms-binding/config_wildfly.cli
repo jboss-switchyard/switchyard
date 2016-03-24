@@ -1,0 +1,6 @@
+if (outcome != success) of /subsystem=messaging-activemq/server=default/jms-queue=HelloRequestQueue:read-resource
+    /subsystem=messaging-activemq/server=default/jms-queue=HelloRequestQueue:add(entries=[HelloRequestQueue])
+end-if
+if (outcome != success) of /subsystem=messaging-activemq/server=default/jms-queue=HelloReplyQueue:read-resource
+    /subsystem=messaging-activemq/server=default/jms-queue=HelloReplyQueue:add(entries=[HelloReplyQueue])
+end-if

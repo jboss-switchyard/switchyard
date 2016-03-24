@@ -30,7 +30,7 @@
         </license>
     </licenses>
     <properties>
-        <version.wildfly.hornetq>2.4.1.Final</version.wildfly.hornetq>
+        <version.wildfly.hornetq>2.4.7.Final</version.wildfly.hornetq>
     </properties>
     <dependencies>
         <dependency>

@@ -38,10 +38,6 @@
         </dependency>
         <dependency>
             <groupId>org.hornetq</groupId>
-            <artifactId>hornetq-ra</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.hornetq</groupId>
             <artifactId>hornetq-commons</artifactId>
         </dependency>
         <dependency>

@@ -13,7 +13,6 @@
  */
 package org.switchyard.test.quickstarts.util;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -32,7 +31,7 @@ import org.jboss.dmr.ModelNode;
  */
 public class ResourceDeployer {
     
-    public static final String DEFAULT_HOST = "localhost";
+    public static final String DEFAULT_HOST = "127.0.0.1";
     public static final int DEFAULT_PORT = 9999;
     public static final String USER = "guest";
     public static final String PASSWD = "Guestp123!";

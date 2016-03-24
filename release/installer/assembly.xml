@@ -46,6 +46,10 @@
             <outputDirectory>${installer.root.dir}/res</outputDirectory>
         </file>
         <file>
+            <source>${bundle.dir}/xsl/host.xsl</source>
+            <outputDirectory>${installer.root.dir}/res</outputDirectory>
+        </file>
+        <file>
             <source>${bundle.dir}/xsl/jbossws-spi_module.xsl</source>
             <outputDirectory>${installer.root.dir}/res</outputDirectory>
         </file>

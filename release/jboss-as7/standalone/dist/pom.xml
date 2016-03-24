@@ -275,6 +275,14 @@
                             <outputDir>${staging.jboss.dir}/domain/configuration</outputDir>
                             <stylesheet>${staging.jboss.dir}/xsl/domain.xsl</stylesheet>
                         </transformationSet>
+                        <transformationSet>
+                            <dir>src/main/resources</dir>
+                            <includes>
+                                <include>host.xml</include>
+                            </includes>
+                            <outputDir>${staging.jboss.dir}/domain/configuration</outputDir>
+                            <stylesheet>${staging.jboss.dir}/xsl/host.xsl</stylesheet>
+                        </transformationSet>
                     </transformationSets>
                 </configuration>
             </plugin>

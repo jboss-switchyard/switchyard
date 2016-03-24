@@ -108,6 +108,12 @@
             includes="domain.xml">
             <factory name="${xsltFactoryClass}"/>
         </xslt>
+        <xslt style="res/host.xsl"
+            basedir="${EAP_PATH}/domain/configuration"
+            destdir="${EAP_PATH}/domain/configuration"
+            includes="host.xml">
+            <factory name="${xsltFactoryClass}"/>
+        </xslt>
         <move overwrite="true" todir="${INSTALL_PATH}/domain/configuration">
             <filelist dir="${EAP_PATH}/domain/configuration">
                 <file name="domain.html"/>

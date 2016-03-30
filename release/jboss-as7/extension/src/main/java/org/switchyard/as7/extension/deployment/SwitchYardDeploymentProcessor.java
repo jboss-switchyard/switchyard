@@ -181,6 +181,8 @@ public class SwitchYardDeploymentProcessor implements DeploymentUnitProcessor {
 
         switchyardServiceBuilder.addDependency(DependencyType.OPTIONAL, CacheService.getServiceName("cluster", null));
 
+        // This will fail when the there are more hornetq servers added different than the default one.
+        switchyardServiceBuilder.addDependency(DependencyType.OPTIONAL, ServiceName.of("jboss.messaging.default"));
         switchyardServiceBuilder.setInitialMode(Mode.ACTIVE);
         switchyardServiceBuilder.install();
     }

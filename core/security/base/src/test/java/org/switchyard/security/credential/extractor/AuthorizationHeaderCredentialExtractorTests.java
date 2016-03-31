@@ -15,10 +15,10 @@ package org.switchyard.security.credential.extractor;
 
 import java.util.Set;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 import org.switchyard.common.io.pull.StringPuller;
+import org.switchyard.security.credential.AuthorizationTokenCredential;
 import org.switchyard.security.credential.Credential;
 import org.switchyard.security.credential.NameCredential;
 import org.switchyard.security.credential.PasswordCredential;
@@ -33,6 +33,7 @@ public class AuthorizationHeaderCredentialExtractorTests {
     private static final String BASE_PATH = "/org/switchyard/security/credential/extractor/AuthorizationHeaderCredentialExtractorTests-";
     private static final String BASIC_TXT = BASE_PATH + "Basic.txt";
     private static final String DIGEST_TXT = BASE_PATH + "Digest.txt";
+    private static final String BEARER_TXT = BASE_PATH + "Bearer.txt";
 
     @Test
     public void testBasic() throws Exception {
@@ -80,4 +81,15 @@ public class AuthorizationHeaderCredentialExtractorTests {
         // TODO: complete per SWITCHYARD-1082
     }
 
+    @Test
+    public void testBearer() throws Exception {
+        String source = new StringPuller().pull(BEARER_TXT, AuthorizationHeaderCredentialExtractorTests.class);
+        Set<Credential> creds = new AuthorizationHeaderCredentialExtractor().extract(source);
+        Assert.assertEquals(1, creds.size());
+        Credential credential = creds.iterator().next();
+        Assert.assertEquals(AuthorizationTokenCredential.class, credential.getClass());
+        AuthorizationTokenCredential authzTokenCredential = (AuthorizationTokenCredential)credential;
+        Assert.assertEquals("Bearer", authzTokenCredential.getSchema());
+        Assert.assertEquals("mytoken-0123456789", authzTokenCredential.getToken());
+    }
 }

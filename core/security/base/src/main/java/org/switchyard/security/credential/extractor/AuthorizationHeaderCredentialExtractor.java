@@ -23,6 +23,7 @@ import java.util.Set;
 import org.switchyard.common.codec.Base64;
 import org.switchyard.common.lang.Strings;
 import org.switchyard.security.BaseSecurityLogger;
+import org.switchyard.security.credential.AuthorizationTokenCredential;
 import org.switchyard.security.credential.Credential;
 import org.switchyard.security.credential.NameCredential;
 import org.switchyard.security.credential.PasswordCredential;
@@ -84,45 +85,65 @@ public class AuthorizationHeaderCredentialExtractor implements CredentialExtract
         Set<Credential> credentials = new HashSet<Credential>();
         if (source != null) {
             if (source.startsWith("Basic ")) {
-                String encoded = source.substring(6, source.length());
-                String decoded = Base64.decodeToString(encoded, _charset);
-                if (decoded.indexOf(':') != -1) {
-                    String[] split = decoded.split(":", 2);
-                    String name = split.length > 0 ? split[0] : null;
-                    if (name != null) {
-                        credentials.add(new NameCredential(name));
-                    }
-                    String password = split.length > 1 ? split[1] : null;
-                    if (password != null) {
-                        credentials.add(new PasswordCredential(password));
-                    }
-                }
+                extractBasic(source, credentials);
             } else if (source.startsWith("Digest ")) {
-                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                // https://issues.jboss.org/browse/SWITCHYARD-1082
-                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                Map<String,String> map = new HashMap<String,String>();
-                String everything = source.substring(6, source.length()).trim();
-                List<String> list = Strings.splitTrimToNull(everything, ",\n");
-                for (String pair : list) {
-                    String[] split = pair.split("=", 2);
-                    String key = split.length > 0 ? split[0] : null;
-                    String value = split.length > 1 ? split[1] : null;
-                    if (key != null && value != null) {
-                        if (value.startsWith("\"") && value.endsWith("\"")) {
-                            value = value.substring(1, value.length() - 1);
-                        }
-                        map.put(key, value);
-                    }
-                }
-                String username = map.get("username");
-                if (username != null) {
-                    credentials.add(new NameCredential(username));
-                }
-                // TODO: complete per SWITCHYARD-1082
+                extractDigest(source, credentials);
+            } else {
+                // Assuming it's a authz token like Bearer, token, AWS4-HMAC-SHA256
+                extractAuthorizationToken(source, credentials);
             }
         }
         return credentials;
     }
-
+    
+    private void extractBasic(String source, Set<Credential> credentials) {
+        String encoded = source.substring(6, source.length());
+        String decoded = Base64.decodeToString(encoded, _charset);
+        if (decoded.indexOf(':') != -1) {
+            String[] split = decoded.split(":", 2);
+            String name = split.length > 0 ? split[0] : null;
+            if (name != null) {
+                credentials.add(new NameCredential(name));
+            }
+            String password = split.length > 1 ? split[1] : null;
+            if (password != null) {
+                credentials.add(new PasswordCredential(password));
+            }
+        }
+    }
+    
+    private void extractDigest(String source, Set<Credential> credentials) {
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // https://issues.jboss.org/browse/SWITCHYARD-1082
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        Map<String,String> map = new HashMap<String,String>();
+        String everything = source.substring(6, source.length()).trim();
+        List<String> list = Strings.splitTrimToNull(everything, ",\n");
+        for (String pair : list) {
+            String[] split = pair.split("=", 2);
+            String key = split.length > 0 ? split[0] : null;
+            String value = split.length > 1 ? split[1] : null;
+            if (key != null && value != null) {
+                if (value.startsWith("\"") && value.endsWith("\"")) {
+                    value = value.substring(1, value.length() - 1);
+                }
+                map.put(key, value);
+            }
+        }
+        String username = map.get("username");
+        if (username != null) {
+            credentials.add(new NameCredential(username));
+        }
+        // TODO: complete per SWITCHYARD-1082
+    }
+    
+    private void extractAuthorizationToken(String source, Set<Credential> credentials) {
+        source = source.trim();
+        int space = source.indexOf(' ');
+        if (space != -1) {
+            String schema = source.substring(0, space);
+            String token = source.substring(space+1, source.length());
+            credentials.add(new AuthorizationTokenCredential(schema, token));
+        }
+    }
 }

@@ -17,6 +17,7 @@ package org.switchyard.component.resteasy;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletRequest;
 import javax.ws.rs.WebApplicationException;
 
 import org.switchyard.Exchange;
@@ -120,6 +121,14 @@ public class InboundHandler extends BaseServiceHandler {
         // identify ourselves
         exchange.getContext().setProperty(ExchangeCompletionEvent.GATEWAY_NAME, _gatewayName, Scope.EXCHANGE)
                 .addLabels(BehaviorLabel.TRANSIENT.label());
+
+        ServletRequest servletRequest = restMessageRequest.getServletRequest();
+        if (servletRequest != null) {
+            String encoding = servletRequest.getCharacterEncoding();
+            if (encoding != null) {
+                exchange.getContext().setProperty(org.apache.camel.Exchange.CHARSET_NAME, encoding, Scope.EXCHANGE);
+            }
+        }
 
         _securityContextManager.addCredentials(exchange, restMessageRequest.extractCredentials());
 

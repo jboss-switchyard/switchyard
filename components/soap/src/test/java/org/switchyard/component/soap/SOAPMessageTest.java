@@ -13,10 +13,13 @@
  */
 package org.switchyard.component.soap;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.switchyard.Exchange;
+import org.switchyard.bus.camel.CamelExchange;
 import org.switchyard.component.test.mixins.http.HTTPMixIn;
 import org.switchyard.test.MockHandler;
 import org.switchyard.test.SwitchYardRunner;
@@ -88,6 +91,8 @@ public class SOAPMessageTest {
     public void toSOAP12Endpoint_soap12() {
         _mock.replyWithOut(RESPONSE);
         _httpMixIn.postResourceAndTestXML(SOAP12_ENDPOINT, "soap12-request.xml", "soap12-response.xml");
+        CamelExchange ex = (CamelExchange)_mock.getMessages().poll();
+        Assert.assertEquals("UTF-8", ex.getExchange().getProperty(org.apache.camel.Exchange.CHARSET_NAME));
     }
 
     @Ignore

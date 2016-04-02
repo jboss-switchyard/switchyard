@@ -35,6 +35,7 @@ import org.jboss.com.sun.net.httpserver.HttpServer;
 import org.switchyard.Exchange;
 import org.switchyard.Message;
 import org.switchyard.ServiceDomain;
+import org.switchyard.bus.camel.CamelExchange;
 import org.switchyard.component.http.composer.HttpRequestBindingData;
 import org.switchyard.component.http.composer.HttpComposition;
 import org.switchyard.component.http.composer.HttpContextMapper;
@@ -169,9 +170,11 @@ public class HttpGatewayTest {
     public void httpGatewayServiceTest() throws Exception {
         String response = httpMixIn.sendString("http://localhost:8080/http", INPUT, HTTPMixIn.HTTP_POST);
         //Test CSR - Composing a Service Request
-        Assert.assertEquals(String.class, mockService.getMessages().peek().getMessage().getContent().getClass());
+        CamelExchange ex = (CamelExchange)mockService.getMessages().peek();
+        Assert.assertEquals(String.class, ex.getMessage().getContent().getClass());
         Assert.assertEquals(1, mockService.getMessages().size());
         Assert.assertEquals(INPUT, response);
+        Assert.assertEquals("UTF-8", ex.getExchange().getProperty(org.apache.camel.Exchange.CHARSET_NAME));
     }
 
     @Test

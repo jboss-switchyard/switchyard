@@ -111,6 +111,13 @@ public class InboundHandler extends BaseServiceHandler {
             exchange.getContext().setProperty(ExchangeCompletionEvent.GATEWAY_NAME, _gatewayName, Scope.EXCHANGE)
                     .addLabels(BehaviorLabel.TRANSIENT.label());
 
+            if (input.getRequestInfo().getCharacterEncoding() != null) {
+                exchange.getContext().setProperty(
+                        org.apache.camel.Exchange.CHARSET_NAME,
+                        input.getRequestInfo().getCharacterEncoding(),
+                        Scope.EXCHANGE);
+            }
+
             Message message = _messageComposer.compose(input, exchange);
             _securityContextManager.addCredentials(exchange, input.extractCredentials());
             if (exchange.getContract().getConsumerOperation().getExchangePattern() == ExchangePattern.IN_ONLY) {

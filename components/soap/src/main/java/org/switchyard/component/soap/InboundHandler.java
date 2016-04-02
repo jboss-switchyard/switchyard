@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.wsdl.BindingOperation;
 import javax.wsdl.Definition;
 import javax.wsdl.Fault;
@@ -295,6 +296,16 @@ public class InboundHandler extends BaseServiceHandler {
             exchange.getContext().setProperty(ExchangeCompletionEvent.GATEWAY_NAME, _gatewayName, Scope.EXCHANGE)
                     .addLabels(BehaviorLabel.TRANSIENT.label());
 
+            if (msgContext != null) {
+                HttpServletRequest servletRequest = (HttpServletRequest)msgContext.get(MessageContext.SERVLET_REQUEST);
+                if (servletRequest != null) {
+                    String encoding = servletRequest.getCharacterEncoding();
+                    if (encoding != null) {
+                        exchange.getContext().setProperty(org.apache.camel.Exchange.CHARSET_NAME, encoding, Scope.EXCHANGE);
+                    }
+                }
+            }
+
             SOAPBindingData soapBindingData = new SOAPBindingData(soapMessage, wsContext);
 
             // add any thread-local and/or binding-extracted credentials
@@ -303,11 +314,11 @@ public class InboundHandler extends BaseServiceHandler {
             securityContext.getCredentials().addAll(soapBindingData.extractCredentials());
             _securityContextManager.setContext(exchange, securityContext);
 
-            @SuppressWarnings("unchecked")
-            Map<String, List<String>> httpHeaders =
-                    (Map<String, List<String>>) wsContext.getMessageContext()
-                                                         .get(MessageContext.HTTP_REQUEST_HEADERS);
-            soapBindingData.setHttpHeaders(httpHeaders);
+            if (msgContext != null) {
+                @SuppressWarnings("unchecked")
+                Map<String, List<String>> httpHeaders = (Map<String, List<String>>) msgContext.get(MessageContext.HTTP_REQUEST_HEADERS);
+                soapBindingData.setHttpHeaders(httpHeaders);
+            }
 
             Message message;
             try {

@@ -17,60 +17,135 @@
     <parent>
         <groupId>org.jboss.as</groupId>
         <artifactId>jboss-as-console-build</artifactId>
-        <version>2.8.18.Final</version>
+        <version>2.8.23.Final</version>
         <relativePath/>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.switchyard.console.wildfly</groupId>
     <artifactId>switchyard-console-wildfly-application</artifactId>
+    <version>2.1.0-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>SwitchYard: WildFly Management Console Application</name>
     <description>Integrated WildFly console application, which includes the SwitchYard extension.</description>
     <properties>
         <enforcer.skip>true</enforcer.skip>
+        <gwt.module>org.switchyard.console.SwitchYard</gwt.module>
         <version.switchyard>2.1.0-SNAPSHOT</version.switchyard>
     </properties>
     <dependencies>
         <dependency>
             <groupId>org.switchyard.console.wildfly</groupId>
             <artifactId>switchyard-console-wildfly-extension</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
+            <version>${version.switchyard}</version>
         </dependency>
         <dependency>
             <groupId>org.switchyard.console.wildfly</groupId>
             <artifactId>switchyard-console-wildfly-extension</artifactId>
             <classifier>sources</classifier>
-            <version>${project.version}</version>
-            <scope>provided</scope>
+            <version>${version.switchyard}</version>
         </dependency>
         <dependency>
-            <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-console-core</artifactId>
+            <groupId>org.switchyard.console.wildfly</groupId>
+            <artifactId>switchyard-console-wildfly-component-bean</artifactId>
+            <version>${version.switchyard}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.switchyard.console.wildfly</groupId>
+            <artifactId>switchyard-console-wildfly-component-bean</artifactId>
+            <classifier>sources</classifier>
+            <version>${version.switchyard}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.switchyard.console.wildfly</groupId>
+            <artifactId>switchyard-console-wildfly-component-bpel</artifactId>
+            <version>${version.switchyard}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.switchyard.console.wildfly</groupId>
+            <artifactId>switchyard-console-wildfly-component-bpel</artifactId>
+            <classifier>sources</classifier>
+            <version>${version.switchyard}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.switchyard.console.wildfly</groupId>
+            <artifactId>switchyard-console-wildfly-component-bpm</artifactId>
+            <version>${version.switchyard}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.switchyard.console.wildfly</groupId>
+            <artifactId>switchyard-console-wildfly-component-bpm</artifactId>
+            <classifier>sources</classifier>
+            <version>${version.switchyard}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.switchyard.console.wildfly</groupId>
+            <artifactId>switchyard-console-wildfly-component-camel</artifactId>
+            <version>${version.switchyard}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.switchyard.console.wildfly</groupId>
+            <artifactId>switchyard-console-wildfly-component-camel</artifactId>
+            <classifier>sources</classifier>
+            <version>${version.switchyard}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.switchyard.console.wildfly</groupId>
+            <artifactId>switchyard-console-wildfly-component-clojure</artifactId>
+            <version>${version.switchyard}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.switchyard.console.wildfly</groupId>
+            <artifactId>switchyard-console-wildfly-component-clojure</artifactId>
+            <classifier>sources</classifier>
+            <version>${version.switchyard}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.switchyard.console.wildfly</groupId>
+            <artifactId>switchyard-console-wildfly-component-core</artifactId>
+            <version>${version.switchyard}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.switchyard.console.wildfly</groupId>
+            <artifactId>switchyard-console-wildfly-component-core</artifactId>
+            <classifier>sources</classifier>
+            <version>${version.switchyard}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.switchyard.console.wildfly</groupId>
+            <artifactId>switchyard-console-wildfly-component-hornetq</artifactId>
+            <version>${version.switchyard}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.switchyard.console.wildfly</groupId>
+            <artifactId>switchyard-console-wildfly-component-hornetq</artifactId>
+            <classifier>sources</classifier>
+            <version>${version.switchyard}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.switchyard.console.wildfly</groupId>
+            <artifactId>switchyard-console-wildfly-component-rules</artifactId>
+            <version>${version.switchyard}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.switchyard.console.wildfly</groupId>
+            <artifactId>switchyard-console-wildfly-component-rules</artifactId>
+            <classifier>sources</classifier>
+            <version>${version.switchyard}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.switchyard.console.wildfly</groupId>
+            <artifactId>switchyard-console-wildfly-component-soap</artifactId>
+            <version>${version.switchyard}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.switchyard.console.wildfly</groupId>
+            <artifactId>switchyard-console-wildfly-component-soap</artifactId>
+            <classifier>sources</classifier>
+            <version>${version.switchyard}</version>
         </dependency>
     </dependencies>
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>stage-common-sources</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <tasks>
-                                <copy todir="${project.basedir}/src/main/webapp">
-                                    <fileset dir="../../app/src/main/webapp/" includes="**/*.*"/>
-                                </copy>
-                            </tasks>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
@@ -85,6 +160,15 @@
                             <sources>
                                 <source>../gwt/src/main/java</source>
                                 <source>../gwt/target/dependency/eap/java</source>
+                                <source>../components/bean/target/dependency/eap/java</source>
+                                <source>../components/bpel/target/dependency/eap/java</source>
+                                <source>../components/bpm/target/dependency/eap/java</source>
+                                <source>../components/camel/target/dependency/eap/java</source>
+                                <source>../components/clojure/target/dependency/eap/java</source>
+                                <source>../components/core/target/dependency/eap/java</source>
+                                <source>../components/hornetq/target/dependency/eap/java</source>
+                                <source>../components/rules/target/dependency/eap/java</source>
+                                <source>../components/soap/target/dependency/eap/java</source>
                             </sources>
                         </configuration>
                     </execution>
@@ -133,9 +217,7 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>gwt-maven-plugin</artifactId>
                 <configuration>
-                    <!-- fixes the web mode problem -->
-                    <fragmentCount>-1</fragmentCount>
-                    <persistentunitcachedir>${project.build.directory}</persistentunitcachedir>
+                    <extraJvmArgs>-Xms1024m -Xmx2048m -Xss1024k</extraJvmArgs>
                 </configuration>
             </plugin>
         </plugins>

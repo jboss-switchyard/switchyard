@@ -1,8 +1,10 @@
 target
 .classpath
 .project
+.idea
 .settings
 .checkstyle
+.DS_Store
 *.sw?
 *.iml
 *.ipr

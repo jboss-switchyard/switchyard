@@ -32,47 +32,10 @@
     </scm>
     <properties>
         <version.org.jboss.as.console>${version.org.jboss.as.console.wildfly}</version.org.jboss.as.console>
-        <version.com.google.gwt>2.8.0.20150826</version.com.google.gwt>
-        <version.gwt.maven.plugin>2.7.0</version.gwt.maven.plugin>
-        <version.com.gwtplatform>1.4</version.com.gwtplatform>
     </properties>
     <modules>
         <module>component</module>
         <module>gwt</module>
         <module>app</module>
     </modules>  
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.jboss.as</groupId>
-                <artifactId>jboss-as-console-bom</artifactId>
-                <version>${version.org.jboss.as.console}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.gwtplatform</groupId>
-                <artifactId>gwtp-mvp-shared</artifactId>
-                <version>${version.com.gwtplatform}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.google.gwt</groupId>
-                <artifactId>gwt-user</artifactId>
-                <version>${version.com.google.gwt}</version>
-                <scope>provided</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>gwt-maven-plugin</artifactId>
-                    <version>${version.gwt.maven.plugin}</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
 </project>

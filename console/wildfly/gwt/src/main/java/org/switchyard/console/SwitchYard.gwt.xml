@@ -12,10 +12,10 @@
  - limitations under the License.
  -->
 
-<module rename-to="SwitchYard">
+<module rename-to="app">
 
   <inherits name="org.switchyard.console.Extensions" />
-  <inherits name="org.jboss.as.console.App" />
+  <inherits name="org.jboss.as.console.composite.WildFlyDev" />
 
   <!-- Specify the paths for translatable code -->
   <source path='client' />

@@ -23,13 +23,6 @@
     <artifactId>switchyard-console-component-core</artifactId>
     <name>SwitchYard: Console Core Component Module</name>
     <description>Provides API for component specific extensions to the SwitchYard console.</description>
-    <dependencies>
-        <dependency>
-            <groupId>com.google.gwt</groupId>
-            <artifactId>gwt-dev</artifactId>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
     <build>
         <plugins>
             <!-- GWT Maven Plugin -->

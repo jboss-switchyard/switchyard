@@ -949,7 +949,7 @@
             <dependency>
                 <groupId>org.switchyard.console</groupId>
                 <artifactId>switchyard-console-application</artifactId>
-                <version>${version.org.jboss.as.console}</version>
+                <version>${project.version}</version>
                 <classifier>resources</classifier>
             </dependency>
             <dependency>

@@ -15,15 +15,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>switchyard-console-parent</artifactId>
-        <groupId>org.switchyard.console</groupId>
-        <version>2.1.0-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
+        <groupId>org.jboss.as</groupId>
+        <artifactId>jboss-as-console-extension</artifactId>
+        <version>2.5.11.Final</version>
+        <relativePath/>
     </parent>
+    <groupId>org.switchyard.console</groupId>
     <artifactId>switchyard-console-components</artifactId>
+    <version>2.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>SwitchYard: Console System Components</name>
     <description>Base pom for console system component UI contributions.</description>
+    <properties>
+        <version.org.jboss.as.console>2.5.11.Final</version.org.jboss.as.console>
+    </properties>
     <modules>
         <module>core</module>
         <module>bean</module>
@@ -35,39 +40,120 @@
         <module>rules</module>
         <module>soap</module>
     </modules>
-    <dependencies>
-        <dependency>
-            <groupId>org.jboss.ballroom</groupId>
-            <artifactId>widgets</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.gwt</groupId>
-            <artifactId>gwt-user</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.gwtplatform</groupId>
-            <artifactId>gwtp-mvp-client</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.inject</groupId>
-            <artifactId>guice</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.gwt.inject</groupId>
-            <artifactId>gin</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.google.gwt</groupId>
-            <artifactId>gwt-dev</artifactId>
-            <type>jar</type>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.switchyard.console</groupId>
+                <artifactId>switchyard-console-component-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.switchyard.console</groupId>
+                <artifactId>switchyard-console-component-bean</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.switchyard.console</groupId>
+                <artifactId>switchyard-console-component-bpel</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.switchyard.console</groupId>
+                <artifactId>switchyard-console-component-bpm</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.switchyard.console</groupId>
+                <artifactId>switchyard-console-component-camel</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.switchyard.console</groupId>
+                <artifactId>switchyard-console-component-clojure</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.switchyard.console</groupId>
+                <artifactId>switchyard-console-component-hornetq</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.switchyard.console</groupId>
+                <artifactId>switchyard-console-component-rules</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.switchyard.console</groupId>
+                <artifactId>switchyard-console-component-soap</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <!-- HAL console dependencies -->
+            <dependency>
+                <groupId>org.jboss.as</groupId>
+                <artifactId>console-spi</artifactId>
+                <version>${version.org.jboss.as.console}</version>
+                <scope>provided</scope>
+            </dependency> 
+            <dependency>
+                <groupId>org.jboss.as</groupId>
+                <artifactId>console-spi</artifactId>
+                <version>${version.org.jboss.as.console}</version>
+                <scope>provided</scope>
+                <classifier>sources</classifier>
+            </dependency> 
+            <dependency>
+                <groupId>org.jboss.as</groupId>
+                <artifactId>diagnostics</artifactId>
+                <version>${version.org.jboss.as.console}</version>
+                <scope>provided</scope>
+            </dependency> 
+            <dependency>
+                <groupId>org.jboss.as</groupId>
+                <artifactId>diagnostics</artifactId>
+                <version>${version.org.jboss.as.console}</version>
+                <scope>provided</scope>
+                <classifier>sources</classifier>
+            </dependency> 
+            <dependency>
+                <groupId>org.jboss.as</groupId>
+                <artifactId>jboss-as-console-core</artifactId>
+                <version>${version.org.jboss.as.console}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.as</groupId>
+                <artifactId>jboss-as-console-core</artifactId>
+                <version>${version.org.jboss.as.console}</version>
+                <scope>provided</scope>
+                <classifier>sources</classifier>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.as</groupId>
+                <artifactId>jboss-as-console-dmr</artifactId>
+                <version>${version.org.jboss.as.console}</version>
+                <scope>provided</scope>
+            </dependency> 
+            <dependency>
+                <groupId>org.jboss.as</groupId>
+                <artifactId>jboss-as-console-flow</artifactId>
+                <version>${version.org.jboss.as.console}</version>
+                <scope>provided</scope>
+            </dependency> 
+            <dependency>
+                <groupId>org.jboss.as</groupId>
+                <artifactId>ace-gwt</artifactId>
+                <version>${version.org.jboss.as.console}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.as</groupId>
+                <artifactId>ace-gwt</artifactId>
+                <version>${version.org.jboss.as.console}</version>
+                <scope>provided</scope>
+                <classifier>sources</classifier>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <build>
         <plugins>
             <plugin>

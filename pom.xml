@@ -1165,6 +1165,11 @@
             </dependency>
             <dependency>
                 <groupId>org.switchyard</groupId>
+                <artifactId>switchyard-security-wildfly</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.switchyard</groupId>
                 <artifactId>switchyard-serial</artifactId>
                 <version>${project.version}</version>
             </dependency>

@@ -66,7 +66,11 @@ public final class ProviderRegistry {
         Iterator<T> iterator = services.iterator();
         while (iterator.hasNext()) {
             try {
-                return iterator.next();
+                T instance = iterator.next();
+                if (_logger.isDebugEnabled()) {
+                    _logger.debug(String.format("Loading [%s] for type [%s]", instance.getClass().getName(), clazz.getName()));
+                }
+                return instance;
             } catch (Throwable t) {
                 _logger.debug("Error creating provider for class " + clazz.getName(), t);
             }
@@ -102,7 +106,11 @@ public final class ProviderRegistry {
         Iterator<T> iterator = services.iterator();
         while (iterator.hasNext()) {
             try {
-                list.add(iterator.next());
+                T instance = iterator.next();
+                if (_logger.isDebugEnabled()) {
+                    _logger.debug(String.format("Loading [%s] for type [%s]", instance.getClass().getName(), clazz.getName()));
+                }
+                list.add(instance);
             } catch (Throwable t) {
                 _logger.debug("Error creating provider for class " + clazz.getName(), t);
             }

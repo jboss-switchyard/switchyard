@@ -18,14 +18,13 @@
 
     <resources>
         <resource-root path="switchyard-security-${project.version}.jar"/>
-        <resource-root path="switchyard-security-jboss-${project.version}.jar"/>
+        <resource-root path="switchyard-security-wildfly-${project.version}.jar"/>
     </resources>
 
     <dependencies>
         <module name="javax.api"/>
         <module name="javax.servlet.api"/>
         <module name="javax.xml.ws.api"/>
-        <module name="org.jboss.as.web"/>
         <module name="org.jboss.logging"/>
         <module name="org.picketbox" export="true"/>
         <module name="org.picketlink" export="true"/>

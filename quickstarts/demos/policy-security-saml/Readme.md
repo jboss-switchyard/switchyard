@@ -48,7 +48,6 @@ Wildfly
 
         mvn clean -Pdeploy -Pwildfly
 
-Warning --> Wildfly 8.0.0 When the application is undeployed, it is required to restart the server to get all the undeployment changes done.
 
 
 

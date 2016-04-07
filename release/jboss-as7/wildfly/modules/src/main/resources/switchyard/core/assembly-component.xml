@@ -36,5 +36,15 @@
             <outputFileNameMapping>${artifact.artifactId}-${project.version}.${artifact.extension}
             </outputFileNameMapping>
         </dependencySet>
+        <dependencySet>
+            <useTransitiveDependencies>false</useTransitiveDependencies>
+            <includes>
+                <include>org.switchyard:switchyard-security</include>
+                <include>org.switchyard:switchyard-security-wildfly</include>
+            </includes>
+            <outputDirectory>/modules/system/layers/soa/org/switchyard/security/main</outputDirectory>
+            <outputFileNameMapping>${artifact.artifactId}-${project.version}.${artifact.extension}
+            </outputFileNameMapping>
+        </dependencySet>
     </dependencySets>
 </component>

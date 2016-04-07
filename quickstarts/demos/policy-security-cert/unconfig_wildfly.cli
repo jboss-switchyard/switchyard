@@ -5,3 +5,4 @@ end-if
 if (outcome == success) of /subsystem=security/security-domain=policy-security-cert:read-resource
     /subsystem=security/security-domain=policy-security-cert:remove
 end-if
+:reload

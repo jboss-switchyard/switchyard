@@ -17,14 +17,13 @@
 package org.switchyard.quickstarts.demo.policy.security.wss.signencrypt;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
-
-import org.apache.ws.security.WSPasswordCallback;
 
 public class WorkServiceCallbackHandler implements CallbackHandler {
 
@@ -41,11 +40,19 @@ public class WorkServiceCallbackHandler implements CallbackHandler {
     @Override
     public void handle(Callback[] arg0) throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < arg0.length; i++) {
-            WSPasswordCallback pc = (WSPasswordCallback) arg0[i];
-            String password = _passwords.get(pc.getIdentifier());
-            if (password != null) {
-                pc.setPassword(password);
-                return;
+            try {
+                // A dirty hack to get this working with both of CXF2 and CXF3.
+                // WSPasswordCallback has been moved to another package in CXF3
+                Method getIdentifierMethod = arg0[i].getClass().getMethod("getIdentifier", new Class[0]);
+                Method setPasswordMethod = arg0[i].getClass().getMethod("setPassword", new Class[] {String.class});
+                String identifier = (String) getIdentifierMethod.invoke(arg0[i], new Object[0]);
+                String password = _passwords.get(identifier);
+                if (password != null) {
+                    setPasswordMethod.invoke(arg0[i], new Object[] {password});
+                    return;
+                }
+            } catch (Exception e) {
+                throw new UnsupportedCallbackException(arg0[i], e.getMessage());
             }
         }
     }

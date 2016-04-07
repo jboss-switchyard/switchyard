@@ -8,3 +8,4 @@ end-if
 if (outcome == success) of /subsystem=security/security-domain=saml-validate-token:read-resource
     /subsystem=security/security-domain=saml-validate-token:remove
 end-if
+:reload

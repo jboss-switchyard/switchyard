@@ -50,7 +50,7 @@ public final class RouteFactory {
      */
     public static List<RouteDefinition> getRoutes(CamelComponentImplementationModel model, SwitchYardCamelContext camelContext) {
         if (model.getJavaClass() != null) {
-            return createRoute(model.getJavaClass(), model.getComponent().getTargetNamespace());
+            return createRoute(model.getJavaClass(), camelContext, model.getComponent().getTargetNamespace());
         }
 
         return loadRoute(model.getXMLPath(), camelContext, model.getModelConfiguration().getPropertyResolver());
@@ -130,7 +130,7 @@ public final class RouteFactory {
      * @return the route definition
      */
     public static List<RouteDefinition> createRoute(String className) {
-        return createRoute(className, null);
+        return createRoute(className, null, null);
     }
 
     /**
@@ -140,7 +140,18 @@ public final class RouteFactory {
      * @return the route definition
      */
     public static List<RouteDefinition> createRoute(String className, String namespace) {
-        return createRoute(Classes.forName(className), namespace);
+        return createRoute(className, null, namespace);
+    }
+
+    /**
+     * Create a new route from the given class name and service name.
+     * @param className name of the class containing an @Route definition
+     * @param camelContext CamelContext
+     * @param namespace the namespace to append to switchyard:// service URIs
+     * @return the route definition
+     */
+    public static List<RouteDefinition> createRoute(String className, SwitchYardCamelContext camelContext, String namespace) {
+        return createRoute(Classes.forName(className), camelContext, namespace);
     }
 
     /**
@@ -149,7 +160,7 @@ public final class RouteFactory {
      * @return the route definition
      */
     public static List<RouteDefinition> createRoute(Class<?> routeClass) {
-        return createRoute(routeClass, null);
+        return createRoute(routeClass, null, null);
     }
 
     /**
@@ -158,7 +169,7 @@ public final class RouteFactory {
      * @param namespace the namespace to append to switchyard:// service URIs
      * @return the route definition
      */
-    public static List<RouteDefinition> createRoute(Class<?> routeClass, String namespace) {
+    public static List<RouteDefinition> createRoute(Class<?> routeClass, SwitchYardCamelContext camelContext, String namespace) {
         if (!RouteBuilder.class.isAssignableFrom(routeClass)) {
             throw CamelComponentMessages.MESSAGES.javaDSLClassMustExtend(routeClass.getName(),
                     RouteBuilder.class.getName());
@@ -168,6 +179,9 @@ public final class RouteFactory {
         RouteBuilder builder;
         try {
             builder = (RouteBuilder) routeClass.newInstance();
+            if (camelContext != null) {
+                builder.setContext(camelContext);
+            }
             builder.configure();
             List<RouteDefinition> routes = builder.getRouteCollection().getRoutes();
             if (routes.isEmpty()) {

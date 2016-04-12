@@ -14,14 +14,18 @@
 package org.switchyard.component.camel;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
+import org.apache.camel.ThreadPoolRejectedPolicy;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.RouteDefinition;
+import org.apache.camel.spi.ThreadPoolProfile;
 import org.junit.Assert;
 import org.junit.Test;
 import org.switchyard.component.camel.scanner.ServiceInterface;
 import org.switchyard.component.camel.scanner.SingleRouteService;
 import org.switchyard.SwitchYardException;
+import org.switchyard.common.camel.SwitchYardCamelContextImpl;
 
 public class RouteFactoryTest {
 
@@ -78,6 +82,18 @@ public class RouteFactoryTest {
                 RouteFactory.loadRoute("org/switchyard/component/camel/deploy/routes.xml");
         Assert.assertEquals(2, routes.size());
     }
+    
+    @Test
+    public void testExecutorServiceShutdown() throws Exception {
+        SwitchYardCamelContextImpl context = new SwitchYardCamelContextImpl();
+        Assert.assertEquals(null, CustomExecutorRoute.customPool);
+        List<RouteDefinition> routes = RouteFactory.createRoute(CustomExecutorRoute.class.getName(), context, null);
+        context.addRouteDefinitions(routes);
+        context.start();
+        Assert.assertEquals(false, CustomExecutorRoute.customPool.isShutdown());
+        context.stop();
+        Assert.assertEquals(true, CustomExecutorRoute.customPool.isShutdown());
+    }
 }
 
 class NoRouteAnnotation extends RouteBuilder {
@@ -96,5 +112,29 @@ class DoesntExtendRouteBuilder {
 @Route(ServiceInterface.class)
 class NoRoutesDefined extends RouteBuilder {
     public void configure() {
+    }
+}
+
+class CustomExecutorRoute extends RouteBuilder {
+    public static ExecutorService customPool;
+    
+    public void configure() {
+        from("direct:input")
+            .log("direct:input")
+            .wireTap("direct:InboundWireTap")
+            .executorService(createCustomThreadPool(this, "pool-CustomExecutorRoute"))
+            .end();
+        from("direct:InboundWireTap").log("InboundWireTap");
+    }
+    private ExecutorService createCustomThreadPool(RouteBuilder builder, String name) {
+        ThreadPoolProfile profile = new ThreadPoolProfile();
+        profile.setId("I48-custom-profile");
+        profile.setPoolSize(50);
+        profile.setMaxPoolSize(500);
+        profile.setKeepAliveTime(1L);
+        profile.setMaxQueueSize(1000);
+        profile.setRejectedPolicy(ThreadPoolRejectedPolicy.Abort);
+        customPool = builder.getContext().getExecutorServiceManager().newThreadPool(builder, name, profile);
+        return customPool;
     }
 }

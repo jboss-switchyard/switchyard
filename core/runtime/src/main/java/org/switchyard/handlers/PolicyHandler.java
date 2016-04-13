@@ -19,9 +19,9 @@ import java.util.Set;
 import org.switchyard.BaseHandler;
 import org.switchyard.Exchange;
 import org.switchyard.ExchangePhase;
-import org.switchyard.HandlerException;
 import org.switchyard.policy.Policy;
 import org.switchyard.policy.PolicyUtil;
+import org.switchyard.policy.PolicyViolationException;
 import org.switchyard.runtime.RuntimeMessages;
 
 /**
@@ -41,7 +41,7 @@ public class PolicyHandler extends BaseHandler {
      * {@inheritDoc}
      */
     @Override
-    public void handleMessage(Exchange exchange) throws HandlerException {
+    public void handleMessage(Exchange exchange) throws PolicyViolationException {
         // only execute on the IN phase
         if (ExchangePhase.IN.equals(exchange.getPhase())) {
             Set<Policy> required = PolicyUtil.getRequired(exchange);
@@ -58,7 +58,7 @@ public class PolicyHandler extends BaseHandler {
                 while (missing.hasNext()) {
                     requires.append(" " + missing.next().getQName().toString());
                 }
-                throw RuntimeMessages.MESSAGES.requiredPolicesNeeded(requires.toString());
+                throw new PolicyViolationException(required, RuntimeMessages.MESSAGES.requiredPolicesNeeded(requires.toString()));
             }
         }
     }

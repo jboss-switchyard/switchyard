@@ -22,9 +22,9 @@ import javax.transaction.TransactionManager;
 import org.jboss.logging.Logger;
 import org.switchyard.Exchange;
 import org.switchyard.ExchangeHandler;
-import org.switchyard.HandlerException;
 import org.switchyard.Property;
 import org.switchyard.Scope;
+import org.switchyard.TransactionFailureException;
 import org.switchyard.label.BehaviorLabel;
 import org.switchyard.policy.PolicyUtil;
 import org.switchyard.policy.TransactionPolicy;
@@ -61,7 +61,7 @@ public class TransactionHandler implements ExchangeHandler {
     }
     
     @Override
-    public void handleMessage(Exchange exchange) throws HandlerException {
+    public void handleMessage(Exchange exchange) throws TransactionFailureException {
         // if no TM is available, there's nothing to do
         if (_transactionManager == null) {
             return;
@@ -107,7 +107,7 @@ public class TransactionHandler implements ExchangeHandler {
         return _transactionManager;
     }
     
-    private void handleAfter(Exchange exchange) throws HandlerException {
+    private void handleAfter(Exchange exchange) throws TransactionFailureException {
         Transaction transaction = null;
         try {
             // complete the transaction which is initiated by this handler
@@ -126,7 +126,7 @@ public class TransactionHandler implements ExchangeHandler {
         }
     }
     
-    private void handleBefore(Exchange exchange) throws HandlerException {
+    private void handleBefore(Exchange exchange) throws TransactionFailureException {
         if (!(propagatesRequired(exchange) || suspendsRequired(exchange) || managedGlobalRequired(exchange)
                 || managedLocalRequired(exchange) || noManagedRequired(exchange))) {
             return;
@@ -172,7 +172,7 @@ public class TransactionHandler implements ExchangeHandler {
         provideRequiredPolicies(exchange);
     }
 
-    private void evaluatePolicyCombination(Exchange exchange) throws HandlerException {
+    private void evaluatePolicyCombination(Exchange exchange) throws TransactionFailureException {
         // check for incompatible policy definition 
         if (suspendsRequired(exchange) && propagatesRequired(exchange)) {
             throw RuntimeMessages.MESSAGES.invalidTransactionPolicy(TransactionPolicy.SUSPENDS_TRANSACTION.toString(), 
@@ -247,7 +247,7 @@ public class TransactionHandler implements ExchangeHandler {
         PolicyUtil.provide(exchange, TransactionPolicy.NO_MANAGED_TRANSACTION);
     }
 
-    private void startTransaction(Exchange exchange) throws HandlerException {
+    private void startTransaction(Exchange exchange) throws TransactionFailureException {
         if (_log.isDebugEnabled()) {
             printDebugInfo("Creating new transaction");
         }
@@ -274,7 +274,7 @@ public class TransactionHandler implements ExchangeHandler {
         }
     }
     
-    private void endTransaction() throws HandlerException {
+    private void endTransaction() throws TransactionFailureException {
         if (_log.isDebugEnabled()) {
             printDebugInfo("Completing transaction");
         }
@@ -370,7 +370,7 @@ public class TransactionHandler implements ExchangeHandler {
         }
     }
 
-    private Transaction getCurrentTransaction() throws HandlerException {
+    private Transaction getCurrentTransaction() throws TransactionFailureException {
         try {
             return _transactionManager.getTransaction();
         } catch (Exception e) {
@@ -378,7 +378,7 @@ public class TransactionHandler implements ExchangeHandler {
         }
     }
     
-    private int getCurrentTransactionStatus() throws HandlerException {
+    private int getCurrentTransactionStatus() throws TransactionFailureException {
         try {
             return _transactionManager.getStatus();
         } catch (Exception e) {

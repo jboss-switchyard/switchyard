@@ -1,3 +1,16 @@
+/*
+ * Copyright 2013 Red Hat Inc. and/or its affiliates and other contributors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,  
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.switchyard.runtime;
 
 import org.jboss.logging.Messages;
@@ -6,6 +19,7 @@ import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageBundle;
 import org.switchyard.HandlerException;
 import org.switchyard.SwitchYardException;
+import org.switchyard.TransactionFailureException;
 
 /**
  * <p/>
@@ -22,106 +36,108 @@ public interface RuntimeMessages {
 
     /**
      * validatorFailed method definition.
-     * @param validatorName validatorName
+     * @param clazz validator class name
+     * @param type Java type
+     * @param name QName
      * @param detail detail
-     * @return HandlerException
+     * @return failure message
      */
-    @Message(id = 14000, value = "Validator '%s' failed: %s")
-    HandlerException validatorFailed(String validatorName, String detail);
+    @Message(id = 14000, value = "Validator:[class=%s', type='%s', name='%s'] failed: %s")
+    String validatorFailed(String clazz, String type, String name, String detail);
 
     /**
      * failedToCompleteTransaction method definition.
      * @param e e
-     * @return HandlerException
+     * @return TransactionFailureException
      */
     @Message(id = 14001, value = "TransactionHandler failed to complete a transaction")
-    HandlerException failedToCompleteTransaction(@Cause Exception e);
+    TransactionFailureException failedToCompleteTransaction(@Cause Exception e);
 
     /**
      * invalidTransactionPolicy method definition.
      * @param policyOne policyOne
      * @param policyTwo policyTwo
-     * @return HandlerException
+     * @return TransactionFailureException
      */
     @Message(id = 14002, value = "Invalid transaction policy : %s and %s cannot be requested simultaneously.")
-    HandlerException invalidTransactionPolicy(String policyOne, String policyTwo);
+    TransactionFailureException invalidTransactionPolicy(String policyOne, String policyTwo);
 
     /**
      * invalidTransactionPolicyCombo method definition.
      * @param policyOne policyOne
      * @param policyTwo policyTwo
      * @param policyThree policyThree
-     * @return HandlerException
+     * @return TransactionFailureException
      */
     @Message(id = 14003, value = "Invalid transaction policy : %s cannot be requested with %s nor %s")
-    HandlerException invalidTransactionPolicyCombo(String policyOne, String policyTwo, String policyThree);
+    TransactionFailureException invalidTransactionPolicyCombo(String policyOne, String policyTwo, String policyThree);
 
     /**
      * noTransactionPropagated method definition.
      * @param policy policy
-     * @return HandlerException
+     * @return TransactionFailureException
      */
     @Message(id = 14004, value = "Invalid transaction status : %s is required but the transaction doesn't exist")
-    HandlerException noTransactionPropagated(String policy);
+    TransactionFailureException noTransactionPropagated(String policy);
 
     /**
      * failedCreateNewTransaction method definition.
      * @param e e
-     * @return HandlerException
+     * @return TransactionFailureException
      */
     @Message(id = 14005, value = "Failed to create new transaction")
-    HandlerException failedCreateNewTransaction(@Cause Exception e);
+    TransactionFailureException failedCreateNewTransaction(@Cause Exception e);
 
     /**
      * transactionAlreadyExists method definition.
-     * @return HandlerException
+     * @return TransactionFailureException
      */
     @Message(id = 14006, value = "Transaction already exists")
-    HandlerException transactionAlreadyExists();
+    TransactionFailureException transactionAlreadyExists();
 
     /**
      * failedToRollbackTransaction method definition.
      * @param e e
-     * @return HandlerException
+     * @return TransactionFailureException
      */
     @Message(id = 14007, value = "Failed to rollback transaction")
-    HandlerException failedToRollbackTransaction(@Cause Exception e);
+    TransactionFailureException failedToRollbackTransaction(@Cause Exception e);
 
     /**
      * failedToCommitTransaction method definition.
      * @param e e
-     * @return HandlerException
+     * @return TransactionFailureException
      */
     @Message(id = 14008, value = "Failed to commit transaction")
-    HandlerException failedToCommitTransaction(@Cause Exception e);
+    TransactionFailureException failedToCommitTransaction(@Cause Exception e);
 
     /**
      * failedToCompleteWithStatus method definition.
      * @param status status
-     * @return HandlerException
+     * @return TransactionFailureException
      */
     @Message(id = 14009, value = "Failed to complete transaction due to invalid status - code=%d: "
             + "see javax.transaction.Status.")
-    HandlerException failedToCompleteWithStatus(int status);
+    TransactionFailureException failedToCompleteWithStatus(int status);
 
     /**
      * failedToRetrieveStatus method definition.
      * @param e e
-     * @return HandlerException
+     * @return TransactionFailureException
      */
     @Message(id = 14010, value = "Failed to retrieve transaction status")
-    HandlerException failedToRetrieveStatus(@Cause Exception e);
+    TransactionFailureException failedToRetrieveStatus(@Cause Exception e);
 
     /**
      * transformationsNotApplied method definition.
      * @param expectedPayload expectedPayload
      * @param actualPayload actualPayload
-     * @return HandlerException
+     * @return errormessage
      */
     @Message(id = 14011, value = "Transformations not applied.  Required payload type of '%s'.  "
             + "Actual payload type is '%s'.  You must define and register a Transformer to transform "
             + "between these types.")
-    HandlerException transformationsNotApplied(String expectedPayload, String actualPayload);
+    String transformationsNotApplied(String expectedPayload, String actualPayload);
 
     /**
      * noRegisteredService method definition.
@@ -143,10 +159,10 @@ public interface RuntimeMessages {
     /**
      * requiredPolicesNeeded method definition.
      * @param requires requires
-     * @return HandlerException
+     * @return error message
      */
     @Message(id = 14014, value = "Required policies have not been provided: %s")
-    HandlerException requiredPolicesNeeded(String requires);
+    String requiredPolicesNeeded(String requires);
 
     /**
      * multipleFallbackValidatorsAvailable method definition.
@@ -315,7 +331,7 @@ public interface RuntimeMessages {
      * @return IllegalStateException
      */
     @Message(id = 14035, value = "Message may be sent only once. Use Message.copy() to re-send same payload.")
-    IllegalStateException messageOnlySentOnce();    
+    IllegalStateException messageOnlySentOnce();
 
     /**
      * scopeDifferent method definition.
@@ -329,16 +345,27 @@ public interface RuntimeMessages {
     /**
      * propagatedTransactionHasInvalidStatus method definition.
      * @param txStatus Transaction status code
-     * @return HandlerException
+     * @return TransactionFailureException
      */
     @Message(id = 14038, value = "Transaction has invalid status '%s' - it must be '0' (STATUS_ACTIVE) on propagation")
-    HandlerException propagatedTransactionHasInvalidStatus(int txStatus);
+    TransactionFailureException propagatedTransactionHasInvalidStatus(int txStatus);
 
     /**
      * transactionAlreadyRolledBack method definition.
-     * @return HandlerException
+     * @return TransactionFailureException
      */
     @Message(id = 14039, value = "Transaction was already rolled back somehow. It may be caused by the transaction timeout, or application did it before SwitchYard handled it.")
-    HandlerException transactionAlreadyRolledBack();
+    TransactionFailureException transactionAlreadyRolledBack();
     
+    /**
+     * validatorFailed method definition.
+     * @param clazz validator class name
+     * @param type Java type
+     * @param name QName
+     * @param cause cause
+     * @return failure message
+     */
+    @Message(id = 14040, value = "Validator:[class=%s', type='%s', name='%s'] failed")
+    String validatorFailed(String clazz, String type, String name, @Cause SwitchYardException cause);
+
 }

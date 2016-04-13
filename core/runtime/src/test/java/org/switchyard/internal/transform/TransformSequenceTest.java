@@ -28,7 +28,7 @@ import org.switchyard.transform.TransformSequence;
 public class TransformSequenceTest {
 
     @Test
-    public void test() {
+    public void test() throws Exception {
         final QName A = new QName("a");
         final QName B = new QName("b");
         final QName C = new QName("c");

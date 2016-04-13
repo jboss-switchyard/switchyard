@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.jboss.logging.Logger;
 import org.switchyard.BaseHandler;
 import org.switchyard.Exchange;
-import org.switchyard.HandlerException;
+import org.switchyard.SecurityFailureException;
 import org.switchyard.ServiceDomain;
 import org.switchyard.ServiceSecurity;
 import org.switchyard.security.SecurityMetadata;
@@ -76,7 +76,7 @@ public class SecurityHandler extends BaseHandler {
      * {@inheritDoc}
      */
     @Override
-    public void handleMessage(Exchange exchange) throws HandlerException {
+    public void handleMessage(Exchange exchange) throws SecurityFailureException {
         ServiceSecurity serviceSecurity = SecurityMetadata.getServiceSecurity(exchange);
         if (serviceSecurity == null) {
             // nothing to do
@@ -109,7 +109,7 @@ public class SecurityHandler extends BaseHandler {
         }
     }
 
-    private void process(Exchange exchange, ServiceSecurity serviceSecurity) throws HandlerException {
+    private void process(Exchange exchange, ServiceSecurity serviceSecurity) throws SecurityFailureException {
         processCount().incrementAndGet();
         SecurityContext securityContext = _securityContextManager.getContext(exchange);
         if (isRequired(exchange, CONFIDENTIALITY) && !isProvided(exchange, CONFIDENTIALITY)) {

@@ -16,8 +16,7 @@ package org.switchyard.tests;
 
 import javax.xml.namespace.QName;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.switchyard.Exchange;
@@ -29,6 +28,7 @@ import org.switchyard.ServiceReference;
 import org.switchyard.handlers.TransformHandler;
 import org.switchyard.transform.BaseTransformer;
 import org.switchyard.transform.TransformSequence;
+import org.switchyard.transform.TransformationFailureException;
 import org.switchyard.transform.Transformer;
 
 /**
@@ -118,7 +118,7 @@ public class IndirectTransformationTest {
         }
         
         @Override
-        public void handleMessage(Exchange exchange) throws HandlerException {
+        public void handleMessage(Exchange exchange) throws TransformationFailureException {
             String content = (String) exchange.getMessage().getContent();
             if (content.equals("Hello there, SwitchYard")) {
                 success=true;

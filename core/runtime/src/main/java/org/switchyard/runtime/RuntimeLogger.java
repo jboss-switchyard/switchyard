@@ -10,6 +10,7 @@ import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
+import org.switchyard.transform.TransformationFailureException;
 /**
  * <p/>
  * This file is using the subset 13800-13999 for logger messages.
@@ -72,5 +73,13 @@ public interface RuntimeLogger {
     @LogMessage(level = ERROR)
     @Message(id = 13805, value = "Failed to rollback the transaction which is in STATUS_ROLLEDBACK - this was required to clean up the transaction which is aborted by Narayana transaction reaper thread. See WFLY-4327.")
     void failedToRollbackOnStatusRolledback(@Cause SystemException e);
+
+    /**
+     * transformationFailedInHandleFault method definition.
+     * @param e cause
+     */
+    @LogMessage(level = WARN)
+    @Message(id = 13806, value = "Transformer failed in handleFault() - Ignoring")
+    void transformationFailedInHandleFault(@Cause TransformationFailureException e);
 
 }

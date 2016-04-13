@@ -16,7 +16,7 @@ package org.switchyard;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
 
 /**
  * Mock Handler.
@@ -166,7 +166,7 @@ public class MockHandler extends BaseHandler {
             sleep();
         }
 
-        TestCase.fail("Timed out waiting on event queue length to be "
+        Assert.fail("Timed out waiting on event queue length to be "
                 + numMessages + " or greater.");
     }
 
@@ -177,7 +177,7 @@ public class MockHandler extends BaseHandler {
         try {
             Thread.sleep(DEFAULT_SLEEP_MS);
         } catch (InterruptedException e) {
-            TestCase.fail("Failed to sleep: " + e.getMessage());
+            Assert.fail("Failed to sleep: " + e.getMessage());
         }
     }
 }

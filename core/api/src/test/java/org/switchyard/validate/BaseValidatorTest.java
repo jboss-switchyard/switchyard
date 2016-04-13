@@ -16,8 +16,7 @@ package org.switchyard.validate;
 
 import javax.xml.namespace.QName;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 public class BaseValidatorTest {

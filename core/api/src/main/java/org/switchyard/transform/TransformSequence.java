@@ -26,6 +26,7 @@ import org.switchyard.APIMessages;
 import org.switchyard.Exchange;
 import org.switchyard.Message;
 import org.switchyard.Property;
+import org.switchyard.SwitchYardException;
 import org.switchyard.label.BehaviorLabel;
 
 /**
@@ -97,8 +98,9 @@ public final class TransformSequence implements Serializable {
      * Apply this {@link TransformSequence} to the supplied {@link Message} instance.
      * @param message Message instance.
      * @param registry Transformation Registry.
+     * @throws TransformationFailureException transformation failure exception
      */
-    public void apply(Message message, TransformerRegistry registry) {
+    public void apply(Message message, TransformerRegistry registry) throws TransformationFailureException {
 
         while (_sequence.size() > 1) {
             QName from = _sequence.get(0);
@@ -115,16 +117,26 @@ public final class TransformSequence implements Serializable {
             }
 
             Object result;
-            if (Message.class.isAssignableFrom(transformer.getFromType())) {
-                // A returned object just indicates that the transformation took place.
-                result = transformer.transform(message);
-            } else {
-                // A returned object indicates that the transformation took place and is
-                // used as the new Message payload.
-                result = transformer.transform(message.getContent(transformer.getFromType()));
-                message.setContent(result);
+            try {
+                if (Message.class.isAssignableFrom(transformer.getFromType())) {
+                    // A returned object just indicates that the transformation took place.
+                    result = transformer.transform(message);
+                } else {
+                    // A returned object indicates that the transformation took place and is
+                    // used as the new Message payload.
+                    result = transformer.transform(message.getContent(transformer.getFromType()));
+                    message.setContent(result);
+                }
+            } catch (SwitchYardException e) {
+                String msg = APIMessages.MESSAGES.transformerFailed(
+                        transformer.getClass().getName(),
+                        transformer.getFromType().getName(),
+                        transformer.getFrom().toString(),
+                        transformer.getToType().getName(),
+                        transformer.getTo().toString(),
+                        e);
+                throw new TransformationFailureException(transformer, e.getCause() != null ? e.getCause() : e, msg);
             }
-            
             // We can now remove the 1st element in the sequence.  2nd element will become the
             // "from" for the next transformation in the sequence, if one is required...
             _sequence.remove(0);
@@ -194,8 +206,9 @@ public final class TransformSequence implements Serializable {
      *
      * @param exchange The Exchange instance.
      * @param registry The transformation registry.
+     * @throws TransformationFailureException transformation failure exception
      */
-    public static void applySequence(final Exchange exchange, final TransformerRegistry registry) {
+    public static void applySequence(final Exchange exchange, final TransformerRegistry registry) throws TransformationFailureException {
         Message message = exchange.getMessage();
         TransformSequence transformSequence = get(exchange);
 

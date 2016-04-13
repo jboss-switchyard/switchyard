@@ -19,13 +19,13 @@ import javax.xml.namespace.QName;
 import org.jboss.logging.Logger;
 import org.switchyard.BaseHandler;
 import org.switchyard.Exchange;
-import org.switchyard.HandlerException;
 import org.switchyard.Message;
 import org.switchyard.Property;
 import org.switchyard.SwitchYardException;
 import org.switchyard.label.BehaviorLabel;
 import org.switchyard.runtime.RuntimeLogger;
 import org.switchyard.runtime.RuntimeMessages;
+import org.switchyard.validate.ValidationFailureException;
 import org.switchyard.validate.ValidationResult;
 import org.switchyard.validate.Validator;
 import org.switchyard.validate.ValidatorRegistry;
@@ -59,20 +59,30 @@ public class ValidateHandler extends BaseHandler {
     /**
      * Validate the current message on the exchange.
      * @param exchange exchange
-     * @throws HandlerException handler exception
+     * @throws ValidationFailureException validation failure exception
      */
     @Override
-    public void handleMessage(Exchange exchange) throws HandlerException {
+    public void handleMessage(Exchange exchange) throws ValidationFailureException {
         Validator<?> validator = get(exchange);
         if (validator != null) {
             try {
                 ValidationResult result = applyValidator(exchange, validator);
                 if (!result.isValid()) {
-                    throw RuntimeMessages.MESSAGES.validatorFailed(validator.getClass().getName(), result.getDetail());
+                    String msg = RuntimeMessages.MESSAGES.validatorFailed(
+                            validator.getClass().getName(),
+                            validator.getType().getName(),
+                            validator.getName().toString(),
+                            result.getDetail());
+                    throw new ValidationFailureException(validator, result, msg);
                 }
-            } catch (SwitchYardException syEx) {
-                // Validators which throw SwitchYardException should be reported as HandlerException    
-                throw new HandlerException(syEx.getMessage());
+            } catch (SwitchYardException e) {
+                // Validators which throw SwitchYardException should be reported as a ValidationFailureException
+                String msg = RuntimeMessages.MESSAGES.validatorFailed(
+                        validator.getClass().getName(),
+                        validator.getType().getName(),
+                        validator.getName().toString(),
+                        e);
+                throw new ValidationFailureException(validator, e.getCause() != null ? e.getCause() : e, msg);
             }
         }
     }

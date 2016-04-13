@@ -16,18 +16,16 @@ package org.switchyard.tests;
 
 import javax.xml.namespace.QName;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.switchyard.Exchange;
-import org.switchyard.HandlerException;
 import org.switchyard.Message;
 import org.switchyard.MockDomain;
 import org.switchyard.MockHandler;
-import org.switchyard.Scope;
 import org.switchyard.ServiceReference;
 import org.switchyard.validate.BaseValidator;
+import org.switchyard.validate.ValidationFailureException;
 import org.switchyard.validate.ValidationResult;
 import org.switchyard.validate.Validator;
 
@@ -136,10 +134,11 @@ public class ValidationTest {
 
         invokerHandler.waitForFaultMessage();
         Object content = invokerHandler.getFaults().poll().getMessage().getContent();
-        Assert.assertTrue(content instanceof HandlerException);
+        Assert.assertTrue(content instanceof ValidationFailureException);
         
-        boolean failed = ((HandlerException)content).getMessage().contains("Validator 'org.switchyard.tests.ValidationTest$2' failed: validation fail test");
-        Assert.assertTrue(failed);
+        ValidationFailureException vfe = (ValidationFailureException)content;
+        Assert.assertEquals(failValidate.getClass(), vfe.getValidator().getClass());
+        Assert.assertEquals("validation fail test", vfe.getValidationResult().getDetail());
     }
     
 }

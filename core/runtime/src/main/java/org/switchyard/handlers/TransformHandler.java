@@ -23,14 +23,15 @@ import org.jboss.logging.Logger;
 import org.switchyard.BaseHandler;
 import org.switchyard.Exchange;
 import org.switchyard.ExchangePhase;
-import org.switchyard.HandlerException;
 import org.switchyard.Property;
 import org.switchyard.internal.transform.BaseTransformerRegistry;
 import org.switchyard.label.BehaviorLabel;
 import org.switchyard.metadata.JavaTypes;
 import org.switchyard.metadata.ServiceOperation;
+import org.switchyard.runtime.RuntimeLogger;
 import org.switchyard.runtime.RuntimeMessages;
 import org.switchyard.transform.TransformSequence;
+import org.switchyard.transform.TransformationFailureException;
 import org.switchyard.transform.Transformer;
 import org.switchyard.transform.TransformerRegistry;
 
@@ -75,10 +76,10 @@ public class TransformHandler extends BaseHandler {
     /**
      * Transform the current message on the exchange.
      * @param exchange exchange
-     * @throws HandlerException handler exception
+     * @throws TransformationFailureException transformation failure exception
      */
     @Override
-    public void handleMessage(Exchange exchange) throws HandlerException {
+    public void handleMessage(Exchange exchange) throws TransformationFailureException {
         // Initialize transform sequence for operation types
         if (exchange.getPhase() == ExchangePhase.IN) {
             initInTransformSequence(exchange);
@@ -96,8 +97,7 @@ public class TransformHandler extends BaseHandler {
         if (!TransformSequence.assertTransformsApplied(exchange)) {
             QName actualPayloadType = TransformSequence.getCurrentMessageType(exchange);
             QName expectedPayloadType = TransformSequence.getTargetMessageType(exchange);
-            throw RuntimeMessages.MESSAGES.transformationsNotApplied(expectedPayloadType.toString(), 
-                    actualPayloadType.toString());
+            throw new TransformationFailureException(RuntimeMessages.MESSAGES.transformationsNotApplied(expectedPayloadType.toString(), actualPayloadType.toString()));
         }
 
         // Replace the CONTENT_TYPE property to indicate current content type after transform
@@ -108,7 +108,11 @@ public class TransformHandler extends BaseHandler {
     public void handleFault(Exchange exchange) {
         // Apply transforms to the fault...
         initFaultTransformSequence(exchange);
-        TransformSequence.applySequence(exchange, _registry);
+        try {
+            TransformSequence.applySequence(exchange, _registry);
+        } catch (TransformationFailureException e) {
+            RuntimeLogger.ROOT_LOGGER.transformationFailedInHandleFault(e);
+        }
         if (!TransformSequence.assertTransformsApplied(exchange)) {
             QName actualPayloadType = TransformSequence.getCurrentMessageType(exchange);
             QName expectedPayloadType = TransformSequence.getTargetMessageType(exchange);

@@ -29,7 +29,7 @@ import org.switchyard.internal.transform.BaseTransformerRegistry;
 public class MessageTransformerTest {
     
     @Test
-    public void test() throws IOException {
+    public void test() throws Exception {
         final QName A = new QName("a");
         final QName B = new QName("b");
 
@@ -46,7 +46,7 @@ public class MessageTransformerTest {
     }
 
     @Test
-    public void testNullOutputFromTransformation() throws IOException {
+    public void testNullOutputFromTransformation() throws Exception {
         final QName A = new QName("a");
         final QName B = new QName("b");
 

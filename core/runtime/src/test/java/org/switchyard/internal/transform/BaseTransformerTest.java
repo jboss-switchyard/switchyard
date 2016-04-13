@@ -16,8 +16,7 @@ package org.switchyard.internal.transform;
 
 import javax.xml.namespace.QName;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 import org.switchyard.transform.BaseTransformer;
 

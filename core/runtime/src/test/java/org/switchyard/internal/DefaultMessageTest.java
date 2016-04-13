@@ -21,8 +21,7 @@ import java.util.Map;
 
 import javax.activation.DataSource;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.switchyard.Message;

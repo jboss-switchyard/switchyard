@@ -20,8 +20,7 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.switchyard.internal.DefaultMessage;
@@ -108,7 +107,7 @@ public class BaseTransformerRegistryTest {
     }
  
     @Test
-    public void testGetTransformSequence() {
+    public void testGetTransformSequence() throws Exception {
         final QName A = new QName("a");
         final QName B = new QName("b");
         final QName C = new QName("c");

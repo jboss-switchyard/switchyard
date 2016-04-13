@@ -13,8 +13,8 @@
  */
 package org.switchyard.tests;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.switchyard.common.version.Queries.Projects.SWITCHYARD;
 import static org.switchyard.common.version.Queries.Projects.SWITCHYARD_API;
 import static org.switchyard.common.version.Queries.Projects.SWITCHYARD_COMMON;

@@ -30,6 +30,7 @@ import org.switchyard.security.credential.ConfidentialityCredential;
 import org.switchyard.security.credential.Credential;
 import org.switchyard.security.credential.PrincipalCredential;
 import org.switchyard.security.credential.extractor.AuthorizationHeaderCredentialExtractor;
+import org.switchyard.security.credential.extractor.ServletRequestCredentialExtractor;
 
 /**
  * Wrapper for RESTEasy messages.
@@ -44,11 +45,16 @@ public class RESTEasyBindingData implements SecurityBindingData {
     private ServletRequest _servletRequest;
     private Boolean _secured = false;
     private Principal _principal;
+    private static ServletRequestCredentialExtractor srce = null;
 
     /**
      * Creates a new RESTEasy message.
      */
-    public RESTEasyBindingData() {}
+    public RESTEasyBindingData() {
+        if (srce == null) {
+            srce = SecurityServices.getServletRequestCredentialExtractor();
+        }
+    }
 
     /**
      * Creates a new RESTEasy message, given the specified content.
@@ -211,7 +217,7 @@ public class RESTEasyBindingData implements SecurityBindingData {
     public Set<Credential> extractCredentials() {
         Set<Credential> credentials = new HashSet<Credential>();
         if (_servletRequest != null) {
-            credentials.addAll(SecurityServices.getServletRequestCredentialExtractor().extract(_servletRequest));
+            credentials.addAll(srce.extract(_servletRequest));
         } else {
             if (_secured) {
                 credentials.add(new ConfidentialityCredential(true));

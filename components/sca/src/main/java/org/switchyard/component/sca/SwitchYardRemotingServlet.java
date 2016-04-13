@@ -49,6 +49,7 @@ import org.switchyard.remote.http.HttpInvoker;
 import org.switchyard.security.SecurityServices;
 import org.switchyard.security.context.SecurityContextManager;
 import org.switchyard.security.credential.Credential;
+import org.switchyard.security.credential.extractor.ServletRequestCredentialExtractor;
 import org.switchyard.security.credential.extractor.SOAPMessageCredentialExtractor;
 import org.switchyard.serial.FormatType;
 import org.switchyard.serial.Serializer;
@@ -67,6 +68,7 @@ import com.arjuna.mwlabs.wst11.at.context.TxContextImple;
 public class SwitchYardRemotingServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
+    private static ServletRequestCredentialExtractor srce = SecurityServices.getServletRequestCredentialExtractor();
     private static Logger _log = Logger.getLogger(SwitchYardRemotingServlet.class);
     
     private Serializer _serializer = SerializerFactory.create(FormatType.JSON, null, true);
@@ -100,7 +102,7 @@ public class SwitchYardRemotingServlet extends HttpServlet {
                     ? service.createExchange(replyHandler)
                     : service.createExchange(msg.getOperation(), replyHandler);
               
-            Set<Credential> credentials = SecurityServices.getServletRequestCredentialExtractor().extract(request);
+            Set<Credential> credentials = srce.extract(request);
             credentials.addAll(extractWebServiceSecurityCredentials(request, msg));
             if (credentials != null && !credentials.isEmpty()) {
                 SecurityContextManager scm = new SecurityContextManager(domain);

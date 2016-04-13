@@ -28,6 +28,7 @@ import org.switchyard.component.common.composer.SecurityBindingData;
 import org.switchyard.component.soap.SOAPLogger;
 import org.switchyard.security.SecurityServices;
 import org.switchyard.security.credential.Credential;
+import org.switchyard.security.credential.extractor.ServletRequestCredentialExtractor;
 import org.switchyard.security.credential.extractor.SOAPMessageCredentialExtractor;
 import org.switchyard.security.credential.extractor.WebServiceContextCredentialExtractor;
 
@@ -44,6 +45,7 @@ public class SOAPBindingData implements SecurityBindingData {
     private SOAPFaultInfo _soapFaultInfo;
     private Integer _status;
     private Map<String, List<String>> _httpHeaders = new HashMap<String, List<String>>();
+    private static ServletRequestCredentialExtractor srce = null;
 
     /**
      * Constructs a new SOAP binding data with the specified SOAP message.
@@ -61,6 +63,10 @@ public class SOAPBindingData implements SecurityBindingData {
     public SOAPBindingData(SOAPMessage soapMessage, WebServiceContext webServiceContext) {
         _soapMessage = soapMessage;
         _webServiceContext = webServiceContext;
+
+        if (srce == null) {
+            srce = SecurityServices.getServletRequestCredentialExtractor();
+        }
     }
 
     /**
@@ -136,7 +142,7 @@ public class SOAPBindingData implements SecurityBindingData {
         credentials.addAll(new SOAPMessageCredentialExtractor().extract(getSOAPMessage()));
         credentials.addAll(new WebServiceContextCredentialExtractor().extract(getWebServiceContext()));
         try {
-            credentials.addAll(SecurityServices.getServletRequestCredentialExtractor().extract(getServletRequest()));
+            credentials.addAll(srce.extract(getServletRequest()));
         } catch (UnsupportedOperationException uoe) {
             // Ignore. This can happen with JBossWS http transport
             SOAPLogger.ROOT_LOGGER.credentialsAreIgnoredForServletRequest();

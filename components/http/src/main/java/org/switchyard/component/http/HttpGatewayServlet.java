@@ -33,15 +33,17 @@ import org.switchyard.component.http.composer.HttpRequestBindingData;
 import org.switchyard.component.http.composer.HttpRequestInfo;
 import org.switchyard.component.http.composer.HttpResponseBindingData;
 import org.switchyard.security.SecurityServices;
+import org.switchyard.security.credential.extractor.ServletRequestCredentialExtractor;
 
 /**
- * Hanldes HTTP requests to invoke a SwitchYard service.
+ * Handles HTTP requests to invoke a SwitchYard service.
  *
  * @author Magesh Kumar B <mageshbk@jboss.com> (C) 2012 Red Hat Inc.
  */
 public class HttpGatewayServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
+    private static ServletRequestCredentialExtractor srce = SecurityServices.getServletRequestCredentialExtractor();
     private static final Logger LOGGER = Logger.getLogger(HttpGatewayServlet.class);
     private static final Map<String,String> LOCALNAMEMAP = new ConcurrentHashMap<String,String>();
 
@@ -245,7 +247,7 @@ public class HttpGatewayServlet extends HttpServlet {
         }
 
         // Credentials...
-        requestInfo.getCredentials().addAll(SecurityServices.getServletRequestCredentialExtractor().extract(request));
+        requestInfo.getCredentials().addAll(srce.extract(request));
 
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace(requestInfo);

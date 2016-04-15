@@ -30,6 +30,9 @@ public class V1CamelImplementationModel extends V1ComponentImplementationModel
     // The class attribute for Java DSL routes
     private static final String CLASS = "class";
 
+    // The bean attribute for Java DSL routes
+    private static final String BEAN = "bean";
+
     // The path attribute for XML DSL routes
     private static final String PATH = "path";
 
@@ -67,6 +70,25 @@ public class V1CamelImplementationModel extends V1ComponentImplementationModel
             setChildModel(model);
         } else {
             classConfig.setAttribute(CLASS, className);
+        }
+        return this;
+    }
+
+    @Override
+    public String getJavaBean() {
+        Configuration javaConfig = getModelConfiguration().getFirstChild(JAVA);
+        return javaConfig != null ? javaConfig.getAttribute(BEAN) : null;
+    }
+
+    @Override
+    public V1CamelImplementationModel setJavaBean(String beanName) {
+        Configuration javaConfig = getModelConfiguration().getFirstChild(JAVA);
+        if (javaConfig == null) {
+            NameValueModel model = new NameValueModel(getNamespaceURI(), JAVA);
+            model.getModelConfiguration().setAttribute(BEAN, beanName);
+            setChildModel(model);
+        } else {
+            javaConfig.setAttribute(BEAN, beanName);
         }
         return this;
     }

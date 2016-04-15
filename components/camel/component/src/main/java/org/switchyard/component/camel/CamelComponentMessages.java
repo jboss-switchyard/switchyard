@@ -130,10 +130,28 @@ public interface CamelComponentMessages {
     NullPointerException couldNotResolveToEndpointUri(String to);
 
     /**
-     * invalidJavaDSLClassSpecified
+     * invalidJavaDSLClassSpecified.
      * @param className class name
-     * @return Exception
+     * @return SwitchYardException
      */
     @Message(id = 33017, value = "Could not load a Java DSL class '%s'")
-    SwitchYardException invalidJavaDSLClassSpecified(String className);        
+    SwitchYardException invalidJavaDSLClassSpecified(String className);
+
+    /**
+     * noJavaDSLBeanFound.
+     * @param beanName bean name
+     * @return SwitchYardException
+     */
+    @Message(id = 33018, value = "Could not find a Java DSL bean '%s' from registry")
+    SwitchYardException noJavaDSLBeanFound(String beanName);
+
+    /**
+     * javaDSLBeanMustExtend.
+     * @param beanName bean name
+     * @param name base class name
+     * @return SwitchYardException
+     */
+    @Message(id = 33019, value = "Java DSL bean '%s' must extend '%s'")
+    SwitchYardException javaDSLBeanMustExtend(String beanName, String name);
+
 }

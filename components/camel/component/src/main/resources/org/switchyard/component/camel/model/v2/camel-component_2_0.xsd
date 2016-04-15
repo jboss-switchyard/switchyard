@@ -38,7 +38,8 @@
     </complexType>
 
     <complexType name="JavaDSLType">
-        <attribute name="class" type="string"/>
+        <attribute name="class" type="string" use="optional"/>
+        <attribute name="bean" type="string" use="optional"/>
     </complexType>
 
     <complexType name="XMLDSLType">

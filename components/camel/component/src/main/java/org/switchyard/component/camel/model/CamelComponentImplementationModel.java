@@ -48,6 +48,12 @@ public interface CamelComponentImplementationModel extends ComponentImplementati
     String getJavaClass();
     
     /**
+     * Name of a CDI bean containing one or more @Route definitions.
+     * @return reference to the route bean
+     */
+    String getJavaBean();
+    
+    /**
      * Path to a file containing an XML route definition.
      * @return path to the route definition
      */
@@ -59,6 +65,13 @@ public interface CamelComponentImplementationModel extends ComponentImplementati
      * @return reference to this config model
      */
     CamelComponentImplementationModel setJavaClass(String className);
+    
+    /**
+     * Set the name of a CDI bean with one ore more @Route definitions.
+     * @param beanName name of the bean
+     * @return reference to this config model
+     */
+    CamelComponentImplementationModel setJavaBean(String beanName);
     
     /**
      * Set the path to a file containing an XML route definition.

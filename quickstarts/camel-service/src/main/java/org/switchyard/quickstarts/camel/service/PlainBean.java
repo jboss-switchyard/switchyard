@@ -16,24 +16,8 @@
  */
 package org.switchyard.quickstarts.camel.service;
 
-import org.apache.camel.builder.RouteBuilder;
-import javax.inject.Inject;
-import javax.inject.Named;
-
-@Named("JavaDSLBuilder")
-public class JavaDSLBuilder extends RouteBuilder {
-
-    @Inject
-    private PlainBean bean;
-    
-    public void configure() {
-        from("switchyard://JavaDSL")
-            .log("Message received in Java DSL Route with injected CDI bean >> " + bean.getMessage())
-            .log("${body}")
-            .split(body(String.class).tokenize("\n"))
-            .filter()
-            .groovy("request.getBody().startsWith('sally:')")
-            .transform().javaScript("request.getBody().substring(6, request.getBody().length())")
-            .to("switchyard://XMLService?operationName=acceptMessage");
+public class PlainBean {
+    public String getMessage() {
+        return "This is a plain Java bean";
     }
 }

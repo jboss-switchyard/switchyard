@@ -49,13 +49,26 @@ public final class RouteFactory {
      * @return list of route definitions
      */
     public static List<RouteDefinition> getRoutes(CamelComponentImplementationModel model, SwitchYardCamelContext camelContext) {
-        if (model.getJavaClass() != null) {
+        if (model.getJavaBean() != null) {
+            RouteBuilder routeBuilder = lookupRouteBuilder(model.getJavaBean(), camelContext);
+            return createRoute(routeBuilder, camelContext, model.getComponent().getTargetNamespace());
+        } else if (model.getJavaClass() != null) {
             return createRoute(model.getJavaClass(), camelContext, model.getComponent().getTargetNamespace());
         }
 
         return loadRoute(model.getXMLPath(), camelContext, model.getModelConfiguration().getPropertyResolver());
     }
 
+    private static RouteBuilder lookupRouteBuilder(String beanName, SwitchYardCamelContext camelContext) {
+        Object bean = camelContext.getRegistry().lookupByName(beanName);
+        if (bean == null) {
+            throw CamelComponentMessages.MESSAGES.noJavaDSLBeanFound(beanName);
+        } else if (!(bean instanceof RouteBuilder)) {
+            throw CamelComponentMessages.MESSAGES.javaDSLBeanMustExtend(beanName, RouteBuilder.class.getName());
+        }
+        return (RouteBuilder)bean;
+    }
+    
     /**
      * Loads a set of route definitions from an XML file.
      * 
@@ -155,7 +168,18 @@ public final class RouteFactory {
         if (clazz == null) {
             throw CamelComponentMessages.MESSAGES.invalidJavaDSLClassSpecified(className);
         }
-        return createRoute(clazz, camelContext, namespace);
+        return createRoute(createRouteBuilder(clazz), camelContext, namespace);
+    }
+
+    private static RouteBuilder createRouteBuilder(Class<?> routeClass) {
+        if (!RouteBuilder.class.isAssignableFrom(routeClass)) {
+            throw CamelComponentMessages.MESSAGES.javaDSLClassMustExtend(routeClass.getName(), RouteBuilder.class.getName());
+        }
+        try {
+            return (RouteBuilder) routeClass.newInstance();
+        } catch (Exception ex) {
+            throw CamelComponentMessages.MESSAGES.failedToInitializeDSLClass(routeClass.getName(), ex);
+        }
     }
 
     /**
@@ -164,36 +188,41 @@ public final class RouteFactory {
      * @return the route definition
      */
     public static List<RouteDefinition> createRoute(Class<?> routeClass) {
-        return createRoute(routeClass, null, null);
+        return createRoute(createRouteBuilder(routeClass), null, null);
     }
 
     /**
      * Create a new route from the given class and service name.
      * @param routeClass class containing an @Route definition
+     * @param camelContext CamelContext
      * @param namespace the namespace to append to switchyard:// service URIs
      * @return the route definition
      */
     public static List<RouteDefinition> createRoute(Class<?> routeClass, SwitchYardCamelContext camelContext, String namespace) {
-        if (!RouteBuilder.class.isAssignableFrom(routeClass)) {
-            throw CamelComponentMessages.MESSAGES.javaDSLClassMustExtend(routeClass.getName(),
-                    RouteBuilder.class.getName());
-        }
+        return createRoute(createRouteBuilder(routeClass), camelContext, namespace);
+    }
 
+    /**
+     * Create a new route from the given RouteBuilder instance and service name.
+     * @param routeBuilder RouteBuilder instance containing an @Route definition
+     * @param camelContext CamelContext
+     * @param namespace the namespace to append to switchyard:// service URIs
+     * @return the route definition
+     */
+    public static List<RouteDefinition> createRoute(RouteBuilder routeBuilder, SwitchYardCamelContext camelContext, String namespace) {
         // Create the route and tell it to create a route
-        RouteBuilder builder;
         try {
-            builder = (RouteBuilder) routeClass.newInstance();
             if (camelContext != null) {
-                builder.setContext(camelContext);
+                routeBuilder.setContext(camelContext);
             }
-            builder.configure();
-            List<RouteDefinition> routes = builder.getRouteCollection().getRoutes();
+            routeBuilder.configure();
+            List<RouteDefinition> routes = routeBuilder.getRouteCollection().getRoutes();
             if (routes.isEmpty()) {
-                throw CamelComponentMessages.MESSAGES.noRoutesFoundinJavaDSLClass(routeClass.getName());
+                throw CamelComponentMessages.MESSAGES.noRoutesFoundinJavaDSLClass(routeBuilder.getClass().getName());
             }
             return routes;
         } catch (Exception ex) {
-            throw CamelComponentMessages.MESSAGES.failedToInitializeDSLClass(routeClass.getName(), ex);
+            throw CamelComponentMessages.MESSAGES.failedToInitializeDSLClass(routeBuilder.getClass().getName(), ex);
         }
     }
 

@@ -21,8 +21,11 @@
   <inherits name="org.switchyard.console.component.bpm.ComponentExtension" />
   <inherits name="org.switchyard.console.component.camel.ComponentExtension" />
   <inherits name="org.switchyard.console.component.clojure.ComponentExtension" />
-  <inherits name="org.switchyard.console.component.hornetq.ComponentExtension" />
+  <inherits name="org.switchyard.console.component.http.ComponentExtension" />
+  <inherits name="org.switchyard.console.component.jca.ComponentExtension" />
+  <inherits name="org.switchyard.console.component.resteasy.ComponentExtension" />
   <inherits name="org.switchyard.console.component.rules.ComponentExtension" />
+  <inherits name="org.switchyard.console.component.sca.ComponentExtension" />
   <inherits name="org.switchyard.console.component.soap.ComponentExtension" />
 
 </module>

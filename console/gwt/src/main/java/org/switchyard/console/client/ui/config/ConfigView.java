@@ -73,9 +73,16 @@ public class ConfigView extends DisposableViewImpl implements ConfigPresenter.My
     }
 
     @Override
+    public void setExtensions(List<Component> extensions) {
+        _configEditor.setExtensions(extensions);
+    }
+
+    @Override
     public void setInSlot(Object slot, IsWidget content) {
         if (slot == ConfigPresenter.TYPE_COMPONENT_CONTENT) {
             _configEditor.setComponentContent(content == null ? null : content.asWidget());
+        } else if (slot == ConfigPresenter.TYPE_EXTENSION_CONTENT) {
+            _configEditor.setExtensionContent(content == null ? null : content.asWidget());
         } else {
             Console.error("Unknown slot requested: " + slot); //$NON-NLS-1$
         }

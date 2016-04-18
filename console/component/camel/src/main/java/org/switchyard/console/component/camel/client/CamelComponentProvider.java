@@ -15,7 +15,6 @@ package org.switchyard.console.component.camel.client;
 
 import org.switchyard.console.components.client.extension.BaseComponentProvider;
 import org.switchyard.console.components.client.extension.ComponentExtension;
-import org.switchyard.console.components.client.ui.BaseComponentConfigurationView;
 import org.switchyard.console.components.client.ui.ComponentConfigurationPresenter.ComponentConfigurationView;
 
 /**
@@ -25,18 +24,12 @@ import org.switchyard.console.components.client.ui.ComponentConfigurationPresent
  * 
  * @author Rob Cernich
  */
-@ComponentExtension(displayName = "Camel", componentName = "org.switchyard.component.camel", activationTypes = { "camel", "direct",
-        "file" })
+@ComponentExtension(displayName = "Camel", componentName = "org.switchyard.component.camel", activationTypes = "camel")
 public class CamelComponentProvider extends BaseComponentProvider {
 
     @Override
     public ComponentConfigurationView createConfigurationView() {
-        return new BaseComponentConfigurationView() {
-            @Override
-            protected String getComponentName() {
-                return "Camel";
-            }
-        };
+        return new CamelComponentConfigurationView();
     }
 
 }

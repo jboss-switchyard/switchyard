@@ -65,12 +65,27 @@
         </dependency>
         <dependency>
             <groupId>org.switchyard.console.wildfly</groupId>
-            <artifactId>switchyard-console-wildfly-component-hornetq</artifactId>
+            <artifactId>switchyard-console-wildfly-component-http</artifactId>
+            <version>${version.switchyard}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.switchyard.console.wildfly</groupId>
+            <artifactId>switchyard-console-wildfly-component-jca</artifactId>
+            <version>${version.switchyard}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.switchyard.console.wildfly</groupId>
+            <artifactId>switchyard-console-wildfly-component-resteasy</artifactId>
             <version>${version.switchyard}</version>
         </dependency>
         <dependency>
             <groupId>org.switchyard.console.wildfly</groupId>
             <artifactId>switchyard-console-wildfly-component-rules</artifactId>
+            <version>${version.switchyard}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.switchyard.console.wildfly</groupId>
+            <artifactId>switchyard-console-wildfly-component-sca</artifactId>
             <version>${version.switchyard}</version>
         </dependency>
         <dependency>

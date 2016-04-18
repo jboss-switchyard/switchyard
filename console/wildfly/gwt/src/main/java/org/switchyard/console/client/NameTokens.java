@@ -48,6 +48,8 @@ public final class NameTokens {
 
     /** The parameter name used for component name. */
     public static final String COMPONENT_NAME_PARAM = "component"; //$NON-NLS-1$
+    /** The parameter name used for extension name. */
+    public static final String EXTENSION_NAME_PARAM = "extension"; //$NON-NLS-1$
     /** The parameter name used for application name. */
     public static final String APPLICATION_NAME_PARAM = "application"; //$NON-NLS-1$
     /** The parameter name used for artifact reference key. */

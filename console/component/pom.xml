@@ -36,8 +36,11 @@
         <module>bpm</module>
         <module>camel</module>
         <module>clojure</module>
-        <module>hornetq</module>
+        <module>http</module>
+        <module>jca</module>
+        <module>resteasy</module>
         <module>rules</module>
+        <module>sca</module>
         <module>soap</module>
     </modules>
     <dependencyManagement>
@@ -74,12 +77,27 @@
             </dependency>
             <dependency>
                 <groupId>org.switchyard.console</groupId>
-                <artifactId>switchyard-console-component-hornetq</artifactId>
+                <artifactId>switchyard-console-component-http</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.switchyard.console</groupId>
+                <artifactId>switchyard-console-component-jca</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.switchyard.console</groupId>
+                <artifactId>switchyard-console-component-resteasy</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.switchyard.console</groupId>
                 <artifactId>switchyard-console-component-rules</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.switchyard.console</groupId>
+                <artifactId>switchyard-console-component-sca</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

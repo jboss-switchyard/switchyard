@@ -43,7 +43,9 @@ public class ConfigEditor {
 
     private Form<SystemDetails> _systemDetailsForm;
     private ComponentsList _componentsList;
+    private ExtensionsList _extensionsList;
     private Panel _componentDetails;
+    private Panel _extensionDetails;
     private ComponentProviders _componentProviders;
 
     /**
@@ -76,16 +78,28 @@ public class ConfigEditor {
                 _presenter.onComponentSelected(selected);
             }
         });
-
         _componentDetails = new SimplePanel();
+
+        _extensionsList = new ExtensionsList(_componentProviders);
+        _extensionsList.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+            @Override
+            public void onSelectionChange(SelectionChangeEvent event) {
+                Component selected = _extensionsList.getSelection();
+                _presenter.onExtensionSelected(selected);
+            }
+        });
+        _extensionDetails = new SimplePanel();
 
         layout.add(new ContentGroupLabel(Singleton.MESSAGES.label_coreRuntime())); //$NON-NLS-1$
         layout.add(_systemDetailsForm.asWidget());
 
         layout.add(_componentsList.asWidget());
-
         layout.add(new ContentGroupLabel(Singleton.MESSAGES.label_componentDetails()));
         layout.add(_componentDetails);
+
+        layout.add(_extensionsList.asWidget());
+        layout.add(new ContentGroupLabel(Singleton.MESSAGES.label_extensionDetails()));
+        layout.add(_extensionDetails);
 
         return layout;
     }
@@ -112,12 +126,29 @@ public class ConfigEditor {
     }
 
     /**
+     * @param extensions the extensions installed in the runtime.
+     */
+    public void setExtensions(List<Component> extensions) {
+        _extensionsList.setData(extensions);
+    }
+
+    /**
      * @param content component specific content.
      */
     public void setComponentContent(Widget content) {
         _componentDetails.clear();
         if (content != null) {
             _componentDetails.add(content);
+        }
+    }
+
+    /**
+     * @param content extension specific content.
+     */
+    public void setExtensionContent(Widget content) {
+        _extensionDetails.clear();
+        if (content != null) {
+            _extensionDetails.add(content);
         }
     }
 }

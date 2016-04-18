@@ -202,6 +202,15 @@ public interface Messages extends com.google.gwt.i18n.client.Messages {
   String error_componentLoad(String arg0);
 
   /**
+   * Translated "Could not load information for extension: {0}".
+   * @param arg0 extension name
+   * @return translated "Could not load information for extension: {0}"
+   */
+  @DefaultMessage("Could not load information for extension: {0}")
+  @Key("error_extensionLoad")
+  String error_extensionLoad(String arg0);
+
+  /**
    * Translated "Illegal baseline index {0,number} on number of samples {1,number}.".
    * @param arg0 baseline index
    * @param arg1 sample index
@@ -452,6 +461,15 @@ public interface Messages extends com.google.gwt.i18n.client.Messages {
   String label_averageTime();
 
   /**
+   * Translated "Extension Details".
+   * 
+   * @return translated "Extension Details"
+   */
+  @DefaultMessage("Extension Details")
+  @Key("label_extensionDetails")
+  String label_extensionDetails();
+
+  /**
    * Translated "Component Details".
    * 
    * @return translated "Component Details"
@@ -594,6 +612,15 @@ public interface Messages extends com.google.gwt.i18n.client.Messages {
   @DefaultMessage("Installed Components")
   @Key("label_installedComponents")
   String label_installedComponents();
+
+  /**
+   * Translated "Installed Extensions".
+   * 
+   * @return translated "Installed Extensions"
+   */
+  @DefaultMessage("Installed Extensions")
+  @Key("label_installedExtensions")
+  String label_installedExtensions();
 
   /**
    * Translated "Interface".

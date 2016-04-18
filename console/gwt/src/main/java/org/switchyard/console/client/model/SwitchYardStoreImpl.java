@@ -68,6 +68,7 @@ public class SwitchYardStoreImpl implements SwitchYardStore {
     private static final String LIST_SERVICES = "list-services"; //$NON-NLS-1$
     private static final String LIST_REFERENCES = "list-references"; //$NON-NLS-1$
     private static final String MODULE = "module"; //$NON-NLS-1$
+    private static final String EXTENSION = "extension"; //$NON-NLS-1$
     private static final String PROPERTY = "property"; //$NON-NLS-1$
     private static final String READ_APPLICATION = "read-application"; //$NON-NLS-1$
     private static final String READ_SERVICE = "read-service"; //$NON-NLS-1$
@@ -283,6 +284,83 @@ public class SwitchYardStoreImpl implements SwitchYardStore {
                     }
                 }
                 callback.onFailure(new Exception(Singleton.MESSAGES.error_componentLoad(componentName)));
+            }
+        });
+    }
+
+    @Override
+    public void loadExtensions(final AsyncCallback<List<Component>> callback) {
+        // /subsystem=switchyard:read-children-names(child-type=extension)
+        final List<Component> extensions = new ArrayList<Component>();
+
+        final ModelNode operation = new ModelNode();
+        final ModelNode address = Baseadress.get();
+        operation.get(OP).set(READ_CHILDREN_NAMES_OPERATION);
+        operation.get(CHILD_TYPE).set(EXTENSION);
+        address.add(SUBSYSTEM, SWITCHYARD);
+        operation.get(OP_ADDR).set(address);
+
+        _dispatcher.execute(new DMRAction(operation), new AsyncCallback<DMRResponse>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                callback.onFailure(caught);
+            }
+
+            @Override
+            public void onSuccess(DMRResponse result) {
+                final ModelNode response = result.get().get(RESULT);
+                if (response.isDefined()) {
+                    for (final ModelNode extensionNode : response.asList()) {
+                        try {
+                            final Component extension = _factory.component().as();
+                            extension.setName(extensionNode.asString());
+                            extensions.add(extension);
+                        } catch (IllegalArgumentException e) {
+                            Log.error(PARSE_ERROR_MESSAGE, e);
+                        }
+                    }
+
+                }
+
+                callback.onSuccess(extensions);
+            }
+        });
+    }
+
+    @Override
+    public void loadExtension(final String extensionName, final AsyncCallback<Component> callback) {
+        // /subsystem=switchyard/extension=extensionName:read-resource(recursive=true)
+
+        final ModelNode operation = new ModelNode();
+        final ModelNode address = Baseadress.get();
+        operation.get(OP).set(READ_RESOURCE_OPERATION);
+        operation.get(RECURSIVE).set(true);
+        address.add(SUBSYSTEM, SWITCHYARD);
+        address.add(EXTENSION, extensionName);
+        operation.get(OP_ADDR).set(address);
+        operation.get(NAME).set(extensionName);
+
+        _dispatcher.execute(new DMRAction(operation), new AsyncCallback<DMRResponse>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                callback.onFailure(caught);
+            }
+
+            @Override
+            public void onSuccess(DMRResponse result) {
+                final ModelNode response = result.get();
+                if (response.hasDefined(RESULT)) {
+                    final Component extension = createExtension(response.get(RESULT));
+                    if (extension != null) {
+                        // HACK
+                        extension.setName(extensionName);
+                        callback.onSuccess(extension);
+                        return;
+                    }
+                }
+                callback.onFailure(new Exception(Singleton.MESSAGES.error_extensionLoad(extensionName)));
             }
         });
     }
@@ -856,6 +934,15 @@ public class SwitchYardStoreImpl implements SwitchYardStore {
     private Component createComponent(final ModelNode componentNode) {
         try {
             return AutoBeanCodex.decode(_factory, Component.class, componentNode.toJSONString(true)).as();
+        } catch (Exception e) {
+            Log.error(PARSE_ERROR_MESSAGE, e);
+            return null;
+        }
+    }
+
+    private Component createExtension(final ModelNode extensionNode) {
+        try {
+            return AutoBeanCodex.decode(_factory, Component.class, extensionNode.toJSONString(true)).as();
         } catch (Exception e) {
             Log.error(PARSE_ERROR_MESSAGE, e);
             return null;

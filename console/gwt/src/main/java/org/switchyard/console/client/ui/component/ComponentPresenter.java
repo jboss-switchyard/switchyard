@@ -110,7 +110,8 @@ public class ComponentPresenter extends Presenter<ComponentPresenter.MyView, Com
     private final PlaceManager _placeManager;
     private final SwitchYardStore _switchYardStore;
     private final PresenterFactory _factory;
-    private ComponentConfigurationPresenter _presenterWidget;
+    private ComponentConfigurationPresenter _componentPresenterWidget;
+    private ComponentConfigurationPresenter _extensionPresenterWidget;
 
     /**
      * Create a new ComponentPresenter.
@@ -145,11 +146,13 @@ public class ComponentPresenter extends Presenter<ComponentPresenter.MyView, Com
         releasePresenterWidget();
 
         loadComponent(_placeManager.getCurrentPlaceRequest().getParameter(NameTokens.COMPONENT_NAME_PARAM, null));
+        loadExtension(_placeManager.getCurrentPlaceRequest().getParameter(NameTokens.EXTENSION_NAME_PARAM, null));
     }
 
     @Override
     protected void revealInParent() {
         RevealContentEvent.fire(this, ConfigPresenter.TYPE_COMPONENT_CONTENT, this);
+        RevealContentEvent.fire(this, ConfigPresenter.TYPE_EXTENSION_CONTENT, this);
     }
 
     private void loadComponent(String componentName) {
@@ -160,10 +163,31 @@ public class ComponentPresenter extends Presenter<ComponentPresenter.MyView, Com
 
             @Override
             public void onSuccess(Component component) {
-                _presenterWidget = _factory.create(component.getName());
-                _presenterWidget.bind();
-                ComponentPresenter.this.setInSlot(TYPE_MAIN_CONTENT, _presenterWidget, false);
-                _presenterWidget.setComponent(component);
+                _componentPresenterWidget = _factory.create(component.getName());
+                _componentPresenterWidget.bind();
+                ComponentPresenter.this.setInSlot(TYPE_MAIN_CONTENT, _componentPresenterWidget, false);
+                _componentPresenterWidget.setComponent(component);
+            }
+
+            @Override
+            public void onFailure(Throwable caught) {
+                Console.error(Singleton.MESSAGES.error_unknown(), caught.getMessage());
+            }
+        });
+    }
+
+    private void loadExtension(String extensionName) {
+        if (extensionName == null) {
+            return;
+        }
+        _switchYardStore.loadExtension(extensionName, new AsyncCallback<Component>() {
+
+            @Override
+            public void onSuccess(Component extension) {
+                _extensionPresenterWidget = _factory.create(extension.getName());
+                _extensionPresenterWidget.bind();
+                ComponentPresenter.this.setInSlot(TYPE_MAIN_CONTENT, _extensionPresenterWidget, false);
+                _extensionPresenterWidget.setComponent(extension);
             }
 
             @Override
@@ -174,11 +198,14 @@ public class ComponentPresenter extends Presenter<ComponentPresenter.MyView, Com
     }
 
     private void releasePresenterWidget() {
-        if (_presenterWidget == null) {
-            return;
+        if (_componentPresenterWidget != null) {
+            _componentPresenterWidget.unbind();
+            _componentPresenterWidget = null;
         }
-        _presenterWidget.unbind();
-        _presenterWidget = null;
+        if (_extensionPresenterWidget != null) {
+            _extensionPresenterWidget.unbind();
+            _extensionPresenterWidget = null;
+        }
     }
 
 }

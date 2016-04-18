@@ -70,6 +70,10 @@ public class ConfigPresenter extends Presenter<ConfigPresenter.MyView, ConfigPre
     @ContentSlot
     public static final GwtEvent.Type<RevealContentHandler<?>> TYPE_COMPONENT_CONTENT = new GwtEvent.Type<RevealContentHandler<?>>();
 
+    /** The slot where extension specific details are displayed. */
+    @ContentSlot
+    public static final GwtEvent.Type<RevealContentHandler<?>> TYPE_EXTENSION_CONTENT = new GwtEvent.Type<RevealContentHandler<?>>();
+
     /**
      * MyView
      * 
@@ -90,14 +94,21 @@ public class ConfigPresenter extends Presenter<ConfigPresenter.MyView, ConfigPre
          * @param components the installed components.
          */
         void setComponents(List<Component> components);
-    }
+
+        /**
+         * @param extensions the installed extensions.
+         */
+        void setExtensions(List<Component> extensions);
+}
 
     private final PlaceManager _placeManager;
     private final RevealStrategy _revealStrategy;
     private final SwitchYardStore _switchYardStore;
     private final PresenterFactory _factory;
     private String _componentName;
-    private ComponentConfigurationPresenter _presenterWidget;
+    private ComponentConfigurationPresenter _componentPresenterWidget;
+    private String _extensionName;
+    private ComponentConfigurationPresenter _extensionPresenterWidget;
 
     /**
      * Create a new ConfigPresenter.
@@ -132,8 +143,31 @@ public class ConfigPresenter extends Presenter<ConfigPresenter.MyView, ConfigPre
         clearComponentContent();
 
         Builder requestBuilder = new Builder().nameToken(NameTokens.SYSTEM_CONFIG_PRESENTER);
+        if (_extensionName != null) {
+            requestBuilder.with(NameTokens.EXTENSION_NAME_PARAM, URL.encode(_extensionName));
+        }
         if (component != null) {
             requestBuilder.with(NameTokens.COMPONENT_NAME_PARAM, URL.encode(component.getName()));
+        }
+        _placeManager.revealRelativePlace(requestBuilder.build(), -1);
+    }
+
+    /**
+     * Notifies the presenter that the user wishes to view details about a
+     * specific extension. The presenter will load the details and pass them
+     * back to the view to be displayed.
+     * 
+     * @param extension the selected extension.
+     */
+    public void onExtensionSelected(Component extension) {
+        clearExtensionContent();
+
+        Builder requestBuilder = new Builder().nameToken(NameTokens.SYSTEM_CONFIG_PRESENTER);
+        if (_componentName != null) {
+            requestBuilder.with(NameTokens.COMPONENT_NAME_PARAM, URL.encode(_componentName));
+        }
+        if (extension != null) {
+            requestBuilder.with(NameTokens.EXTENSION_NAME_PARAM, URL.encode(extension.getName()));
         }
         _placeManager.revealRelativePlace(requestBuilder.build(), -1);
     }
@@ -150,6 +184,10 @@ public class ConfigPresenter extends Presenter<ConfigPresenter.MyView, ConfigPre
         _componentName = request.getParameter(NameTokens.COMPONENT_NAME_PARAM, null);
         if (_componentName != null) {
             _componentName = URL.decode(_componentName);
+        }
+        _extensionName = request.getParameter(NameTokens.EXTENSION_NAME_PARAM, null);
+        if (_extensionName != null) {
+            _extensionName = URL.decode(_extensionName);
         }
     }
 
@@ -172,12 +210,15 @@ public class ConfigPresenter extends Presenter<ConfigPresenter.MyView, ConfigPre
         loadSystemDetails();
         loadComponentsList();
         loadComponent();
+        loadExtensionsList();
+        loadExtension();
     }
 
     @Override
     protected void onHide() {
         super.onHide();
         clearComponentContent();
+        clearExtensionContent();
     }
 
     @Override
@@ -222,10 +263,10 @@ public class ConfigPresenter extends Presenter<ConfigPresenter.MyView, ConfigPre
         _switchYardStore.loadComponent(_componentName, new AsyncCallback<Component>() {
             @Override
             public void onSuccess(Component component) {
-                _presenterWidget = _factory.create(component.getName());
-                _presenterWidget.bind();
-                setInSlot(TYPE_COMPONENT_CONTENT, _presenterWidget, false);
-                _presenterWidget.setComponent(component);
+                _componentPresenterWidget = _factory.create(component.getName());
+                _componentPresenterWidget.bind();
+                setInSlot(TYPE_COMPONENT_CONTENT, _componentPresenterWidget, false);
+                _componentPresenterWidget.setComponent(component);
             }
 
             @Override
@@ -237,15 +278,63 @@ public class ConfigPresenter extends Presenter<ConfigPresenter.MyView, ConfigPre
 
     private void clearComponentContent() {
         clearSlot(TYPE_COMPONENT_CONTENT);
-        releasePresenterWidget();
+        releaseComponentPresenterWidget();
     }
 
-    private void releasePresenterWidget() {
-        if (_presenterWidget == null) {
+    private void releaseComponentPresenterWidget() {
+        if (_componentPresenterWidget == null) {
             return;
         }
-        _presenterWidget.unbind();
-        _presenterWidget = null;
+        _componentPresenterWidget.unbind();
+        _componentPresenterWidget = null;
+    }
+
+    private void loadExtensionsList() {
+        _switchYardStore.loadExtensions(new AsyncCallback<List<Component>>() {
+            @Override
+            public void onSuccess(List<Component> extensions) {
+                getView().setExtensions(extensions);
+            }
+
+            @Override
+            public void onFailure(Throwable caught) {
+                Console.error(Singleton.MESSAGES.error_unknown(), caught.getMessage());
+            }
+        });
+    }
+
+    private void loadExtension() {
+        if (_extensionName == null) {
+            clearExtensionContent();
+            return;
+        }
+        _switchYardStore.loadExtension(_extensionName, new AsyncCallback<Component>() {
+            @Override
+            public void onSuccess(Component extension) {
+                _extensionPresenterWidget = _factory.create(extension.getName());
+                _extensionPresenterWidget.bind();
+                setInSlot(TYPE_EXTENSION_CONTENT, _extensionPresenterWidget, false);
+                _extensionPresenterWidget.setComponent(extension);
+            }
+
+            @Override
+            public void onFailure(Throwable caught) {
+                Console.error(Singleton.MESSAGES.error_unknown(), caught.getMessage());
+            }
+        });
+    }
+
+    private void clearExtensionContent() {
+        clearSlot(TYPE_EXTENSION_CONTENT);
+        releaseExtensionPresenterWidget();
+    }
+
+    private void releaseExtensionPresenterWidget() {
+        if (_extensionPresenterWidget == null) {
+            return;
+        }
+        _extensionPresenterWidget.unbind();
+        _extensionPresenterWidget = null;
     }
 
 }

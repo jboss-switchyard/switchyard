@@ -101,6 +101,39 @@
         </dependency>
         <dependency>
             <groupId>org.switchyard.console.wildfly</groupId>
+            <artifactId>switchyard-console-wildfly-component-http</artifactId>
+            <version>${version.switchyard}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.switchyard.console.wildfly</groupId>
+            <artifactId>switchyard-console-wildfly-component-http</artifactId>
+            <classifier>sources</classifier>
+            <version>${version.switchyard}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.switchyard.console.wildfly</groupId>
+            <artifactId>switchyard-console-wildfly-component-jca</artifactId>
+            <version>${version.switchyard}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.switchyard.console.wildfly</groupId>
+            <artifactId>switchyard-console-wildfly-component-jca</artifactId>
+            <classifier>sources</classifier>
+            <version>${version.switchyard}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.switchyard.console.wildfly</groupId>
+            <artifactId>switchyard-console-wildfly-component-resteasy</artifactId>
+            <version>${version.switchyard}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.switchyard.console.wildfly</groupId>
+            <artifactId>switchyard-console-wildfly-component-resteasy</artifactId>
+            <classifier>sources</classifier>
+            <version>${version.switchyard}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.switchyard.console.wildfly</groupId>
             <artifactId>switchyard-console-wildfly-component-core</artifactId>
             <version>${version.switchyard}</version>
         </dependency>
@@ -112,23 +145,23 @@
         </dependency>
         <dependency>
             <groupId>org.switchyard.console.wildfly</groupId>
-            <artifactId>switchyard-console-wildfly-component-hornetq</artifactId>
+            <artifactId>switchyard-console-wildfly-component-rules</artifactId>
             <version>${version.switchyard}</version>
         </dependency>
         <dependency>
             <groupId>org.switchyard.console.wildfly</groupId>
-            <artifactId>switchyard-console-wildfly-component-hornetq</artifactId>
+            <artifactId>switchyard-console-wildfly-component-rules</artifactId>
             <classifier>sources</classifier>
             <version>${version.switchyard}</version>
         </dependency>
         <dependency>
             <groupId>org.switchyard.console.wildfly</groupId>
-            <artifactId>switchyard-console-wildfly-component-rules</artifactId>
+            <artifactId>switchyard-console-wildfly-component-sca</artifactId>
             <version>${version.switchyard}</version>
         </dependency>
         <dependency>
             <groupId>org.switchyard.console.wildfly</groupId>
-            <artifactId>switchyard-console-wildfly-component-rules</artifactId>
+            <artifactId>switchyard-console-wildfly-component-sca</artifactId>
             <classifier>sources</classifier>
             <version>${version.switchyard}</version>
         </dependency>
@@ -165,9 +198,12 @@
                                 <source>../components/bpm/target/dependency/eap/java</source>
                                 <source>../components/camel/target/dependency/eap/java</source>
                                 <source>../components/clojure/target/dependency/eap/java</source>
+                                <source>../components/http/target/dependency/eap/java</source>
+                                <source>../components/jca/target/dependency/eap/java</source>
+                                <source>../components/resteasy/target/dependency/eap/java</source>
                                 <source>../components/core/target/dependency/eap/java</source>
-                                <source>../components/hornetq/target/dependency/eap/java</source>
                                 <source>../components/rules/target/dependency/eap/java</source>
+                                <source>../components/sca/target/dependency/eap/java</source>
                                 <source>../components/soap/target/dependency/eap/java</source>
                             </sources>
                         </configuration>

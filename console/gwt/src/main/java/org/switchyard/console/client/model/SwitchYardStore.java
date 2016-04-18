@@ -75,6 +75,21 @@ public interface SwitchYardStore {
     void loadComponent(String componentName, AsyncCallback<Component> callback);
 
     /**
+     * Load extensions registered with the SwitchYard subsystem.
+     * 
+     * @param callback the callback.
+     */
+    void loadExtensions(AsyncCallback<List<Component>> callback);
+
+    /**
+     * Load details for a specific extension.
+     * 
+     * @param extensionName the name of the extension to load.
+     * @param callback the callback.
+     */
+    void loadExtension(String extensionName, AsyncCallback<Component> callback);
+
+    /**
      * Load services deployed on the SwitchYard subsystem.
      * 
      * @param callback the callback.

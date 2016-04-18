@@ -33,8 +33,11 @@
         <module>bpm</module>
         <module>camel</module>
         <module>clojure</module>
-        <module>hornetq</module>
+        <module>http</module>
+        <module>jca</module>
+        <module>resteasy</module>
         <module>rules</module>
+        <module>sca</module>
         <module>soap</module>
     </modules>
     <dependencyManagement>
@@ -71,12 +74,27 @@
             </dependency>
             <dependency>
                 <groupId>org.switchyard.console.wildfly</groupId>
-                <artifactId>switchyard-console-wildfly-component-hornetq</artifactId>
+                <artifactId>switchyard-console-wildfly-component-http</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.switchyard.console.wildfly</groupId>
+                <artifactId>switchyard-console-wildfly-component-jca</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.switchyard.console.wildfly</groupId>
+                <artifactId>switchyard-console-wildfly-component-resteasy</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.switchyard.console.wildfly</groupId>
                 <artifactId>switchyard-console-wildfly-component-rules</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.switchyard.console.wildfly</groupId>
+                <artifactId>switchyard-console-wildfly-component-sca</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

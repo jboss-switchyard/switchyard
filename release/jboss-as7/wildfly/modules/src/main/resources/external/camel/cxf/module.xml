@@ -21,6 +21,7 @@
 
     <dependencies>
         <module name="javax.api"/>
+        <module name="javax.jws.api"/>
         <module name="javax.ws.rs.api"/>
         <module name="javax.xml.soap.api"/>
         <module name="org.apache.camel.core"/>

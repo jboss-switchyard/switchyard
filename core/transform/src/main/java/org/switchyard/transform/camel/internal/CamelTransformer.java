@@ -25,8 +25,10 @@ import org.switchyard.Context;
 import org.switchyard.Message;
 import org.switchyard.Property;
 import org.switchyard.Scope;
+import org.switchyard.common.camel.ContextPropertyUtil;
 import org.switchyard.common.xml.QNameUtil;
 import org.switchyard.config.model.Scannable;
+import org.switchyard.label.BehaviorLabel;
 import org.switchyard.transform.BaseTransformer;
 import org.switchyard.transform.internal.TransformMessages;
 
@@ -87,11 +89,16 @@ public class CamelTransformer extends BaseTransformer <Message, Message> {
     }
     
     private void copyProperties(Context context, Exchange exchange) {
-        for (Property property : context.getProperties(Scope.MESSAGE)) {
-            String name = property.getName();
-            Object value = property.getValue();
-            if (value != null) {
-                exchange.getIn().setHeader(name, value);
+        for (Property property : context.getProperties()) {
+            if (property.hasLabel(BehaviorLabel.TRANSIENT.label()) 
+                    || ContextPropertyUtil.isReservedProperty(property.getName(), property.getScope())) {
+                continue;
+            }
+
+            if (Scope.EXCHANGE.equals(property.getScope())) {
+                exchange.setProperty(property.getName(), property.getValue());
+            } else {
+                exchange.getIn().setHeader(property.getName(), property.getValue());
             }
         }
     }

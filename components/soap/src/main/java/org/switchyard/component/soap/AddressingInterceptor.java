@@ -14,6 +14,7 @@
 
 package org.switchyard.component.soap;
 
+import javax.xml.soap.SOAPHeaderElement;
 import javax.xml.ws.handler.MessageContext.Scope;
 
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -58,7 +59,7 @@ public class AddressingInterceptor extends AbstractSoapInterceptor {
             if (soapContext.containsKey(SOAPUtil.SWITCHYARD_CONTEXT)) {
                 Context context = (Context)soapContext.get(SOAPUtil.SWITCHYARD_CONTEXT);
 
-                String property = (String)context.getPropertyValue(SOAPUtil.WSA_ACTION_STR);
+                String property = getContextProperty(context, SOAPUtil.WSA_ACTION_STR);
                 AttributedURIType uri = null;
                 EndpointReferenceType ref = null;
                 if (property != null) {
@@ -66,7 +67,7 @@ public class AddressingInterceptor extends AbstractSoapInterceptor {
                     uri.setValue(property);
                     maps.setAction(uri);
                 }
-                property = (String)context.getPropertyValue(SOAPUtil.WSA_FROM_STR);
+                property = getContextProperty(context, SOAPUtil.WSA_FROM_STR);
                 if (property != null) {
                     uri = new AttributedURIType();
                     uri.setValue(property);
@@ -74,7 +75,7 @@ public class AddressingInterceptor extends AbstractSoapInterceptor {
                     ref.setAddress(uri);
                     maps.setFrom(ref);
                 }
-                property = (String)context.getPropertyValue(SOAPUtil.WSA_TO_STR);
+                property = getContextProperty(context, SOAPUtil.WSA_TO_STR);
                 if (property != null) {
                     uri = new AttributedURIType();
                     uri.setValue(property);
@@ -82,7 +83,7 @@ public class AddressingInterceptor extends AbstractSoapInterceptor {
                     ref.setAddress(uri);
                     maps.setTo(ref);
                 }
-                property = (String)context.getPropertyValue(SOAPUtil.WSA_FAULTTO_STR);
+                property = getContextProperty(context, SOAPUtil.WSA_FAULTTO_STR);
                 if (property != null) {
                     uri = new AttributedURIType();
                     uri.setValue(property);
@@ -90,7 +91,7 @@ public class AddressingInterceptor extends AbstractSoapInterceptor {
                     ref.setAddress(uri);
                     maps.setFaultTo(ref);
                 }
-                property = (String)context.getPropertyValue(SOAPUtil.WSA_REPLYTO_STR);
+                property = getContextProperty(context, SOAPUtil.WSA_REPLYTO_STR);
                 if (property != null) {
                     uri = new AttributedURIType();
                     uri.setValue(property);
@@ -98,13 +99,13 @@ public class AddressingInterceptor extends AbstractSoapInterceptor {
                     ref.setAddress(uri);
                     maps.setReplyTo(ref);
                 }
-                property = (String)context.getPropertyValue(SOAPUtil.WSA_RELATESTO_STR);
+                property = getContextProperty(context, SOAPUtil.WSA_RELATESTO_STR);
                 if (property != null) {
                     RelatesToType relatesTo = new RelatesToType();
                     relatesTo.setValue(property);
                     maps.setRelatesTo(relatesTo);
                 }
-                property = (String)context.getPropertyValue(SOAPUtil.WSA_MESSAGEID_STR);
+                property = getContextProperty(context, SOAPUtil.WSA_MESSAGEID_STR);
                 if (property != null) {
                     uri = new AttributedURIType();
                     uri.setValue(property);
@@ -112,5 +113,15 @@ public class AddressingInterceptor extends AbstractSoapInterceptor {
                 }
             }
         }
+    }
+    
+    private String getContextProperty(Context context, String name) {
+        Object p = context.getPropertyValue(name);
+        if (p instanceof SOAPHeaderElement) {
+            return ((SOAPHeaderElement)p).getValue();
+        } else if (p != null) {
+            return p.toString();
+        }
+        return null;
     }
 }

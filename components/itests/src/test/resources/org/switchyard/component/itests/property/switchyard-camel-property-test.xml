@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<switchyard xmlns="urn:switchyard-config:switchyard:2.0"
+    xmlns:camel="urn:switchyard-component-camel:config:2.0"
+    xmlns:file="urn:switchyard-component-camel-file:config:2.0"
+    xmlns:sca="http://docs.oasis-open.org/ns/opencsa/sca/200912">
+  <sca:composite name="camel-jms-outbound-fault" targetNamespace="urn:reproducer:camel-jms-outbound-fault:0.1.0">
+    <sca:component name="CamelPropertyInOnlyService">
+      <camel:implementation.camel>
+        <camel:java bean="CamelPropertyInOnlyRouteBuilder"/>
+      </camel:implementation.camel>
+      <sca:service name="CamelPropertyInOnlyService">
+        <interface.esb inputType="java:java.lang.String"/>
+      </sca:service>
+    </sca:component>
+    <sca:component name="CamelPropertyInOutService">
+      <camel:implementation.camel>
+        <camel:java bean="CamelPropertyInOutRouteBuilder"/>
+      </camel:implementation.camel>
+      <sca:service name="CamelPropertyInOutService">
+        <interface.esb faultType="java:org.switchyard.component.itests.property.CustomFault" inputType="java:java.lang.String" outputType="java:java.lang.String"/>
+      </sca:service>
+    </sca:component>
+    <sca:service name="CamelPropertyInOnlyService" promote="CamelPropertyInOnlyService/CamelPropertyInOnlyService">
+      <interface.esb inputType="java:java.lang.String"/>
+      <file:binding.file name="file1">
+        <file:contextMapper includes=".*"/>
+        <file:directory>target/input</file:directory>
+        <file:fileName>input-inonly.txt</file:fileName>
+        <file:consume>
+          <file:move>input-inonly-success-$${exchangeProperty.org.switchyard.component.itests.property.FileName}.txt</file:move>
+          <file:moveFailed>input-inonly-failure-$${exchangeProperty.org.switchyard.component.itests.property.FileName}.txt</file:moveFailed>
+        </file:consume>
+      </file:binding.file>
+    </sca:service>
+    <sca:service name="CamelPropertyInOutService" promote="CamelPropertyInOutService/CamelPropertyInOutService">
+      <interface.esb faultType="java:org.switchyard.component.itests.property.CustomFault" inputType="java:java.lang.String" outputType="java:java.lang.String"/>
+      <file:binding.file name="file1">
+        <file:contextMapper includes=".*"/>
+        <file:directory>target/input</file:directory>
+        <file:fileName>input-inout.txt</file:fileName>
+        <file:consume>
+          <file:move>input-inout-success-$${exchangeProperty.org.switchyard.component.itests.property.FileName}.txt</file:move>
+          <file:moveFailed>input-inout-failure-$${exchangeProperty.org.switchyard.component.itests.property.FileName}.txt</file:moveFailed>
+        </file:consume>
+      </file:binding.file>
+    </sca:service>
+  </sca:composite>
+  <domain>
+    <properties/>
+  </domain>
+</switchyard>

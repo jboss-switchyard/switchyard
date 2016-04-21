@@ -13,8 +13,7 @@
  */
 package org.switchyard.component.soap.config.model;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 import org.switchyard.config.model.ModelPuller;
 

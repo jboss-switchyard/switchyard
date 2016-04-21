@@ -14,6 +14,7 @@
 package org.switchyard.component.camel.switchyard;
 
 import static org.jboss.logging.Logger.Level.ERROR;
+import static org.jboss.logging.Logger.Level.WARN;
 
 import org.jboss.logging.Logger;
 import org.jboss.logging.annotations.Cause;
@@ -41,4 +42,12 @@ public interface SwitchYardCamelComponentLogger {
     @LogMessage(level = ERROR)
     @Message(id = 33400, value = "Cannot lookup operation using custom operation selector. Returning empty name")
     void cannotLookupOperation(@Cause Exception e);
+    
+    /**
+     * failedToMapSwitchYardContextToCamel method definition.
+     * @param e cause
+     */
+    @LogMessage(level = WARN)
+    @Message(id = 33401, value = "Failed to map SwitchYard context properties into Camel. Giving up...")
+    void failedToMapSwitchYardContextPropertiesToCamel(@Cause Exception e);
 }

@@ -68,13 +68,47 @@ public final class ExchangeMapper {
         
         // Associate the correct Camel message with the SY exchange
         org.switchyard.Message message = syExchange.createMessage();
-        org.apache.camel.Message camelMessage;
-        if (phase.equals(ExchangePhase.OUT) && camelExchange.hasOut()) {
-            camelMessage = camelExchange.getOut();
-        } else {
-            camelMessage = camelExchange.getIn();
-        }
+        org.apache.camel.Message camelMessage =
+                mapCamelPropertiesToSwitchYard(camelExchange, message.getContext(), phase);
         message.setContent(camelMessage.getBody());
+        
+        for (String attachmentName : camelMessage.getAttachmentNames()) {
+            message.addAttachment(attachmentName, new HandlerDataSource(camelMessage.getAttachment(attachmentName)));
+        }
+        
+        return message;
+    }
+    
+    /**
+     * Get a camel message from given exchange, IN message for ExchangePhase.IN, OUT message for ExchangePhase.OUT.
+     * @param camelExchange the camel exchange
+     * @param phase ExchangePhase.IN to target camelExchange.getIn(), ExchangePhase.OUT to 
+     * target camelExchange.getIn().
+     * @return camel message
+     */
+    public static org.apache.camel.Message getCamelMessage(
+            org.apache.camel.Exchange camelExchange,
+            ExchangePhase phase) {
+        
+        if (phase.equals(ExchangePhase.OUT) && camelExchange.hasOut()) {
+            return camelExchange.getOut();
+        } else {
+            return camelExchange.getIn();
+        }
+    }
+    
+    /**
+     * Map from camel exchange properties and message headers to SwitchYard context property.
+     * @param camelExchange the camel exchange
+     * @param syContext switchyard context
+     * @param phase ExchangePhase.IN to target camelExchange.getIn(), ExchangePhase.OUT to 
+     * target camelExchange.getIn().
+     * @return A camel message targeted to retrieve message headers
+     */
+    public static org.apache.camel.Message mapCamelPropertiesToSwitchYard(
+            org.apache.camel.Exchange camelExchange,
+            org.switchyard.Context syContext,
+            ExchangePhase phase) {
         
         for (String property : camelExchange.getProperties().keySet()) {
             if (ContextPropertyUtil.isReservedProperty(property, Scope.EXCHANGE)) {
@@ -91,9 +125,10 @@ public final class ExchangeMapper {
                 continue;
             }
             
-            message.getContext().setProperty(property, camelExchange.getProperty(property), Scope.EXCHANGE);
+            syContext.setProperty(property, camelExchange.getProperty(property), Scope.EXCHANGE);
         }
         
+        org.apache.camel.Message camelMessage = getCamelMessage(camelExchange, phase);
         Set<Map.Entry<String, Object>> entrySet = camelMessage.getHeaders().entrySet();  
         Iterator<Map.Entry<String, Object>> iter = entrySet.iterator();  
         while (iter.hasNext()) {  
@@ -101,14 +136,10 @@ public final class ExchangeMapper {
             if (ContextPropertyUtil.isReservedProperty(header, Scope.MESSAGE)) {
                 continue;
             }
-            message.getContext().setProperty(header, camelMessage.getHeader(header), Scope.MESSAGE);
-        }
-
-        for (String attachmentName : camelMessage.getAttachmentNames()) {
-            message.addAttachment(attachmentName, new HandlerDataSource(camelMessage.getAttachment(attachmentName)));
+            syContext.setProperty(header, camelMessage.getHeader(header), Scope.MESSAGE);
         }
         
-        return message;
+        return camelMessage;
     }
     
     /**
@@ -125,19 +156,8 @@ public final class ExchangeMapper {
         
         DefaultMessage camelMessage = new SwitchYardMessage();
         camelMessage.setBody(syExchange.getMessage().getContent());
-
-        for (Property property : syExchange.getContext().getProperties()) {
-            if (property.hasLabel(BehaviorLabel.TRANSIENT.label()) 
-                    || ContextPropertyUtil.isReservedProperty(property.getName(), property.getScope())) {
-                continue;
-            }
-
-            if (Scope.EXCHANGE.equals(property.getScope())) {
-                camelExchange.setProperty(property.getName(), property.getValue());
-            } else {
-                camelMessage.setHeader(property.getName(), property.getValue());
-            }
-        }
+        
+        mapSwitchYardPropertiesToCamel(syExchange.getContext(), camelExchange, camelMessage);
         
         for (String attachmentName : syExchange.getMessage().getAttachmentMap().keySet()) {
             camelMessage.addAttachment(attachmentName, 
@@ -145,5 +165,30 @@ public final class ExchangeMapper {
         }
         
         return camelMessage;
+    }
+    
+    /**
+     * Map from SwitchYard context property to camel exchange property or camel message header.
+     * @param syContext switchyard context
+     * @param camelExchange camel exchange
+     * @param camelMessage camel message
+     */
+    public static void mapSwitchYardPropertiesToCamel(
+            org.switchyard.Context syContext,
+            org.apache.camel.Exchange camelExchange,
+            org.apache.camel.Message camelMessage) {
+        
+        for (Property property : syContext.getProperties()) {
+            if (property.hasLabel(BehaviorLabel.TRANSIENT.label()) 
+                    || ContextPropertyUtil.isReservedProperty(property.getName(), property.getScope())) {
+                continue;
+            }
+            
+            if (Scope.EXCHANGE.equals(property.getScope())) {
+                camelExchange.setProperty(property.getName(), property.getValue());
+            } else if (camelMessage != null) {
+                camelMessage.setHeader(property.getName(), property.getValue());
+            }
+        }
     }
 }

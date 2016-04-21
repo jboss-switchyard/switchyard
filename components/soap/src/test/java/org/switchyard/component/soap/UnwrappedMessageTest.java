@@ -16,10 +16,9 @@ package org.switchyard.component.soap;
 
 import java.util.concurrent.TimeUnit;
 
-import junit.framework.Assert;
-
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.switchyard.metadata.InOutService;

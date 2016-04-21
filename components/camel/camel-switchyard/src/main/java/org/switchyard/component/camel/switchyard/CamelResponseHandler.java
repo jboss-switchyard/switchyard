@@ -17,6 +17,7 @@ import org.apache.camel.ExchangePattern;
 import org.apache.camel.Message;
 import org.switchyard.Exchange;
 import org.switchyard.ExchangeHandler;
+import org.switchyard.ExchangePhase;
 import org.switchyard.HandlerException;
 import org.switchyard.ServiceReference;
 import org.switchyard.component.camel.common.composer.CamelBindingData;
@@ -84,6 +85,12 @@ public class CamelResponseHandler implements ExchangeHandler {
         final Object content = exchange.getMessage().getContent();
 
         if (content instanceof Throwable) {
+            try {
+                // SWITCHYARD-2906 - Transfer exchange properties/message headers first
+                mapContext(exchange, ExchangeMapper.getCamelMessage(_camelExchange, ExchangePhase.OUT));
+            } catch (Exception e) {
+                SwitchYardCamelComponentLogger.ROOT_LOGGER.failedToMapSwitchYardContextPropertiesToCamel(e);
+            }
             _camelExchange.setException((Throwable) content);
             return;
         }
@@ -110,5 +117,15 @@ public class CamelResponseHandler implements ExchangeHandler {
             }
         }
         return camelMsg;
+    }
+
+    private void mapContext(Exchange exchange, Message camelMessage) throws Exception {
+        Message camelMsg;
+        if (_messageComposer != null) {
+            camelMsg = getCamelMessage();
+            _messageComposer.getContextMapper().mapTo(exchange.getContext(), new CamelBindingData(camelMsg));
+        } else {
+            ExchangeMapper.mapSwitchYardPropertiesToCamel(exchange.getContext(), _camelExchange, camelMessage);
+        }
     }
 }

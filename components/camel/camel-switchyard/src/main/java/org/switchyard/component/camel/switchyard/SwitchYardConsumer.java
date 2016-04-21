@@ -94,13 +94,21 @@ public class SwitchYardConsumer extends DefaultConsumer implements ServiceHandle
         camelExchange.setIn(targetMessage);
 
         invokeCamelProcessor(camelExchange);
-        Exception camelException = camelExchange.getException();
         
         if (camelExchange.isFailed()) {
+            
+            // SWITCHYARD-2906 - Transfer exchange properties/message headers first
+            Message switchyardMessage = isInOut(switchyardExchange) ? switchyardExchange.createMessage() : null;
+            org.apache.camel.Message camelMessage =
+                    ExchangeMapper.mapCamelPropertiesToSwitchYard(
+                            camelExchange,
+                            switchyardMessage != null ? switchyardMessage.getContext() : switchyardExchange.getContext(),
+                            ExchangePhase.OUT);
+            
             QName faultName = switchyardExchange.getContract().getProviderOperation().getFaultType();
             Class<?> declaredFault = faultName != null && QNameUtil.isJavaMessageType(faultName) ? QNameUtil.toJavaMessageType(faultName) : null;
 
-            Object camelFault = camelException;
+            Object camelFault = camelExchange.getException();
             if (camelFault == null) {
                 if (camelExchange.hasOut() && camelExchange.getOut().isFault()) {
                     // Use Out body as a fault content if camelExchange.getException() returns null
@@ -109,26 +117,34 @@ public class SwitchYardConsumer extends DefaultConsumer implements ServiceHandle
                     camelFault = camelExchange.getIn().getBody();
                 }
             }
-
-            // SWITCHYARD-2814 - since fault type is never declared on IN_ONLY operation,
+            
+            // SWITCHYARD-2814 - since fault type is never declared on IN_ONLY operation (i.e. declaredFault == null),
             // any Throwable will be wrapped with HandlerException. Even if the Java interface
-            // declares any Exception on service operation, that will be ignored.
+            // declares any Exception on service operation, that will be ignored .
             if (camelFault != null && declaredFault != null && declaredFault.isAssignableFrom(camelFault.getClass())) {
-                Message msg = switchyardExchange.createMessage().setContent(camelFault);
-                switchyardExchange.sendFault(msg);
+                switchyardMessage.setContent(camelFault);
+                switchyardExchange.sendFault(switchyardMessage);
             } else if (camelFault instanceof Throwable) {
                 throw new HandlerException(Throwable.class.cast(camelFault));
-            } else if (camelFault instanceof Node) {
+            } else if (camelFault instanceof Node && isInOut(switchyardExchange)) {
                 // TODO SWITCHYARD-2816 - Check if the fault is declared in WSDL, otherwise
                 // wrap the fault with HandlerException
-                Message msg = switchyardExchange.createMessage().setContent((Node)camelFault);
-                switchyardExchange.sendFault(msg);
+                switchyardMessage.setContent((Node)camelFault);
+                switchyardExchange.sendFault(switchyardMessage);
             } else {
-                String faultMessage = (camelFault == null) ? null : camelFault.toString();
+                // No exception, no Throwable content, and no XML fault for IN_OUT.
+                // For the last option, converting the content into String and wrap it with HandlerException.
+                if (camelFault != null) {
+                    camelMessage.setBody(camelFault);
+                }
+                String faultMessage = camelMessage.getBody(String.class);
                 throw SwitchYardCamelComponentMessages.MESSAGES.camelExchangeFailedWithoutException(faultMessage);
             }
         } else if (isInOut(switchyardExchange)) {
             sendResponse(camelExchange, switchyardExchange);
+        } else {
+            // SWITCHYARD-2906 - Transfer exchange properties/message headers also on IN_ONLY
+            ExchangeMapper.mapCamelPropertiesToSwitchYard(camelExchange, switchyardExchange.getContext(), ExchangePhase.OUT);
         }
     }
 

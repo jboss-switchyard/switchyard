@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sy:switchyard xmlns:sy="urn:switchyard-config:switchyard:2.0" name="switchyard-component-itests" targetNamespace="urn:org.switchyard.components:switchyard-component-itests:2.1.0-SNAPSHOT"/>

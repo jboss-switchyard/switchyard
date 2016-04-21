@@ -13,29 +13,21 @@
  */
 package org.switchyard.component.camel.switchyard;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.switchyard.common.camel.SwitchYardCamelContextImpl;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultExchange;
 import org.apache.camel.impl.DefaultMessage;
-
+import org.switchyard.Context;
 import org.switchyard.ExchangePhase;
 import org.switchyard.Message;
 import org.switchyard.Property;
-import org.switchyard.ServiceReference;
-import org.switchyard.Scope;
-
-import org.switchyard.internal.DefaultContext;
-import org.switchyard.internal.ExchangeImpl;
+import org.switchyard.internal.CompositeContext;
 import org.switchyard.component.camel.switchyard.ExchangeMapper;
-import org.switchyard.component.camel.common.composer.CamelContextMapper;
-import org.switchyard.component.camel.common.handler.OutboundHandler;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -79,8 +71,10 @@ public class ExchangeMapperTests {
     private org.switchyard.Exchange createSwitchYardExchange() {
         org.switchyard.Exchange switchYardExchange = mock(org.switchyard.Exchange.class);
         Message message = mock(org.switchyard.Message.class);
-        when(message.getContext()).thenReturn(new DefaultContext(Scope.MESSAGE));
+        Context context = new CompositeContext();
+        when(message.getContext()).thenReturn(context);
         when(message.getContent(Integer.class)).thenReturn(10);
+        when(switchYardExchange.getContext()).thenReturn(context);
         when(switchYardExchange.getMessage()).thenReturn(message);
         when(switchYardExchange.createMessage()).thenReturn(message);
         return switchYardExchange;

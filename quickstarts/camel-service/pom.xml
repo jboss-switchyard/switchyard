@@ -50,7 +50,11 @@
         <maven.compiler.target>1.6</maven.compiler.target>
         <maven.compiler.source>1.6</maven.compiler.source>
         <switchyard.osgi.import>*</switchyard.osgi.import>
-        <switchyard.osgi.require.capability/>
+        <switchyard.osgi.require.capability>
+            org.ops4j.pax.cdi.extension; filter:="(extension=switchyard-component-bean)",
+            org.ops4j.pax.cdi.extension; filter:="(extension=deltaspike-core-api)",
+            osgi.extender; filter:="(osgi.extender=pax.cdi)"
+        </switchyard.osgi.require.capability>
         <switchyard.osgi.dynamic>
             org.switchyard,org.switchyard.*
         </switchyard.osgi.dynamic>

@@ -15,6 +15,7 @@ package org.switchyard.deploy.osgi.internal;
 
 import org.apache.camel.TypeConverter;
 import org.apache.camel.core.osgi.OsgiCamelContextHelper;
+import org.apache.camel.core.osgi.OsgiCamelContextPublisher;
 import org.apache.camel.core.osgi.OsgiFactoryFinderResolver;
 import org.apache.camel.core.osgi.OsgiTypeConverter;
 import org.apache.camel.core.osgi.utils.BundleContextUtils;
@@ -37,6 +38,8 @@ public class OsgiSwitchYardCamelContextImpl extends SwitchYardCamelContextImpl {
     public OsgiSwitchYardCamelContextImpl(BundleContext bundleContext) {
         _bundleContext = bundleContext;
         OsgiCamelContextHelper.osgiUpdate(this, bundleContext);
+        // Ensure we publish this CamelContext to the OSGi service registry
+        getManagementStrategy().addEventNotifier(new OsgiCamelContextPublisher(bundleContext));
     }
 
     @Override

@@ -160,6 +160,9 @@ public class EndpointProxy implements InvocationHandler, MessageEndpoint {
         } catch (Throwable t) {
             if (!_beforeDeliveryInvoked) {
                 finish(false);
+            }else {
+                // The transaction will be rolled back in afterDelivery
+                markTransactionAsRollbackOnly(method);
             }
             throw t;
         }
@@ -267,12 +270,19 @@ public class EndpointProxy implements InvocationHandler, MessageEndpoint {
             hasSourceManagedTx = false;
             break;
         case Status.STATUS_COMMITTED:
+        case Status.STATUS_ROLLEDBACK:
             hasSourceManagedTx = false;
-            // possibly the one which has been commited by reaper thread. try to disassociate...
+            // possibly the one which has been commited/rolledback by reaper thread. try to disassociate...
             _transactionManager.suspend();
             break;
+        case Status.STATUS_MARKED_ROLLBACK:
+            hasSourceManagedTx = false;
+            // possibly the broker didn't invoke corresponding afterDelivery after delivery exception
+            JCALogger.ROOT_LOGGER.rollingBackExistingTransactionWhichIsMarkedAsRollbackOnly();
+            _transactionManager.rollback();
+            break;
         default:
-            throw JCAMessages.MESSAGES.methodNewTransactionCouldnTBeStartedDueToTheStatusOfExistingTransactionStatusCodeTxStatusSeeJavaxTransactionStatus();
+            throw JCAMessages.MESSAGES.methodNewTransactionCouldnTBeStartedDueToTheStatusOfExistingTransactionStatusCodeTxStatusSeeJavaxTransactionStatus(txStatus);
         }
         
         if (hasSourceManagedTx && _useBatchCommit) {
@@ -291,6 +301,44 @@ public class EndpointProxy implements InvocationHandler, MessageEndpoint {
             }
         } else if (!endpointRequiresTx && hasSourceManagedTx) {
             _suspendedTx = _transactionManager.suspend();
+        }
+    }
+    
+    private void markTransactionAsRollbackOnly(Method method) throws Exception {
+        Transaction currentTx = _transactionManager.getTransaction();
+        if (_logger.isDebugEnabled()) {
+            _logger.debug(String.format("%s is marking the transaction as rollback only: currentTx=%s, startedTx=%s, suspendedTx=%s",
+                    Thread.currentThread().getName(), currentTx, _startedTx, _suspendedTx));
+        }
+        
+        if (_startedTx != null) {
+            if (currentTx != null && currentTx.equals(_startedTx)) {
+                currentTx.setRollbackOnly();
+                
+            } else {
+                // Suspend any bad transaction - there is bug somewhere, but we will try to tidy things up
+                JCALogger.ROOT_LOGGER.currentTransactionIsNotSameAsThe(currentTx, _startedTx.toString());
+                Transaction origTx = _transactionManager.suspend();
+                try {
+                    _transactionManager.resume(_startedTx);
+                    _startedTx.setRollbackOnly();
+                } finally {
+                    // Resume any suspended transaction
+                    if (origTx != null) {
+                        try {
+                            _transactionManager.suspend();
+                            _transactionManager.resume(origTx);
+                        } catch (Throwable t) {
+                            JCALogger.ROOT_LOGGER.messageEndpointFailedToResumeOldTransaction(_delegate.toString(), origTx.toString());
+                        }
+                    }
+                }
+            }
+            
+        } else if (_messageEndpointFactory.isDeliveryTransacted(method)
+                    && currentTx != null && currentTx.getStatus() == Status.STATUS_ACTIVE) {
+            // Set rollback only flag on a source managed Tx
+            currentTx.setRollbackOnly();
         }
     }
     

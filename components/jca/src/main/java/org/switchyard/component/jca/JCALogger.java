@@ -140,5 +140,12 @@ public interface JCALogger {
     @Message(id = 36813, value = "Invalid destination type '%s' - using '%s' instead")
     void invalidDestinationType(String type, String alternative);
 
+    /**
+     * rollingBackExistingTransactionWhichIsMarkedAsRollbackOnly method definition.
+     */
+    @LogMessage(level = Level.WARN)
+    @Message(id = 36814, value = "The existing transcation is marked as rollback only - rolling back before create new one.")
+    void rollingBackExistingTransactionWhichIsMarkedAsRollbackOnly();
+
 }
 

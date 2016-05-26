@@ -150,8 +150,8 @@ public interface JCAMessages {
      * methodNewTransactionCouldnTBeStartedDueToTheStatusOfExistingTransactionStatusCodeTxStatusSeeJavaxTransactionStatus method definition.
      * @return IllegalStateException
      */
-    @Message(id = 37225, value = "")
-    IllegalStateException methodNewTransactionCouldnTBeStartedDueToTheStatusOfExistingTransactionStatusCodeTxStatusSeeJavaxTransactionStatus();
+    @Message(id = 37225, value = "New transaction could't be started due to the status of existing transaction status code '%s'. See javax.transaction.Status for more details.")
+    IllegalStateException methodNewTransactionCouldnTBeStartedDueToTheStatusOfExistingTransactionStatusCodeTxStatusSeeJavaxTransactionStatus(int status);
 
     /**
      * batchCommitModeCannotBeUsedWithSourceManagedTransactionPleaseTurnOffTheBatchCommit method definition.

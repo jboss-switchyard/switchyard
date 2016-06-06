@@ -1,1 +1,1 @@
-<messageComposer xmlns="urn:switchyard-component-soap:config:1.0" unwrapped="true"/>
+<messageComposer xmlns="urn:switchyard-component-soap:config:2.0" unwrapped="true" copyNamespaces="true"/>

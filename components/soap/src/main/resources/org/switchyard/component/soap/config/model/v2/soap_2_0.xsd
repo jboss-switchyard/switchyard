@@ -34,6 +34,7 @@
         <complexContent>
             <extension base="swyd:MessageComposerType">
                 <attribute name="unwrapped" type="boolean" use="optional" />
+                <attribute name="copyNamespaces" type="boolean" use="optional" />
             </extension>
         </complexContent>
     </complexType>

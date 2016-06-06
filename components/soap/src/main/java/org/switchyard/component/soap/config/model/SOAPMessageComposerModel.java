@@ -33,4 +33,17 @@ public interface SOAPMessageComposerModel extends MessageComposerModel {
      */
     SOAPMessageComposerModel setUnwrapped(boolean unwrapped);
 
+    /**
+     * Indicates whether the composer copies namespaces when extracting a body.
+     * @return true if the composer copies namespaces, false otherwise
+     */
+    Boolean isCopyNamespaces();
+
+    /**
+     * Specifies that the composer should copy namespaces when extracting a body.
+     * @param copyNamespaces true to copy namespaces
+     * @return this instance (useful for chaining)
+     */
+    SOAPMessageComposerModel setCopyNamespaces(boolean copyNamespaces);
+
 }

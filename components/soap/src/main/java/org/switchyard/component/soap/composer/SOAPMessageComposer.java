@@ -26,6 +26,7 @@ import javax.activation.DataSource;
 import javax.wsdl.Operation;
 import javax.wsdl.Part;
 import javax.wsdl.Port;
+import javax.xml.XMLConstants;
 import javax.xml.soap.AttachmentPart;
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPEnvelope;
@@ -70,6 +71,7 @@ public class SOAPMessageComposer extends BaseMessageComposer<SOAPBindingData> {
     private Boolean _mtomEnabled = false;
     private Boolean _xopExpand = false;
     private Boolean _unwrapped = false;
+    private Boolean _copyNamespaces = false;
 
     /**
      * {@inheritDoc}
@@ -94,6 +96,13 @@ public class SOAPMessageComposer extends BaseMessageComposer<SOAPBindingData> {
             if (soapBody.hasFault()) {
                 // peel off the Fault element
                 SOAPFault fault = soapBody.getFault();
+                if (_copyNamespaces) {
+                    Iterator i = fault.getVisibleNamespacePrefixes();
+                    while (i.hasNext()) {
+                        String prefix = i.next().toString();
+                        fault.addNamespaceDeclaration(prefix, fault.getNamespaceURI(prefix));
+                    }
+                }
                 Node faultNode = fault.getParentNode().removeChild(fault);
                 message.setContent(faultNode);
                 return message;
@@ -120,6 +129,15 @@ public class SOAPMessageComposer extends BaseMessageComposer<SOAPBindingData> {
                             bodyNode = subChildren.get(0);
                         }
                     }
+                }
+            }
+            if (_copyNamespaces) {
+                Iterator i = soapBody.getVisibleNamespacePrefixes();
+                while (i.hasNext()) {
+                    String prefix = i.next().toString();
+                    ((Element)bodyNode).setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI,
+                            XMLConstants.XMLNS_ATTRIBUTE + ":" + prefix,
+                            soapBody.getNamespaceURI(prefix));
                 }
             }
             bodyNode = bodyNode.getParentNode().removeChild(bodyNode);
@@ -378,4 +396,19 @@ public class SOAPMessageComposer extends BaseMessageComposer<SOAPBindingData> {
         _unwrapped = unwrapped;
     }
 
+    /**
+     * Check if composer has set copyNamespaces.
+     * @return true if copyNamespaces, false otherwise
+     */
+    public Boolean isCopyNamespaces() {
+        return _copyNamespaces;
+    }
+
+    /**
+     * Set copyNamespaces flag.
+     * @param copyNamespaces true or false
+     */
+    public void setCopyNamespaces(Boolean copyNamespaces) {
+        _copyNamespaces = copyNamespaces;
+    }
 }

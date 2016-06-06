@@ -52,4 +52,16 @@ public class V1SOAPMessageComposerModel extends V1MessageComposerModel implement
         return this;
     }
 
+    @Override
+    public Boolean isCopyNamespaces() {
+        String copyNamespaces = getModelAttribute("copyNamespaces");
+        return copyNamespaces != null && Boolean.valueOf(copyNamespaces);
+    }
+
+    @Override
+    public SOAPMessageComposerModel setCopyNamespaces(boolean copyNamespaces) {
+        setModelAttribute("copyNamespaces", String.valueOf(copyNamespaces));
+        return this;
+    }
+
 }

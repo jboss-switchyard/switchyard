@@ -23,7 +23,7 @@ import org.switchyard.component.soap.config.model.SOAPNamespace;
 import org.switchyard.config.model.ModelPuller;
 
 /**
- * Test of atom binding model.
+ * Test of soap binding model.
  */
 public class V1SOAPMessageComposerModelTest {
 
@@ -43,12 +43,14 @@ public class V1SOAPMessageComposerModelTest {
         SOAPBindingModel model = puller.pull(SOAP_BINDING, getClass());
         Assert.assertTrue(model.isModelValid());
         Assert.assertTrue("Unwrap should be true", model.getSOAPMessageComposer().isUnwrapped());
+        Assert.assertTrue("copyNamespaces should be true", model.getSOAPMessageComposer().isCopyNamespaces());
     }
 
     @Test
     public void testWriteConfig() throws Exception {
-        V1SOAPMessageComposerModel scm = new V1SOAPMessageComposerModel(SOAPNamespace.V_1_0.uri());
+        V1SOAPMessageComposerModel scm = new V1SOAPMessageComposerModel(SOAPNamespace.V_2_0.uri());
         scm.setUnwrapped(true);
+        scm.setCopyNamespaces(true);
 
         V1SOAPMessageComposerModel refModel = new ModelPuller<V1SOAPMessageComposerModel>()
                 .pull(COMPOSER_FRAG, getClass());

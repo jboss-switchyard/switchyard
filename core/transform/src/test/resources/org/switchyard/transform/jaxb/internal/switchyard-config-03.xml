@@ -12,9 +12,9 @@
  - limitations under the License.
  -->
 
-<switchyard xmlns="urn:switchyard-config:switchyard:1.0">
+<switchyard xmlns="urn:switchyard-config:switchyard:2.0">
     <transforms>
-        <transform.jaxb xmlns="urn:switchyard-config:transform:1.0" from="java:org.switchyard.transform.jaxb.internal.POType" to="A" contextPath="org.switchyard.transform.jaxb.internal"/>
-        <transform.jaxb xmlns="urn:switchyard-config:transform:1.0" from="A" to="java:org.switchyard.transform.jaxb.internal.POType" contextPath="org.switchyard.transform.jaxb.internal"/>
+        <transform.jaxb xmlns="urn:switchyard-config:transform:2.0" from="java:org.switchyard.transform.jaxb.internal.POType" to="A" contextPath="org.switchyard.transform.jaxb.internal" enableAttachment="true"/>
+        <transform.jaxb xmlns="urn:switchyard-config:transform:2.0" from="A" to="java:org.switchyard.transform.jaxb.internal.POType" contextPath="org.switchyard.transform.jaxb.internal"/>
     </transforms>
 </switchyard>

@@ -1,6 +1,7 @@
 
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+            xmlns:xmime="http://schemas.xmlsoap.org/2003/04/xmime"
             jxb:version="1.0">
   <xsd:annotation>
   <xsd:documentation>
@@ -158,6 +159,7 @@ program to map this to a "short" Java datatype.
          </xsd:element>
          <xsd:element ref="comment" minOccurs="0"/>
          <xsd:element name="shipDate" type="xsd:date" minOccurs="0"/>
+         <xsd:element name="coverPhoto" type="xsd:base64Binary" xmime:expectedContentTypes="application/octet-stream" minOccurs="0"/>
         </xsd:sequence>
         <xsd:attribute name="partNum" type="SKU" use="required">
            <xsd:annotation>

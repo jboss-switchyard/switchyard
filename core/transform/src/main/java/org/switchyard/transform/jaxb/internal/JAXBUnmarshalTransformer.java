@@ -14,13 +14,16 @@
 
 package org.switchyard.transform.jaxb.internal;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.Reader;
 
+import javax.activation.DataHandler;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.attachment.AttachmentUnmarshaller;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
@@ -49,16 +52,19 @@ public class JAXBUnmarshalTransformer<F, T> extends BaseTransformer<Message, Mes
     private static Logger _logger = Logger.getLogger(JAXBUnmarshalTransformer.class);
 
     private JAXBContext _jaxbContext;
+    private boolean _isXOPPackage;
 
     /**
      * Public constructor.
      * @param from From type.
      * @param to To type.
      * @param contextPath JAXB context path (Java package).
+     * @param isXOPPackage true if XOPPackage is to be enabled.
      * @throws SwitchYardException Failed to create JAXBContext.
      */
-    public JAXBUnmarshalTransformer(QName from, QName to, String contextPath) throws SwitchYardException {
+    public JAXBUnmarshalTransformer(QName from, QName to, String contextPath, boolean isXOPPackage) throws SwitchYardException {
         super(from, to);
+        _isXOPPackage = isXOPPackage;
         try {
             if (contextPath != null) {
                 _jaxbContext = JAXBContext.newInstance(contextPath);
@@ -76,6 +82,7 @@ public class JAXBUnmarshalTransformer<F, T> extends BaseTransformer<Message, Mes
 
         try {
             unmarshaller = _jaxbContext.createUnmarshaller();
+            unmarshaller.setAttachmentUnmarshaller(new JAXBAttachmentUnmarshaller(message, _isXOPPackage));
         } catch (JAXBException e) {
             throw TransformMessages.MESSAGES.failedToCreateMarshaller(getTo().toString(), e);
         }
@@ -112,4 +119,53 @@ public class JAXBUnmarshalTransformer<F, T> extends BaseTransformer<Message, Mes
 
         return message;
     }
+    
+    class JAXBAttachmentUnmarshaller extends AttachmentUnmarshaller {
+
+        private Message _message;
+        private boolean _xop;
+        
+        JAXBAttachmentUnmarshaller(Message message, boolean xop) {
+            _message = message;
+            _xop = xop;
+        }
+        
+        @Override
+        public DataHandler getAttachmentAsDataHandler(String cid) {
+            if (_message.getAttachment(cid) == null) {
+                return null;
+            }
+            
+            return new DataHandler(_message.getAttachment(cid));
+        }
+
+        @Override
+        public byte[] getAttachmentAsByteArray(String cid) {
+            if (_message.getAttachment(cid) == null) {
+                return null;
+            }
+            
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            try {
+                InputStream is = _message.getAttachment(cid).getInputStream();
+                byte[] buff = new byte[128];
+                int read;
+                while ((read = is.read(buff)) != -1) {
+                    os.write(buff, 0, read);
+                }
+                os.flush();
+                os.close();
+                is.close();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            return os.toByteArray();
+        }
+        
+        @Override
+        public boolean isXOPPackage() {
+            return _xop;
+        }
+    }
+
 }

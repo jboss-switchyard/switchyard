@@ -197,6 +197,21 @@
                       </documentation>
                   </annotation>
               </attribute>
+              <attribute name="enableAttachment" type="swyd:propBoolean" default="false">
+                  <annotation>
+                      <documentation xml:lang="en">
+                          whether the binary element should be mapped into external attachment or inline in Java2XML transformation.
+                          default is false, which means the binary content is inlined into XML body.
+                      </documentation>
+                  </annotation>
+              </attribute>
+              <attribute name="enableXOPPackage" type="swyd:propBoolean" default="true">
+                  <annotation>
+                      <documentation xml:lang="en">
+                          whether the XOP Package is enabled or not when processing attachment. default is true
+                      </documentation>
+                  </annotation>
+              </attribute>
             </extension>
         </complexContent>
     </complexType>

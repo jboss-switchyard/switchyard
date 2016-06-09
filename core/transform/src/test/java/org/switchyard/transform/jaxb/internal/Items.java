@@ -8,14 +8,18 @@
 
 package org.switchyard.transform.jaxb.internal;
 
+import javax.activation.DataHandler;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlMimeType;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.datatype.XMLGregorianCalendar;
+
+import java.awt.Image;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Vector;
@@ -47,6 +51,7 @@ import java.util.Vector;
  *                   &lt;element name="USPrice" type="{http://www.w3.org/2001/XMLSchema}decimal"/>
  *                   &lt;element ref="{}comment" minOccurs="0"/>
  *                   &lt;element name="shipDate" type="{http://www.w3.org/2001/XMLSchema}date" minOccurs="0"/>
+ *                   &lt;element name="coverPhoto" type="{http://www.w3.org/2001/XMLSchema}base64Binary" minOccurs="0"/>
  *                 &lt;/sequence>
  *                 &lt;attribute name="partNum" use="required" type="{}SKU" />
  *               &lt;/restriction>
@@ -121,6 +126,7 @@ public class Items {
      *         &lt;element name="USPrice" type="{http://www.w3.org/2001/XMLSchema}decimal"/>
      *         &lt;element ref="{}comment" minOccurs="0"/>
      *         &lt;element name="shipDate" type="{http://www.w3.org/2001/XMLSchema}date" minOccurs="0"/>
+     *         &lt;element name="coverPhoto" type="{http://www.w3.org/2001/XMLSchema}base64Binary" minOccurs="0"/>
      *       &lt;/sequence>
      *       &lt;attribute name="partNum" use="required" type="{}SKU" />
      *     &lt;/restriction>
@@ -136,7 +142,8 @@ public class Items {
         "quantity",
         "price",
         "comment",
-        "shipDate"
+        "shipDate",
+        "coverPhoto"
     })
     public static class Item {
 
@@ -150,6 +157,8 @@ public class Items {
         protected String comment;
         @XmlSchemaType(name = "date")
         protected XMLGregorianCalendar shipDate;
+        @XmlMimeType(value = "application/octet-stream")
+        protected DataHandler coverPhoto;
         @XmlAttribute(name = "partNum", required = true)
         protected String partNumber;
 
@@ -275,6 +284,30 @@ public class Items {
          */
         public void setShipDate(XMLGregorianCalendar value) {
             this.shipDate = value;
+        }
+
+        /**
+         * Gets the value of the coverPhoto property.
+         *
+         * @return
+         *     possible object is
+         *     {@link javax.activation.DataHandler }
+         *
+         */
+        public DataHandler getCoverPhoto() {
+            return coverPhoto;
+        }
+
+        /**
+         * Sets the value of the coverPhoto property.
+         *
+         * @param value
+         *     allowed object is
+         *     {@link java.awt.Image }
+         *     
+         */
+        public void setCoverPhoto(DataHandler value) {
+            this.coverPhoto = value;
         }
 
         /**

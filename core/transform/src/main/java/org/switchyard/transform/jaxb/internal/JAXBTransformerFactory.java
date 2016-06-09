@@ -54,9 +54,9 @@ public class JAXBTransformerFactory implements TransformerFactory<JAXBTransformM
         QName toType = model.getTo();
 
         if (toJavaTransformType(fromType, toType) == JavaTransformType.JAVA2XML) {
-            return new JAXBMarshalTransformer(fromType, toType, model.getContextPath());
+            return new JAXBMarshalTransformer(fromType, toType, model.getContextPath(), model.isAttachmentEnabled(), model.isXOPPackageEnabled());
         } else {
-            return new JAXBUnmarshalTransformer(fromType, toType, model.getContextPath());
+            return new JAXBUnmarshalTransformer(fromType, toType, model.getContextPath(), model.isXOPPackageEnabled());
         }
     }
 
@@ -106,7 +106,7 @@ public class JAXBTransformerFactory implements TransformerFactory<JAXBTransformM
 
             if (fromType != null) {
                 QName toType = JavaTypes.toMessageType(inType);
-                transformers.add(new JAXBUnmarshalTransformer(fromType, toType, inType.getPackage().getName()));
+                transformers.add(new JAXBUnmarshalTransformer(fromType, toType, inType.getPackage().getName(), true));
             } else if (_log.isDebugEnabled()) {
                 _log.debug(createMissingFactoryMethodMessage(inType, objectFactory));
             }
@@ -121,7 +121,7 @@ public class JAXBTransformerFactory implements TransformerFactory<JAXBTransformM
 
             if (toType != null) {
                 QName fromType = JavaTypes.toMessageType(outType);
-                transformers.add(new JAXBMarshalTransformer(fromType, toType, outType.getPackage().getName()));
+                transformers.add(new JAXBMarshalTransformer(fromType, toType, outType.getPackage().getName(), false, false));
             } else if (_log.isDebugEnabled()) {
                 _log.debug(createMissingFactoryMethodMessage(outType, objectFactory));
             }

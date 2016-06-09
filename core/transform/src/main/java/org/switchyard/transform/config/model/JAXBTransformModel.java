@@ -29,6 +29,12 @@ public interface JAXBTransformModel extends TransformModel {
     /** The "contextPath" name. */
     public static final String CONTEXT_PATH = "contextPath";
     
+    /** The "enableAttachment" name. */
+    public static final String ENABLE_ATTACHMENT = "enableAttachment";
+
+    /** The "enableXOPPackage" name. */
+    public static final String ENABLE_XOP_PACKAGE = "enableXOPPackage";
+
     /**
      * Gets the contextPath attribute.
      * @return the contextPath attribute
@@ -41,5 +47,31 @@ public interface JAXBTransformModel extends TransformModel {
      * @return this JAXBTransformModel (useful for chaining)
      */
     public JAXBTransformModel setContextPath(String contextPath);
+
+    /**
+     * Gets enableAttachment attribute.
+     * @return the enableAttachment attribute
+     */
+    public boolean isAttachmentEnabled();
+
+    /**
+     * Sets the enableAttachment attribute.
+     * @param attachmentEnabled the enableAttachment attribute
+     * @return this JAXBTransformModel (useful for chaining)
+     */
+    public JAXBTransformModel setAttachmentEnabled(boolean attachmentEnabled);
+
+    /**
+     * Gets enableXOPPackage attribute.
+     * @return the enableXOPPackage attribute
+     */
+    public boolean isXOPPackageEnabled();
+
+    /**
+     * Sets the enableXOPPackage attribute.
+     * @param xopEnabled the enableXOPPackage attribute
+     * @return this JAXBTransformModel (useful for chaining)
+     */
+    public JAXBTransformModel setXOPPackageEnabled(boolean xopEnabled);
 
 }

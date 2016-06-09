@@ -29,6 +29,7 @@
             <productName>Godzilla and Mothra: Battle for Earth/Godzilla vs. King Ghidora</productName>
             <quantity>3</quantity>
             <USPrice>27.95</USPrice>
+            <coverPhoto><xop:Include xmlns:xop="http://www.w3.org/2004/08/xop/include" href="cid:coverphoto.jpg"/></coverPhoto>
         </item>
     </items>
 </purchaseOrder>

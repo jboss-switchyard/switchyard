@@ -22,6 +22,7 @@ import org.switchyard.transform.config.model.CamelTransformModel;
 import org.switchyard.transform.config.model.DozerFileEntryModel;
 import org.switchyard.transform.config.model.DozerMappingFilesModel;
 import org.switchyard.transform.config.model.DozerTransformModel;
+import org.switchyard.transform.config.model.JAXBTransformModel;
 import org.switchyard.transform.config.model.v1.V1TransformMarshaller;
 
 /**
@@ -33,6 +34,7 @@ public class V2TransformMarshaller extends V1TransformMarshaller {
 
     private static final String TRANSFORM_DOZER = TransformModel.TRANSFORM + "." + DozerTransformModel.DOZER;
     private static final String TRANSFORM_CAMEL = TransformModel.TRANSFORM + "." + CamelTransformModel.CAMEL;
+    private static final String TRANSFORM_JAXB = TransformModel.TRANSFORM + "." + JAXBTransformModel.JAXB;
     
     /**
      * Constructs a new V2TransformMarshaller with the specified Descriptor.
@@ -47,11 +49,6 @@ public class V2TransformMarshaller extends V1TransformMarshaller {
      */
     @Override
     public Model read(Configuration config) {
-        Model model = super.read(config);
-        if (model != null) {
-            return model;
-        }
-
         String name = config.getName();
         Descriptor desc = getDescriptor();
         if (name.equals(TRANSFORM_DOZER)) {
@@ -62,9 +59,11 @@ public class V2TransformMarshaller extends V1TransformMarshaller {
             return new V2DozerFileEntryModel(config, desc);
         } else if (name.equals(TRANSFORM_CAMEL)) {
             return new V2CamelTransformModel(config, desc);
+        } else if (name.equals(TRANSFORM_JAXB)) {
+            return new V2JAXBTransformModel(config, desc);
         }
-
-        return null;
+        
+       return super.read(config);
     }
 
 }

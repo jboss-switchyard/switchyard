@@ -1,7 +1,7 @@
 package org.switchyard.component.soap;
 
 import javax.xml.soap.SOAPException;
-import org.jboss.logging.Cause;
+import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.Messages;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageBundle;
@@ -340,5 +340,15 @@ public interface SOAPMessages {
      */
     @Message(id = 35453, value = "Invalid response SOAPMessage construction.  The associated SwitchYard Exchange is in a FAULT state, but the SOAPMessage is not a Fault message.  The MessageComposer implementation in use (\"%s\") must generate the SOAPMessage instance properly as a Fault message.")
     SOAPException invalidResponseConstruction(String messageComposerName);
+
+    /**
+     * couldNotInstantiateInterceptor method definition.
+     * @param interceptorClassName interceptor class name
+     * @param t cause 
+     * @return SwitchYardException
+     */
+    @Message(id = 35454, value = "Could not instantiate interceptor class: %s")
+    SwitchYardException couldNotInstantiateInterceptor(String interceptorClassName, @Cause Throwable t);
+
 }
 

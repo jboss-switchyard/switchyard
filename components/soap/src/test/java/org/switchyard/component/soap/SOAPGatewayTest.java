@@ -279,6 +279,9 @@ public class SOAPGatewayTest {
             // it is sufficient to test that we actually loaded the WSDL from classpath
             Assert.assertEquals("javax.xml.ws.WebServiceException: Unsupported endpoint address: REPLACE_WITH_ACTUAL_URL", rootCause);
         }
+        Assert.assertNotEquals(String.format("TestInInterceptor[ID=%s, phase=%s] was not invoked", MockInInterceptor.getInterceptorID(), MockInInterceptor.getInterceptorPhase()), 0, MockInInterceptor.getCallCount());
+        
+        Assert.assertNotEquals(String.format("TestOutInterceptor[ID=%s, phase=%s] was not invoked", MockOutInterceptor.getInterceptorID(), MockOutInterceptor.getInterceptorPhase()), 0, MockOutInterceptor.getCallCount());
     }
 
     @Test

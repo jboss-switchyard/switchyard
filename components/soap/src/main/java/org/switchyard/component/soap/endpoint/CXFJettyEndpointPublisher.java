@@ -51,7 +51,7 @@ public class CXFJettyEndpointPublisher extends AbstractEndpointPublisher {
 
             String publishUrl = HTTP_SCHEME + "://" + config.getSocketAddr().getHost() + ":" + config.getSocketAddr().getPort() + "/" + getContextPath();
 
-            wsEndpoint = new CXFJettyEndpoint(bindingId, handler, new AddressingInterceptor(), features);
+            wsEndpoint = new CXFJettyEndpoint(bindingId, config, handler, new AddressingInterceptor(), features);
             //wsEndpoint.getEndpoint().setProperties(properties);
             wsEndpoint.getEndpoint().setWsdlURL(getWsdlLocation());
             wsEndpoint.getEndpoint().setServiceName(config.getPort().getServiceQName());

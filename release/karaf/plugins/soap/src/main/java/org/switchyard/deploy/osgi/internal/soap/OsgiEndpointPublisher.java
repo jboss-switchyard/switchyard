@@ -43,7 +43,7 @@ public class OsgiEndpointPublisher extends AbstractEndpointPublisher {
 
             String publishUrl = "/" + getContextPath();
 
-            wsEndpoint = new CXFJettyEndpoint(bindingId, handler, new AddressingInterceptor(), features);
+            wsEndpoint = new CXFJettyEndpoint(bindingId, config, handler, new AddressingInterceptor(), features);
             wsEndpoint.getEndpoint().setWsdlURL(getWsdlLocation());
             wsEndpoint.getEndpoint().setServiceName(config.getPort().getServiceQName());
             wsEndpoint.publish(publishUrl);

@@ -14,6 +14,7 @@
  
 package org.switchyard.component.soap.endpoint;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,9 +35,15 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.apache.cxf.ws.addressing.soap.DecoupledFaultHandler;
 import org.switchyard.common.type.Classes;
+import org.switchyard.common.type.reflect.Construction;
 import org.switchyard.component.common.Endpoint;
 import org.switchyard.component.soap.InboundHandler;
 import org.switchyard.component.soap.SOAPLogger;
+import org.switchyard.component.soap.SOAPMessages;
+import org.switchyard.component.soap.config.model.InterceptorModel;
+import org.switchyard.component.soap.config.model.InterceptorsModel;
+import org.switchyard.component.soap.config.model.SOAPBindingModel;
+import org.switchyard.config.model.property.PropertiesModel;
 
 /**
  * Wrapper for CXF JAX-WS endpoints.
@@ -64,11 +71,12 @@ public class CXFJettyEndpoint implements Endpoint {
     /**
      * Construct a JAX-WS endpoint based on SOAP version.
      * @param bindingId The SOAP binding version
+     * @param config SOAPBindingModel
      * @param handler The handler instance that contains the actual invoke method implementation
      * @param addressingInterceptor specialized interceptor for mapping addressing information
      * @param features A list of WebService features
      */
-    public CXFJettyEndpoint(final String bindingId, final InboundHandler handler, Interceptor<? extends Message> addressingInterceptor, WebServiceFeature... features) {
+    public CXFJettyEndpoint(final String bindingId, final SOAPBindingModel config, final InboundHandler handler, Interceptor<? extends Message> addressingInterceptor, WebServiceFeature... features) {
         BaseWebService wsProvider = new BaseWebService();
         wsProvider.setInvocationClassLoader(Classes.getTCCL());
         // Hook the handler
@@ -106,8 +114,68 @@ public class CXFJettyEndpoint implements Endpoint {
         _svrFactory.getInInterceptors().add(new LoggingInInterceptor());
         _svrFactory.getInInterceptors().add(new org.apache.cxf.binding.soap.saaj.SAAJInInterceptor());
         _svrFactory.getInInterceptors().add(new org.apache.cxf.binding.soap.interceptor.SoapActionInInterceptor());
+        _svrFactory.getInInterceptors().addAll(getConfiguredInterceptors(config.getInInterceptors()));
+        _svrFactory.getOutInterceptors().addAll(getConfiguredInterceptors(config.getOutInterceptors()));
         _svrFactory.getOutInterceptors().add(new LoggingOutInterceptor());
         _svrFactory.getOutInterceptors().add(new org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor());
+    }
+
+    private static <T extends Interceptor<? extends Message>> List<T> getConfiguredInterceptors(InterceptorsModel interceptorsModel) {
+        List<T> interceptors = new ArrayList<T>();
+        if (interceptorsModel != null) {
+            for (InterceptorModel interceptorModel : interceptorsModel.getInterceptors()) {
+                if (interceptorModel != null) {
+                    @SuppressWarnings("unchecked")
+                    Class<T> interceptorClass = (Class<T>)interceptorModel.getClazz(Classes.getTCCL());
+                    if (interceptorClass != null) {
+                        PropertiesModel propertiesModel = interceptorModel.getProperties();
+                        Map<String, String> properties = propertiesModel != null ? propertiesModel.toMap() : new HashMap<String, String>();
+                        T interceptor = newInterceptor(interceptorClass, properties);
+                        if (interceptor != null) {
+                            interceptors.add(interceptor);
+                        }
+                    }
+                }
+            }
+        }
+        return interceptors;
+    }
+
+    private static <T extends Interceptor<? extends Message>> T newInterceptor(Class<T> interceptorClass, Map<String, String> properties) {
+        T interceptor = null;
+        Constructor<T> constructor = getConstructor(interceptorClass);
+        Class<?>[] parameterTypes = constructor != null ? constructor.getParameterTypes() : new Class<?>[0];
+        try {
+            if (parameterTypes.length == 0) {
+                interceptor = Construction.construct(interceptorClass);
+            } else if (parameterTypes.length == 1) {
+                interceptor = Construction.construct(interceptorClass, parameterTypes, new Object[]{properties});
+            }
+        } catch (Throwable t) {
+            throw SOAPMessages.MESSAGES.couldNotInstantiateInterceptor(interceptorClass.getName(), t);
+        }
+        return interceptor;
+    }
+
+    private static <T extends Interceptor<? extends Message>> Constructor<T> getConstructor(Class<T> interceptorClass) {
+        final Class<?>[][] constructorParameterTypes = new Class<?>[][]{
+            new Class<?>[]{Map.class},
+            new Class<?>[0]
+        };
+
+        Constructor<T> constructor = null;
+        for (Class<?>[] parameterTypes : constructorParameterTypes) {
+            try {
+                constructor = interceptorClass.getConstructor(parameterTypes);
+                if (constructor != null) {
+                    break;
+                }
+            } catch (Throwable t) {
+                // keep checkstyle happy ("at least one statement")
+                t.getMessage();
+            }
+        }
+        return constructor;
     }
 
     /**

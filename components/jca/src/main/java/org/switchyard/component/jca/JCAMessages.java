@@ -2,7 +2,7 @@ package org.switchyard.component.jca;
 
 import javax.naming.NamingException;
 
-import org.jboss.logging.Cause;
+import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.Messages;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageBundle;
@@ -148,6 +148,7 @@ public interface JCAMessages {
 
     /**
      * methodNewTransactionCouldnTBeStartedDueToTheStatusOfExistingTransactionStatusCodeTxStatusSeeJavaxTransactionStatus method definition.
+     * @param status Transaction status
      * @return IllegalStateException
      */
     @Message(id = 37225, value = "New transaction could't be started due to the status of existing transaction status code '%s'. See javax.transaction.Status for more details.")

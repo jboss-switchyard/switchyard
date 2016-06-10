@@ -160,7 +160,7 @@ public class EndpointProxy implements InvocationHandler, MessageEndpoint {
         } catch (Throwable t) {
             if (!_beforeDeliveryInvoked) {
                 finish(false);
-            }else {
+            } else {
                 // The transaction will be rolled back in afterDelivery
                 markTransactionAsRollbackOnly(method);
             }

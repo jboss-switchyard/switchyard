@@ -36,7 +36,7 @@ Wildfly
 
 2. Build and deploy the quickstart
 
-        mvn install -Pdeploy,db
+        mvn install -Pdeploy,db -Pwildfly
 
 3. Wait a bit for producer and consumer threads to start
 
@@ -47,7 +47,7 @@ Wildfly
 
 5. Undeploy the quickstart:
 
-        mvn clean -Pdeploy,db
+        mvn clean -Pdeploy,db -Pwildfly
 
 
 Karaf

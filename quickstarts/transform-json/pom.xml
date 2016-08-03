@@ -45,8 +45,8 @@
     <properties>
         <!-- Bundle symbolic name may not contain dashes -->
         <bundle.symbolic.name>${project.groupId}.switchyard.transform.json</bundle.symbolic.name>
-        <maven.compiler.target>1.6</maven.compiler.target>
-        <maven.compiler.source>1.6</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
+        <maven.compiler.source>1.7</maven.compiler.source>
         <deploy.skip>true</deploy.skip>
         <wildfly.port>9999</wildfly.port>
         <switchyard.osgi.import>*</switchyard.osgi.import>

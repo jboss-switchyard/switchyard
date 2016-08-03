@@ -47,8 +47,8 @@
         <bundle.symbolic.name>${project.groupId}.switchyard.transform.xslt</bundle.symbolic.name>
         <deploy.skip>true</deploy.skip>
         <wildfly.port>9999</wildfly.port>
-        <maven.compiler.target>1.6</maven.compiler.target>
-        <maven.compiler.source>1.6</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
+        <maven.compiler.source>1.7</maven.compiler.source>
         <switchyard.osgi.import>*</switchyard.osgi.import>
         <switchyard.osgi.require.capability>
             org.ops4j.pax.cdi.extension; filter:="(extension=switchyard-component-bean)",

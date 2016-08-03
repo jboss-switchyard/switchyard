@@ -47,8 +47,8 @@
         <bundle.symbolic.name>${project.groupId}.switchyard.camel.amqp.binding</bundle.symbolic.name>
         <deploy.skip>true</deploy.skip>
         <maven.exec.mainClass>org.switchyard.quickstarts.camel.amqp.binding.QpidServer</maven.exec.mainClass>
-        <maven.compiler.target>1.6</maven.compiler.target>
-        <maven.compiler.source>1.6</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
+        <maven.compiler.source>1.7</maven.compiler.source>
         <switchyard.osgi.import>*</switchyard.osgi.import>
         <switchyard.osgi.require.capability>
             org.ops4j.pax.cdi.extension; filter:="(extension=switchyard-component-bean)",

@@ -35,8 +35,8 @@
         <!-- Bundle symbolic name may not contain dashes -->
         <bundle.symbolic.name>${project.groupId}.switchyard.camel.soap.proxy</bundle.symbolic.name>
         <deploy.skip>true</deploy.skip>
-        <maven.compiler.target>1.6</maven.compiler.target>
-        <maven.compiler.source>1.6</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
+        <maven.compiler.source>1.7</maven.compiler.source>
         <switchyard.osgi.export.pkg/>
         <switchyard.osgi.require.capability>
 			org.ops4j.pax.cdi.extension; filter:="(extension=switchyard-component-bean)",

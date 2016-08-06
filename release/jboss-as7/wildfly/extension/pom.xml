@@ -75,6 +75,10 @@
                     <groupId>org.jboss.spec.javax.servlet</groupId>
                     <artifactId>jboss-servlet-api_3.0_spec</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.jboss.com.sun.httpserver</groupId>
+                    <artifactId>httpserver</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -209,10 +213,6 @@
             <artifactId>staxmapper</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.jboss.com.sun.httpserver</groupId>
-            <artifactId>httpserver</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.jboss.common</groupId>
             <artifactId>jboss-common-beans</artifactId>
         </dependency>
@@ -277,12 +277,18 @@
         </dependency>
         <dependency>
             <groupId>org.jboss.ws.cxf</groupId>
-            <artifactId>jbossws-cxf-transports-httpserver</artifactId>
+            <artifactId>jbossws-cxf-transports-undertow</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss.ws.projects</groupId>
-            <artifactId>jaxws-jboss-httpserver-httpspi</artifactId>
+            <artifactId>jaxws-undertow-httpspi</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.undertow</groupId>
+            <artifactId>undertow-core</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.picketbox</groupId>
@@ -350,6 +356,7 @@
                                         <exclude name="org/switchyard/as7/extension/SwitchYardExtension.java"/>
                                         <exclude name="org/switchyard/as7/extension/SwitchYardModuleAdd.java"/>
                                         <exclude name="org/switchyard/as7/extension/SwitchYardSubsystemAdd.java"/>
+                                        <exclude name="org/switchyard/as7/extension/camel/cxf/HttpServerDestination.java"/>
                                         <exclude name="org/switchyard/as7/extension/cluster/RemoteEndpointListener.java"/>
                                         <exclude name="org/switchyard/as7/extension/deployment/SwitchYardCdiIntegrationProcessor.java"/>
                                         <exclude name="org/switchyard/as7/extension/deployment/SwitchYardDeployment.java"/>

@@ -73,6 +73,7 @@
             <dependency>
                 <groupId>org.switchyard.components</groupId>
                 <artifactId>switchyard-component-test-mixin-hornetq</artifactId>
+                <version>${project.version}</version>
                 <scope>test</scope>
                 <exclusions>
                     <exclusion>

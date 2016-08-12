@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-- Copyright 2015 Red Hat Inc. and/or its affiliates and other contributors.
+- Copyright 2016 Red Hat Inc. and/or its affiliates and other contributors.
 -
 - Licensed under the Apache License, Version 2.0 (the "License")
 - you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
     </parent>
     <groupId>org.switchyard.console</groupId>
     <artifactId>switchyard-console-components</artifactId>
-    <version>2.1.0-SNAPSHOT</version>
+    <version>2.1.0.Final</version>
     <packaging>pom</packaging>
     <name>SwitchYard: Console System Components</name>
     <description>Base pom for console system component UI contributions.</description>
@@ -112,27 +112,27 @@
                 <artifactId>console-spi</artifactId>
                 <version>${version.org.jboss.as.console}</version>
                 <scope>provided</scope>
-            </dependency> 
+            </dependency>
             <dependency>
                 <groupId>org.jboss.as</groupId>
                 <artifactId>console-spi</artifactId>
                 <version>${version.org.jboss.as.console}</version>
                 <scope>provided</scope>
                 <classifier>sources</classifier>
-            </dependency> 
+            </dependency>
             <dependency>
                 <groupId>org.jboss.as</groupId>
                 <artifactId>diagnostics</artifactId>
                 <version>${version.org.jboss.as.console}</version>
                 <scope>provided</scope>
-            </dependency> 
+            </dependency>
             <dependency>
                 <groupId>org.jboss.as</groupId>
                 <artifactId>diagnostics</artifactId>
                 <version>${version.org.jboss.as.console}</version>
                 <scope>provided</scope>
                 <classifier>sources</classifier>
-            </dependency> 
+            </dependency>
             <dependency>
                 <groupId>org.jboss.as</groupId>
                 <artifactId>jboss-as-console-core</artifactId>
@@ -151,13 +151,13 @@
                 <artifactId>jboss-as-console-dmr</artifactId>
                 <version>${version.org.jboss.as.console}</version>
                 <scope>provided</scope>
-            </dependency> 
+            </dependency>
             <dependency>
                 <groupId>org.jboss.as</groupId>
                 <artifactId>jboss-as-console-flow</artifactId>
                 <version>${version.org.jboss.as.console}</version>
                 <scope>provided</scope>
-            </dependency> 
+            </dependency>
             <dependency>
                 <groupId>org.jboss.as</groupId>
                 <artifactId>ace-gwt</artifactId>

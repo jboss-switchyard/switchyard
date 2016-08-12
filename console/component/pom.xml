@@ -28,6 +28,7 @@
     <description>Base pom for console system component UI contributions.</description>
     <properties>
         <version.org.jboss.as.console>2.5.11.Final</version.org.jboss.as.console>
+        <enforcer.skip>true</enforcer.skip>
     </properties>
     <modules>
         <module>core</module>

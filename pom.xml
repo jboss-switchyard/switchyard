@@ -1451,6 +1451,11 @@
             </dependency>
             <dependency>
                 <groupId>org.switchyard.quickstarts</groupId>
+                <artifactId>switchyard-camel-atom-binding</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.switchyard.quickstarts</groupId>
                 <artifactId>switchyard-camel-file-binding</artifactId>
                 <version>${project.version}</version>
             </dependency>

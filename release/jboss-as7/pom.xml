@@ -183,6 +183,17 @@
         </dependency>
         <dependency>
             <groupId>org.switchyard.quickstarts</groupId>
+            <artifactId>switchyard-camel-atom-binding</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.switchyard.quickstarts</groupId>
             <artifactId>switchyard-camel-file-binding</artifactId>
             <scope>test</scope>
             <exclusions>

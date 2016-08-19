@@ -168,24 +168,8 @@
          #######                   BPEL Console                    #######
          ################################################################# -->
     <target name="install-bpel-console" 
-        description="Install BPEL Console to SwitchYard Runtime"
-        depends="download-bpel-console, get-jboss-path">
-        
-        <condition property="BPELConsoleAlreadyInstalled">
-            <or>
-                <available file="switchyard-bpel-console.war" filepath="${WILDFLY_PATH}/standalone/deployments"/>
-            </or>
-        </condition>
-        
-        <copy todir="${WILDFLY_PATH}/standalone/deployments" 
-            overwrite="true" 
-            file="res/switchyard-tools-${tools.version}/switchyard-bpel-console-server.war"/>
-        
-        <copy todir="${WILDFLY_PATH}/standalone/deployments/switchyard-bpel-console.war">
-            <fileset dir="res/switchyard-tools-${tools.version}/switchyard-bpel-console.war"/>
-        </copy>
-        
-        <touch file="${WILDFLY_PATH}/standalone/deployments/switchyard-bpel-console.war.dodeploy"/>
+        description="Install BPEL Console to SwitchYard Runtime">
+        <echo>The bpel-console is not currently supported on WildFly 10.   Please use SwitchYard 2.0 and WildFly 8.1.</echo>
     </target>
     
     <target name="download-bpel-console" 

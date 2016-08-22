@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-- Copyright 2015 Red Hat Inc. and/or its affiliates and other contributors.
+- Copyright 2016 Red Hat Inc. and/or its affiliates and other contributors.
 -
 - Licensed under the Apache License, Version 2.0 (the "License")
 - you may not use this file except in compliance with the License.
@@ -23,14 +23,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.switchyard.console.wildfly</groupId>
     <artifactId>switchyard-console-wildfly-application</artifactId>
-    <version>2.1.0.Final</version>
+    <version>3.0.0-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>SwitchYard: WildFly Management Console Application</name>
     <description>Integrated WildFly console application, which includes the SwitchYard extension.</description>
     <properties>
         <enforcer.skip>true</enforcer.skip>
         <gwt.module>org.switchyard.console.SwitchYard</gwt.module>
-        <version.switchyard>2.1.0.Final</version.switchyard>
+        <version.switchyard>3.0.0-SNAPSHOT</version.switchyard>
     </properties>
     <dependencies>
         <dependency>

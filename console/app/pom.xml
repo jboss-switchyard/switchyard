@@ -23,7 +23,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.switchyard.console</groupId>
     <artifactId>switchyard-console-application</artifactId>
-    <version>2.1.0.Final</version>
+    <version>3.0.0-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>SwitchYard: Management Console Application</name>
     <description>Integrated AS7 console application, which includes the SwitchYard extension.</description>
@@ -48,77 +48,65 @@
         <dependency>
             <groupId>org.jboss.as</groupId>
             <artifactId>ace-gwt</artifactId>
-            <version>${project.parent.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss.as</groupId>
             <artifactId>ace-gwt</artifactId>
-            <version>${project.parent.version}</version>
             <scope>provided</scope>
             <classifier>sources</classifier>
         </dependency>
         <dependency>
             <groupId>org.jboss.as</groupId>
             <artifactId>console-spi</artifactId>
-            <version>${project.parent.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss.as</groupId>
             <artifactId>console-spi</artifactId>
-            <version>${project.parent.version}</version>
             <scope>provided</scope>
             <classifier>sources</classifier>
         </dependency>
         <dependency>
             <groupId>org.jboss.as</groupId>
             <artifactId>diagnostics</artifactId>
-            <version>${project.parent.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss.as</groupId>
             <artifactId>diagnostics</artifactId>
-            <version>${project.parent.version}</version>
             <scope>provided</scope>
             <classifier>sources</classifier>
         </dependency>
         <dependency>
             <groupId>org.jboss.as</groupId>
             <artifactId>jboss-as-console-core</artifactId>
-            <version>${project.parent.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss.as</groupId>
             <artifactId>jboss-as-console-core</artifactId>
-            <version>${project.parent.version}</version>
             <scope>provided</scope>
             <classifier>sources</classifier>
         </dependency>
         <dependency>
             <groupId>org.jboss.as</groupId>
             <artifactId>jboss-as-console-dialogs</artifactId>
-            <version>${project.parent.version}</version>
             <type>war</type>
         </dependency>
         <dependency>
             <groupId>org.jboss.as</groupId>
             <artifactId>jboss-as-console-dmr</artifactId>
-            <version>${project.parent.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss.as</groupId>
             <artifactId>jboss-as-console-flow</artifactId>
-            <version>${project.parent.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss.as</groupId>
             <artifactId>jboss-as-console-resources</artifactId>
-            <version>${project.parent.version}</version>
             <type>war</type>
         </dependency>
     </dependencies>
@@ -151,4 +139,85 @@
             </plugin>
         </plugins>
     </build>
+    <dependencyManagement>
+        <dependencies>
+            <!-- HAL console dependencies -->
+            <dependency>
+                <groupId>org.jboss.as</groupId>
+                <artifactId>ace-gwt</artifactId>
+                <version>${project.parent.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.as</groupId>
+                <artifactId>ace-gwt</artifactId>
+                <version>${project.parent.version}</version>
+                <scope>provided</scope>
+                <classifier>sources</classifier>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.as</groupId>
+                <artifactId>console-spi</artifactId>
+                <version>${project.parent.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.as</groupId>
+                <artifactId>console-spi</artifactId>
+                <version>${project.parent.version}</version>
+                <scope>provided</scope>
+                <classifier>sources</classifier>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.as</groupId>
+                <artifactId>diagnostics</artifactId>
+                <version>${project.parent.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.as</groupId>
+                <artifactId>diagnostics</artifactId>
+                <version>${project.parent.version}</version>
+                <scope>provided</scope>
+                <classifier>sources</classifier>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.as</groupId>
+                <artifactId>jboss-as-console-core</artifactId>
+                <version>${project.parent.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.as</groupId>
+                <artifactId>jboss-as-console-core</artifactId>
+                <version>${project.parent.version}</version>
+                <scope>provided</scope>
+                <classifier>sources</classifier>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.as</groupId>
+                <artifactId>jboss-as-console-dialogs</artifactId>
+                <version>${project.parent.version}</version>
+                <type>war</type>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.as</groupId>
+                <artifactId>jboss-as-console-dmr</artifactId>
+                <version>${project.parent.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.as</groupId>
+                <artifactId>jboss-as-console-flow</artifactId>
+                <version>${project.parent.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.as</groupId>
+                <artifactId>jboss-as-console-resources</artifactId>
+                <version>${project.parent.version}</version>
+                <type>war</type>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 </project>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-- Copyright 2015 Red Hat Inc. and/or its affiliates and other contributors.
+- Copyright 2016 Red Hat Inc. and/or its affiliates and other contributors.
 -
 - Licensed under the Apache License, Version 2.0 (the "License")
 - you may not use this file except in compliance with the License.
@@ -23,11 +23,11 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.switchyard.console.wildfly</groupId>
     <artifactId>switchyard-console-wildfly-extension</artifactId>
-    <version>2.1.0.Final</version>
+    <version>3.0.0-SNAPSHOT</version>
     <name>SwitchYard: WildFly Management Console Extension</name>
     <description>WildFly management console extension supporting the SwitchYard runtime.</description>
     <properties>
-        <version.switchyard>2.1.0.Final</version.switchyard>
+        <version.switchyard>3.0.0-SNAPSHOT</version.switchyard>
         <common.sources.dir>${project.build.directory}/dependency/eap/java</common.sources.dir>
         <common.resources.dir>${project.build.directory}/dependency/eap/resources</common.resources.dir>
         <common.test.resources.dir>${project.build.directory}/dependency/eap-test/resources</common.test.resources.dir>
@@ -151,7 +151,7 @@
                             </sources>
                         </configuration>
                     </execution>
-                   <execution>
+                    <execution>
                         <id>add-common-resources-dir</id>
                         <phase>generate-sources</phase>
                         <goals>

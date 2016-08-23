@@ -22,7 +22,7 @@
     </parent>
     <groupId>org.switchyard.console</groupId>
     <artifactId>switchyard-console-components</artifactId>
-    <version>2.1.0.Final</version>
+    <version>2.1.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>SwitchYard: Console System Components</name>
     <description>Base pom for console system component UI contributions.</description>

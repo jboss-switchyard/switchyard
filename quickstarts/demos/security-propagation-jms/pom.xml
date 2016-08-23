@@ -16,7 +16,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.switchyard.quickstarts.demos</groupId>
     <artifactId>switchyard-demo-security-propagation-jms</artifactId>
-    <version>2.1.0.Final</version>
+    <version>2.1.1-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <name>Quickstart Demo : Security Propagation over JMS queue</name>
     <description>Quickstart Demo : Security Propagation over JMS queue</description>

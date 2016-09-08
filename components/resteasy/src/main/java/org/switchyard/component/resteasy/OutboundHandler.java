@@ -151,8 +151,15 @@ public class OutboundHandler extends BaseServiceHandler {
             RESTEasyBindingData restResponse = methodInvoker.invoke(exchange, restRequest.getParameters(), restRequest.getHeaders());
             restResponse.setOperationName(opName);
             Message out = _messageComposer.compose(restResponse, exchange);
+
+            if(restResponse.getStatusCode() < 400) {
+                exchange.send(out);
+            } else {
+                exchange.sendFault(out);
+            }
+
             // Our transformer magic transforms the entity appropriately here :)
-            exchange.send(out);
+
         } catch (Exception e) {
             final String m = RestEasyMessages.MESSAGES.unexpectedExceptionComposingRESTResponse();
             LOGGER.error(m, e);

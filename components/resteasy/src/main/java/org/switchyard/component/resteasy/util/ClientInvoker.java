@@ -494,7 +494,18 @@ public class ClientInvoker extends ClientInterceptorRepositoryImpl implements Me
             clientResponse.setAttributeExceptionsTo(_method.toString());
             clientResponse.setAnnotations(_method.getAnnotations());
             ClientRequestContext clientRequestContext = new ClientRequestContext(request, clientResponse, errorHandler, _extractorFactory, _baseUri);
-            Object response = _extractor.extractEntity(clientRequestContext);
+
+            Object response = null;
+            try {
+                response = _extractor.extractEntity(clientRequestContext);
+            } catch (RuntimeException e) {
+                if(clientRequestContext.getClientResponse().getStatus() < 400) {
+                    //unexpected exception by extractor
+                    throw e;
+                }
+                response = e;
+            }
+
             RESTEasyBindingData restResponse = new RESTEasyBindingData();
             if (response != null) {
                 restResponse.setParameters(new Object[]{response});

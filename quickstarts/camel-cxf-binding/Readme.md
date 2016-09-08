@@ -68,7 +68,7 @@ karaf@root> features:addurl mvn:org.switchyard.karaf/switchyard/{SWITCHYARD-VERS
 
 3. Install the quickstart feature :
 
-karaf@root> features:install switchyard-quickstart-camel-cxf
+karaf@root> features:install switchyard-quickstart-camel-cxf-binding
 
 3. Open a console window and type
 <pre>

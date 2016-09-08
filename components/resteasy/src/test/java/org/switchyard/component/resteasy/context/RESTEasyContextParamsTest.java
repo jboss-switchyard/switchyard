@@ -145,8 +145,11 @@ public class RESTEasyContextParamsTest {
 
     @Test
     public void messageBodyWriterProviderReferenceTest() throws Exception {
-        _consumerService.operation(OP_CREATE_WITH_OWN_MEDIA_TYPE).sendInOut(PAYLOAD);
-        Assert.assertTrue(SyTxtMessageBodyRW.isInvoked());
+        try {
+            _consumerService.operation(OP_CREATE_WITH_OWN_MEDIA_TYPE).sendInOut(PAYLOAD);
+        } catch (InvocationFaultException ife) {
+            Assert.assertTrue(SyTxtMessageBodyRW.isInvoked());
+        }
     }
 
     private static class RESTEasyContextParamsInterface extends BaseService {

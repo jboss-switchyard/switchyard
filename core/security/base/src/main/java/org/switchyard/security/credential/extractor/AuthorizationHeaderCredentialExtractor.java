@@ -84,9 +84,9 @@ public class AuthorizationHeaderCredentialExtractor implements CredentialExtract
     public Set<Credential> extract(String source) {
         Set<Credential> credentials = new HashSet<Credential>();
         if (source != null) {
-            if (source.startsWith("Basic ")) {
+            if (source.toUpperCase().startsWith("BASIC ")) {
                 extractBasic(source, credentials);
-            } else if (source.startsWith("Digest ")) {
+            } else if (source.toUpperCase().startsWith("DIGEST ")) {
                 extractDigest(source, credentials);
             } else {
                 // Assuming it's a authz token like Bearer, token, AWS4-HMAC-SHA256

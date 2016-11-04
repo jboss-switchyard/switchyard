@@ -28,6 +28,7 @@ import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPHeaderElement;
 import javax.xml.soap.SOAPMessage;
 
+import org.apache.cxf.message.Message;
 import org.switchyard.Context;
 import org.switchyard.Property;
 import org.switchyard.Scope;
@@ -107,8 +108,6 @@ public class SOAPContextMapper extends BaseRegexContextMapper<SOAPBindingData> {
                     } else {
                         context.setProperty(key, values).addLabels(SOAP_MIME_LABELS);
                     }
-
-                    copyHttpHeadersToContext(context, key, values);
                 }
             }
         }
@@ -146,6 +145,123 @@ public class SOAPContextMapper extends BaseRegexContextMapper<SOAPBindingData> {
         }
     }
 
+    public SOAPBindingData mapToMessageScope(Property property, SOAPHeader soapHeader,
+        SOAPBindingData data) throws Exception {
+        Object value = property.getValue();
+        SOAPBindingData target = data;
+        if (value != null) {
+            String name = property.getName();
+            QName qname = XMLHelper.createQName(name);
+            boolean qualifiedForSoapHeader = Strings.trimToNull(qname.getNamespaceURI()) != null;
+            if (qualifiedForSoapHeader && matches(qname)) {
+                if (value instanceof Node) {
+                    Node domNode = soapHeader.getOwnerDocument().importNode((Node)value, true);
+                    soapHeader.appendChild(domNode);
+                } else if (value instanceof Configuration) {
+                    Element configElement = new ElementPuller().pull(new StringReader(value.toString()));
+                    Node configNode = soapHeader.getOwnerDocument().importNode(configElement, true);
+                    soapHeader.appendChild(configNode);
+                } else {
+                    String v = value.toString();
+                    if (SOAPHeadersType.XML.equals(_soapHeadersType)) {
+                        try {
+                            Element xmlElement = new ElementPuller().pull(new StringReader(v));
+                            Node xmlNode = soapHeader.getOwnerDocument().importNode(xmlElement, true);
+                            soapHeader.appendChild(xmlNode);
+                        } catch (Throwable t) {
+                            soapHeader.addChildElement(qname).setValue(v);
+                        }
+                    } else {
+                        soapHeader.addChildElement(qname).setValue(v);
+                    }
+                }
+            } else if (matches(name) || property.hasLabel(EndpointLabel.HTTP.label())) {
+                if (HTTP_RESPONSE_STATUS.equalsIgnoreCase(name)) {
+                    if (value instanceof String) {
+                        target.setStatus(Integer.parseInt((String) value));
+                    } else if (value instanceof Integer) {
+                        target.setStatus((Integer) value);
+                    }
+                } else if (HTTP_HEADERS_EXCLUDED.contains(name.toLowerCase())) {
+                    // Excluding HTTP headers which should not be set manually
+                } else {
+                    if (value instanceof List) {
+                        List<String> stringValues = new ArrayList<String>();
+                        for (Object v : List.class.cast(value)) {
+                            if (v == null || v instanceof String) {
+                                stringValues.add((String)v);
+                            }
+                        }
+                        if (!stringValues.isEmpty()) {
+                            target.getHttpHeaders().put(name, stringValues);
+                        }
+                    } else if (value instanceof String) {
+                        target.getHttpHeaders().put(name, Collections.singletonList((String)value));
+                    }
+                }
+            } else {
+                copyToSOAPHeader(soapHeader, property);
+            }
+        }
+        return target;
+    }
+
+    public SOAPBindingData mapToExchangeScope(Property property, SOAPHeader soapHeader,
+            SOAPBindingData data) throws Exception {
+        Object value = property.getValue();
+        SOAPBindingData target = data;
+        if (value != null) {
+            String name = property.getName();
+            QName qname = XMLHelper.createQName(name);
+            boolean qualifiedForSoapHeader = Strings.trimToNull(qname.getNamespaceURI()) != null;
+            if (qualifiedForSoapHeader && matches(qname)) {
+                if (value instanceof Node) {
+                    Node domNode = soapHeader.getOwnerDocument().importNode((Node)value, true);
+                    soapHeader.appendChild(domNode);
+                } else if (value instanceof Configuration) {
+                    Element configElement = new ElementPuller().pull(new StringReader(value.toString()));
+                    Node configNode = soapHeader.getOwnerDocument().importNode(configElement, true);
+                    soapHeader.appendChild(configNode);
+                } else {
+                    String v = value.toString();
+                    if (SOAPHeadersType.XML.equals(_soapHeadersType)) {
+                        try {
+                            Element xmlElement = new ElementPuller().pull(new StringReader(v));
+                            Node xmlNode = soapHeader.getOwnerDocument().importNode(xmlElement, true);
+                            soapHeader.appendChild(xmlNode);
+                        } catch (Throwable t) {
+                            soapHeader.addChildElement(qname).setValue(v);
+                        }
+                    } else {
+                        soapHeader.addChildElement(qname).setValue(v);
+                    }
+                }
+            } else if (matches(name) || property.hasLabel(EndpointLabel.HTTP.label())) {
+                if (HTTP_RESPONSE_STATUS.equalsIgnoreCase(name)) {
+                    if (value instanceof String) {
+                        target.setStatus(Integer.parseInt((String) value));
+                    } else if (value instanceof Integer) {
+                        target.setStatus((Integer) value);
+                    }
+                } else if (HTTP_HEADERS_EXCLUDED.contains(name.toLowerCase())) {
+                    // Excluding HTTP headers which should not be set manually
+                } else {
+                    if (value instanceof List) {
+                        List<String> stringValues = new ArrayList<String>();
+                        for (Object v : List.class.cast(value)) {
+                            if (v == null || v instanceof String) {
+                                stringValues.add((String)v);
+                            }
+                        }
+                    }
+                }
+            } else {
+                copyToSOAPHeader(soapHeader, property);
+            }
+        }
+        return target;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -155,63 +271,12 @@ public class SOAPContextMapper extends BaseRegexContextMapper<SOAPBindingData> {
 
         SOAPMessage soapMessage = target.getSOAPMessage();
         SOAPHeader soapHeader = soapMessage.getSOAPHeader();
-        for (Property property : context.getProperties()) {
-            Object value = property.getValue();
-            if (value != null) {
-                String name = property.getName();
-                QName qname = XMLHelper.createQName(name);
-                boolean qualifiedForSoapHeader = Strings.trimToNull(qname.getNamespaceURI()) != null;
-                if (qualifiedForSoapHeader && matches(qname)) {
-                    if (value instanceof Node) {
-                        Node domNode = soapHeader.getOwnerDocument().importNode((Node)value, true);
-                        soapHeader.appendChild(domNode);
-                    } else if (value instanceof Configuration) {
-                        Element configElement = new ElementPuller().pull(new StringReader(value.toString()));
-                        Node configNode = soapHeader.getOwnerDocument().importNode(configElement, true);
-                        soapHeader.appendChild(configNode);
-                    } else {
-                        String v = value.toString();
-                        if (SOAPHeadersType.XML.equals(_soapHeadersType)) {
-                            try {
-                                Element xmlElement = new ElementPuller().pull(new StringReader(v));
-                                Node xmlNode = soapHeader.getOwnerDocument().importNode(xmlElement, true);
-                                soapHeader.appendChild(xmlNode);
-                            } catch (Throwable t) {
-                                soapHeader.addChildElement(qname).setValue(v);
-                            }
-                        } else {
-                            soapHeader.addChildElement(qname).setValue(v);
-                        }
-                    }
-                } else if (matches(name) || property.hasLabel(EndpointLabel.HTTP.label())) {
-                    if (HTTP_RESPONSE_STATUS.equalsIgnoreCase(name)) {
-                        if (value instanceof String) {
-                            target.setStatus(Integer.parseInt((String) value));
-                        } else if (value instanceof Integer) {
-                            target.setStatus((Integer) value);
-                        }
-                    } else if (HTTP_HEADERS_EXCLUDED.contains(name.toLowerCase())) {
-                        // Excluding HTTP headers which should not be set manually
-                        continue;
-                    } else {
-                        if (value instanceof List) {
-                            List<String> stringValues = new ArrayList<String>();
-                            for (Object v : List.class.cast(value)) {
-                                if (v == null || v instanceof String) {
-                                    stringValues.add((String)v);
-                                }
-                            }
-                            if (!stringValues.isEmpty()) {
-                                target.getHttpHeaders().put(name, stringValues);
-                            }
-                        } else if (value instanceof String) {
-                            target.getHttpHeaders().put(name, Collections.singletonList((String)value));
-                        }
-                    }
-                } else {
-                    copyToSOAPHeader(soapHeader, property);
-                }
-            }
+        for (Property property : context.getProperties(Scope.EXCHANGE)) {
+            target = mapToExchangeScope(property, soapHeader, target);
+        }
+
+        for (Property property : context.getProperties(Scope.MESSAGE)) {
+            target = mapToMessageScope(property, soapHeader, target);
         }
     }
 

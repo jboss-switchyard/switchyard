@@ -14,6 +14,11 @@
 package org.switchyard.component.soap;
 
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPMessage;
@@ -22,6 +27,7 @@ import javax.xml.ws.soap.SOAPBinding;
 import org.junit.Assert;
 import org.junit.Test;
 import org.switchyard.Context;
+import org.switchyard.Property;
 import org.switchyard.Scope;
 import org.switchyard.component.soap.composer.SOAPBindingData;
 import org.switchyard.component.soap.composer.SOAPContextMapper;
@@ -125,10 +131,56 @@ public class SOAPContextMapperTest {
         Assert.assertEquals("<last xmlns=\"urn:names:1.0\">Doe</last>", getPropertyValue(targetContext, LAST_NAME));
         // test mapTo
         Context sourceContext = newSourceContext();
+        sourceContext.setProperty("bar", "bar", Scope.EXCHANGE);
+        sourceContext.setProperty("foo", "foo", Scope.MESSAGE);
         SOAPMessage targetMessage = newTargetMessage();
-        mapper.mapTo(sourceContext, new SOAPBindingData(targetMessage));
+        SOAPBindingData target = new SOAPBindingData(targetMessage);
+        mapper.mapTo(sourceContext, target);
         Assert.assertEquals("John", getChildElement(targetMessage, FIRST_NAME).getTextContent());
         Assert.assertEquals("Doe", getChildElement(targetMessage, LAST_NAME).getTextContent());
+
+        Assert.assertTrue(target.getHttpHeaders().containsKey("foo"));
+        List<String> value = (List<String>) target.getHttpHeaders().get("foo");
+        Assert.assertTrue(value.get(0).equals("foo"));
+
+        Assert.assertFalse(target.getHttpHeaders().containsKey("bar"));
+    }
+
+    // SWITCHYARD-2969
+    @Test
+    public void testHTTPHeaderMessageScopeMapping() throws Exception {
+        // Test that HTTP headers are added to message scope but not to exchange scope
+        SOAPContextMapper mapper = new SOAPContextMapper();
+        mapper.setSOAPHeadersType(SOAPHeadersType.XML);
+        // test mapFrom
+        SOAPMessage sourceMessage = newSourceMessage();
+        Context targetContext = newContext();
+
+        SOAPBindingData data = new SOAPBindingData(sourceMessage);
+        Map<String, List<String>> httpHeaders = new HashMap<String, List<String>>();
+        ArrayList<String> values = new ArrayList<String>();
+        values.add("foo");
+        httpHeaders.put("bar", values);
+        data.setHttpHeaders(httpHeaders);
+        mapper.mapFrom(data, targetContext);
+
+        Set<Property> msgProperties = targetContext.getProperties(Scope.MESSAGE);
+        boolean found = false;
+        for (Property msg : msgProperties) {
+            if (msg.getName().equals("bar")) {
+                found = true;
+            }
+        }
+        Assert.assertTrue(found);
+
+        Set<Property> exchProperties = targetContext.getProperties(Scope.EXCHANGE);
+        found = false;
+        for (Property msg : exchProperties) {
+            if (msg.getName().equals("bar")) {
+                found = true;
+            }
+        }
+        Assert.assertFalse(found);
     }
 
     @Test

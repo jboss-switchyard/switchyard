@@ -47,7 +47,7 @@ public class BaseRegexContextMapper<D extends BindingData> extends BaseContextMa
     // RTGOV Resubmission ID / property propagation
     private boolean _prefixPropagationSet = false;
     private static final String SERVICE_REFERENCE_PROPERTY = "org.switchyard.bus.camel.consumer";
-    private final List<Pattern> _includeRegexes = new ArrayList<Pattern>();
+    private List<Pattern> _includeRegexes = null;
 
     private void setPatternList(String regexs, List<Pattern> patternList) {
         Set<String> regexSet = Strings.uniqueSplitTrimToNull(regexs, ",");
@@ -175,21 +175,26 @@ public class BaseRegexContextMapper<D extends BindingData> extends BaseContextMa
      * @param context context
      */
     protected void setRegexPropagationList(Context context) {
-        _includeRegexes.clear();
+        // ENTESB-6525: Ensure thread safe access to this list
+        if(_includeRegexes!=null) {
+           return;
+        } else {
+           _includeRegexes = new ArrayList<Pattern>();
 
-        if (!_prefixPropagationSet) {
-            if (context.getProperty(SERVICE_REFERENCE_PROPERTY) != null) {
-                ServiceDomain domain = ((ServiceReference)context.getProperty(SERVICE_REFERENCE_PROPERTY).getValue()).getDomain();
+           if (!_prefixPropagationSet) {
+               if (context.getProperty(SERVICE_REFERENCE_PROPERTY) != null) {
+                   ServiceDomain domain = ((ServiceReference)context.getProperty(SERVICE_REFERENCE_PROPERTY).getValue()).getDomain();
 
-                if (domain.getProperty(PropertyConstants.DOMAIN_PROPERTY_PROPAGATE_REGEX) != null) {
-                    String regexList = (String) domain.getProperty(PropertyConstants.DOMAIN_PROPERTY_PROPAGATE_REGEX);
-                    setPatternList(regexList, _includeRegexes);
-                }
-            }
-            _prefixPropagationSet = true;
-        }
-        Pattern rtGovResubmissionPattern = Pattern.compile(PropertyConstants.RTGOV_HEADER_RESUBMITTED_ID_PATTERN);
-        _includeRegexes.add(rtGovResubmissionPattern);
+                   if (domain.getProperty(PropertyConstants.DOMAIN_PROPERTY_PROPAGATE_REGEX) != null) {
+                       String regexList = (String) domain.getProperty(PropertyConstants.DOMAIN_PROPERTY_PROPAGATE_REGEX);
+                       setPatternList(regexList, _includeRegexes);
+                   }
+               }
+               _prefixPropagationSet = true;
+           }
+           Pattern rtGovResubmissionPattern = Pattern.compile(PropertyConstants.RTGOV_HEADER_RESUBMITTED_ID_PATTERN);
+           _includeRegexes.add(rtGovResubmissionPattern);
+       }
     }
     
     protected List<Pattern> getIncludeRegexes() {

@@ -108,7 +108,18 @@ public class CamelMessage extends SwitchYardMessage implements Message {
                     + "', class=" + transformer.getClass()
                     + "'] to the body '" + body + "'");
         }
-        Object transformedContent = transformer.transform(body);
+
+        Object transformedContent = null;
+        if (Message.class.isAssignableFrom(transformer.getFromType())) {
+            // A returned object just indicates that the transformation took place.
+            transformer.transform(this);
+            transformedContent = getBody();
+        } else {
+            // A returned object indicates that the transformation took place and is
+            // used as the new Message payload.
+            transformedContent = transformer.transform(body);
+        }
+
         if (transformedContent == null) {
             throw BusMessages.MESSAGES.transformerReturnedNull(body.getClass().getName(), type.getName(), transformer.getClass().getName());
         }

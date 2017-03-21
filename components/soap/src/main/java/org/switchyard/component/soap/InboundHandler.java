@@ -480,9 +480,8 @@ public class InboundHandler extends BaseServiceHandler {
     }
 
     private SOAPMessage handleException(SOAPMessage soapRequest, Boolean oneWay, SOAPException se) {
-        if (oneWay) {
-            LOGGER.error(se);
-        } else {
+        LOGGER.error(se);
+        if (!oneWay) {
             try {
                 return SOAPUtil.generateFault(se, _bindingId, soapRequest);
             } catch (SOAPException e) {

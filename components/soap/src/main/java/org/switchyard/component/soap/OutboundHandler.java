@@ -262,7 +262,6 @@ public class OutboundHandler extends BaseServiceHandler {
                     }
                 }
             } catch (Exception e) {
-                LOGGER.error(e);
                 throw e instanceof SOAPException ? (SOAPException)e : new SOAPException(e);
             }
             if (LOGGER.isTraceEnabled()) {
@@ -307,6 +306,7 @@ public class OutboundHandler extends BaseServiceHandler {
             }
 
         } catch (SOAPException se) {
+            LOGGER.error(se);
             throw SOAPMessages.MESSAGES.unexpectedExceptionHandlingSOAPMessage(se);
         }
     }

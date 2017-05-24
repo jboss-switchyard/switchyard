@@ -28,6 +28,7 @@ import org.switchyard.component.common.Endpoint;
 import org.switchyard.component.common.SynchronousInOutHandler;
 import org.switchyard.component.common.composer.MessageComposer;
 import org.switchyard.component.common.selector.OperationSelectorFactory;
+import org.switchyard.component.http.ContentType;
 import org.switchyard.component.http.composer.HttpBindingData;
 import org.switchyard.component.http.composer.HttpComposition;
 import org.switchyard.component.http.composer.HttpRequestBindingData;
@@ -115,6 +116,11 @@ public class InboundHandler extends BaseServiceHandler {
                 exchange.getContext().setProperty(
                         org.apache.camel.Exchange.CHARSET_NAME,
                         input.getRequestInfo().getCharacterEncoding(),
+                        Scope.EXCHANGE);
+            } else if (input.getContentType().getCharset() != null) {
+                exchange.getContext().setProperty(
+                        org.apache.camel.Exchange.CHARSET_NAME,
+                        input.getContentType().getCharset(),
                         Scope.EXCHANGE);
             }
 
